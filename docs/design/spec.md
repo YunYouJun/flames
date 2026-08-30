@@ -18,10 +18,12 @@
 ## 架构约束
 
 - 共享 GLSL 噪声、火焰梯度、指针输入和画质策略。
-- 完整目录预计使用 8–10 个 kernel、23 个 preset 与少量 special pass。
-- 同时驻留的 Three.js program 目标为 12–16 个以内。
+- 完整目录固定为 9 个视觉家族、22 个基础异火 preset；帝炎作为第 1 席终局视觉单独开启。
+- 同时驻留的 Three.js program 硬上限为 16 个，单席活跃 program 不超过 4 个。
 - 不为每种异火生产循环视频、动图或静态海报。
 - WebGL 不可用时提供可读的 CSS/SSR 火焰状态。
+
+完整席位、来源分层、视觉状态与视觉 brief 以 Web 应用的 flame manifest 为唯一元数据来源。Nuxt Content 只承载可选长文，Markdown frontmatter 仅保存 `flameId` 外键，不重复名称、名次或 slug。
 
 ## MVP 验证对象
 
