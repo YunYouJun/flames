@@ -1,56 +1,7 @@
-# What is starter-monorepo?
+# What is Flames?
 
-starter-monorepo is a modern TypeScript monorepo starter template designed for building and managing multiple packages efficiently.
+Flames is a small, framework-agnostic Three.js runtime for procedural flame experiences. A preset selects one of a limited set of shader kernels and supplies palette, movement, turbulence, scale, and intensity parameters.
 
-## Features
+It powers the companion “异火榜” web experience, but the engine itself has no dependency on Vue or Nuxt.
 
-### 📦 Monorepo Management
-
-Built on pnpm workspaces, allowing you to manage multiple packages in a single repository with shared dependencies.
-
-### 🚀 Fast Development
-
-- **tsdown** - Rolldown-powered build tool for TypeScript libraries
-- **Vite** - Next-generation frontend tooling
-- **Hot Module Replacement** - Instant feedback during development
-
-### 📝 TypeScript First
-
-Full TypeScript support with:
-- Strict type checking
-- Type generation
-- IntelliSense support
-
-### ✅ Testing & Quality
-
-- **Vitest** - Fast unit testing framework
-- **ESLint** - Code linting with @antfu/eslint-config
-- **Git Hooks** - Pre-commit checks with simple-git-hooks
-
-### 📚 Documentation
-
-- **VitePress** - Modern static site generator
-- **TypeDoc** - Automatic API documentation from source code
-- **Live Preview** - Real-time documentation development
-
-## Use Cases
-
-- Building component libraries
-- Creating utility packages
-- Developing design systems
-- Managing shared configurations
-
-## Why Monorepo?
-
-Monorepo architecture offers several advantages:
-
-1. **Code Sharing** - Easy to share code between packages
-2. **Atomic Changes** - Change multiple packages in a single commit
-3. **Unified Tooling** - Single configuration for all packages
-4. **Better Dependency Management** - Avoid version conflicts
-
-## Next Steps
-
-- [Getting Started](/guide/getting-started) - Set up your first project
-- [Configuration](/guide/configuration) - Customize your setup
-- [API Reference](/api/) - Explore the API documentation
+The project deliberately avoids one complete shader per catalog entry. Shared kernels keep GPU program count bounded while optional special passes can preserve the identity of exceptional flames.

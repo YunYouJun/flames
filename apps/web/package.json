@@ -1,0 +1,25 @@
+{
+  "name": "@yunyoujun/flames-web",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxt/content": "catalog:",
+    "@yunyoujun/flame-engine": "workspace:*",
+    "better-sqlite3": "catalog:",
+    "nuxt": "catalog:",
+    "three": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

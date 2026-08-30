@@ -1,80 +1,53 @@
-# starter-monorepo
+# Flames · 异火榜
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![bundle][bundle-src]][bundle-href]
-[![JSDocs][jsdocs-src]][jsdocs-href]
-[![License][license-src]][license-href]
+基于《斗破苍穹》原著设定的非官方实时视觉演绎。
 
-TypeScript Monorepo Starter with VitePress Documentation
+项目以 Three.js 与程序化 Shader 重构异火的形、色与气息。当前 MVP 收录：
 
-## 📚 Documentation
+- 第二位：虚无吞炎
+- 第三位：净莲妖火
+- 第十一位：骨灵冷火
 
-Online documentation: https://starter-monorepo.pages.dev/
+每种异火都支持指针移动、长按与拖拽三类实时交互，并拥有不同的反馈方式。
 
-## ✨ Features
+> 本项目为非官方、非商业的视觉实验，不隶属于原著作者、出版方、动画或游戏版权方。设定摘要均为重新概括，原作内容与相关商标归各自权利人所有。
 
-- 📦 Monorepo architecture with pnpm workspaces
-- 🚀 Rolldown-powered library builds with tsdown
-- 📝 Full TypeScript support
-- ✅ Vitest testing framework
-- 📚 Auto-generated API docs (TypeDoc + VitePress)
-- 🔧 ESLint + Git hooks for code quality
-- 🎨 Modern documentation site
+## 开发
 
-## 📦 Installation
+需要 Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` 与 pnpm `11.21.0`。
 
 ```bash
-pnpm add pkg-placeholder
+pnpm install
+pnpm dev
 ```
 
-## 🚀 Quick Start
+常用命令：
 
-```typescript
-import { one, two } from 'pkg-placeholder'
-
-console.log(one, two) // 1 2
+```bash
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm generate
 ```
 
-## 📖 More
+## 仓库结构
 
-For detailed documentation, visit: https://starter-monorepo.pages.dev
+```text
+apps/web/                 Nuxt 4 展示站
+packages/flame-engine/    框架无关的 Three.js 火焰运行时
+examples/basic/           原生 DOM 接入示例
+playground/               Shader 参数试验场
+docs/                     VitePress 文档与设计规范
+```
 
-## Optional Nuxt App
+## 路线
 
-This template stays focused on TypeScript libraries and does not bundle an application by default. If you need a deployable SSR or full-stack application, you can add one under the preconfigured `apps/*` workspace using [Vitesse for Nuxt](https://github.com/antfu/vitesse-nuxt) as a reference:
+MVP 先验证三类视觉 kernel 与交互语言。最终目标是完成异火榜 22 种基础异火，以及作为终局状态呈现的帝炎。各异火将复用共享 GLSL 模块与有限数量的 kernel，而不是维护 23 套彼此割裂的着色器。
 
-See the `apps/web` integration guide in
-[English](./apps/web/README.md) or
-[简体中文](./apps/web/README.zh-CN.md) for the recommended Nuxt 4 structure,
-dependency catalog setup, and the repository-level files that should not be
-copied from the standalone template.
+## 部署
 
-## Modify
-
-- [ ] replace `pkg-placeholder` `starter-monorepo` in repo
-
-## [Sponsors](https://www.yunyoujun.cn/sponsors/)
-
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/YunYouJun/sponsors/public/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/YunYouJun/sponsors/public/sponsors.svg' alt='Sponsors'/>
-  </a>
-</p>
+仓库内的 `edgeone.json` 已将 EdgeOne Pages 构建命令设为 `pnpm generate`，静态输出目录为 `apps/web/.output/public`。当前阶段仅准备部署配置，不会自动创建远程项目或发布站点。
 
 ## License
 
-[MIT](./LICENSE) License © [YunYouJun](https://github.com/YunYouJun)
-
-<!-- Badges -->
-
-[npm-version-src]: https://img.shields.io/npm/v/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669
-[npm-version-href]: https://npmjs.com/package/pkg-placeholder
-[npm-downloads-src]: https://img.shields.io/npm/dm/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669
-[npm-downloads-href]: https://npmjs.com/package/pkg-placeholder
-[bundle-src]: https://img.shields.io/bundlephobia/minzip/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669&label=minzip
-[bundle-href]: https://bundlephobia.com/result?p=pkg-placeholder
-[license-src]: https://img.shields.io/github/license/YunYouJun/pkg-placeholder.svg?style=flat&colorA=080f12&colorB=1fa669
-[license-href]: https://github.com/YunYouJun/pkg-placeholder/blob/main/LICENSE
-[jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
-[jsdocs-href]: https://www.jsdocs.io/package/pkg-placeholder
+[MIT](./LICENSE) © YunYouJun。小说设定与名称不包含在代码许可证授权范围内，详见 [NOTICE](./NOTICE)。

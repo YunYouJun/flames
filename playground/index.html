@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flames Playground</title>
+  </head>
+  <body>
+    <canvas></canvas>
+    <form>
+      <h1>Flame Lab</h1>
+      <label>Kernel
+        <select name="kernel">
+          <option value="lotus">Lotus</option>
+          <option value="void">Void</option>
+          <option value="cold">Cold</option>
+        </select>
+      </label>
+      <label>Speed <input name="speed" type="range" min="0.2" max="1.8" step="0.01" value="0.86"></label>
+      <label>Scale <input name="scale" type="range" min="0.5" max="1.4" step="0.01" value="0.98"></label>
+      <label>Turbulence <input name="turbulence" type="range" min="0.2" max="1.8" step="0.01" value="0.88"></label>
+      <label>Intensity <input name="intensity" type="range" min="0.4" max="2" step="0.01" value="1.42"></label>
+    </form>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,8 +1,8 @@
 ---
-title: Nuxt Web 应用
-description: 参考 Vitesse Nuxt，在 Monorepo 中添加 Nuxt 4 应用。
+title: Nuxt 展示端
+description: 异火榜实时视觉体验的页面状态、路由与部署边界。
 ---
 
-# Nuxt Web 应用
+# Nuxt 展示端
 
 <!--@include: ../../../apps/web/README.zh-CN.md#docs-->

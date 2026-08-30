@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "pkg-placeholder": ["./packages/pkg-placeholder/src/index.ts"]
+      "@yunyoujun/flame-engine": ["./packages/flame-engine/src/index.ts"]
     },
     "resolveJsonModule": true,
     "strict": true,

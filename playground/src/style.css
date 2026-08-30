@@ -1,0 +1,51 @@
+:root {
+  color: #e8e0d0;
+  background: #030608;
+  font-family: ui-monospace, monospace;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, #14252a, #030608 60%);
+  touch-action: none;
+}
+
+form {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  display: grid;
+  width: 15rem;
+  gap: 1rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(232, 224, 208, 0.18);
+  background: rgba(3, 6, 8, 0.84);
+  backdrop-filter: blur(0.8rem);
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  color: #a88a55;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: rgba(232, 224, 208, 0.7);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+input,
+select {
+  width: 100%;
+}

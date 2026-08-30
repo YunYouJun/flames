@@ -11,3 +11,12 @@ node_modules
 temp
 cache
 .eslintcache
+.nuxt
+.output
+.data
+.env
+.env.*
+!.env.example
+test-results
+playwright-report
+/artifacts/qa

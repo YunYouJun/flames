@@ -6,6 +6,7 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
 allowBuilds:
+  better-sqlite3: true
   esbuild: true
   simple-git-hooks: true
 
@@ -22,18 +23,24 @@ catalog:
   '@antfu/ni': ^30.5.0
   '@antfu/utils': ^9.3.0
   '@iconify-json/svg-spinners': ^1.2.4
+  '@nuxt/content': ^3.16.0
+  '@playwright/test': ^1.55.0
   '@shikijs/vitepress-twoslash': ^4.4.3
   '@types/node': ^26.2.0
+  '@types/three': ^0.185.0
   '@unocss/reset': ^66.7.5
   '@vueuse/core': ^14.4.0
   '@yunyoujun/docs': ^0.1.14
+  better-sqlite3: ^12.11.1
   bumpp: ^12.2.0
   eslint: ^10.8.1
   floating-vue: ^5.2.2
   lint-staged: ^17.3.0
+  nuxt: ^4.5.2
   pinia: ^4.0.2
   publint: ^0.3.23
   simple-git-hooks: ^2.13.1
+  three: ^0.185.1
   tsdown: ^0.22.14
   tsx: ^4.23.12
   typedoc: ^0.28.20
@@ -48,3 +55,4 @@ catalog:
   vitepress-plugin-group-icons: ^1.7.6
   vitest: ^4.1.10
   vue: ^3.5.41
+  vue-tsc: ^3.3.11

@@ -2,10 +2,11 @@
 
 ## Project Overview
 
-TypeScript Monorepo Starter Template (`starter-monorepo`) by YunYouJun.
+Flames (`YunYouJun/flames`) is an unofficial, non-commercial real-time visual interpretation of the fictional 异火榜.
 
-- **Purpose**: Reusable monorepo template for building TypeScript libraries
+- **Purpose**: Procedural Three.js flame engine and Nuxt visual experience
 - **Architecture**: pnpm workspaces with catalog dependencies
+- **Web**: Nuxt 4 static generation + Nuxt Content
 - **Docs**: VitePress + TypeDoc auto-generated API docs
 - **Build**: tsdown
 - **Test**: vitest
@@ -15,8 +16,10 @@ TypeScript Monorepo Starter Template (`starter-monorepo`) by YunYouJun.
 
 ```bash
 pnpm build          # Build all packages
-pnpm dev            # Dev mode (tsdown --watch)
+pnpm dev            # Start the Nuxt experience
+pnpm generate       # Generate the static EdgeOne artifact
 pnpm test           # Run tests
+pnpm e2e            # Run desktop and mobile browser tests
 pnpm lint           # Lint (eslint --cache)
 pnpm typecheck      # Type check (tsc --noEmit)
 pnpm docs:dev       # Dev documentation site
@@ -37,10 +40,11 @@ pnpm release        # bumpp -r && publish
 1. Create `packages/<name>/` with: `src/index.ts`, `test/index.test.ts`, `tsdown.config.ts`, `package.json`
 2. Update `tsconfig.json` paths
 3. Update `typedoc.json` entryPoints
-4. Package exports should use `".": "./dist/index.mjs"` plus `"types": "./dist/index.d.mts"`
+4. Use tsdown `exports.devExports` so workspaces resolve source while publish exports resolve `dist`
 
 ## Code Style
 
 - Follows @antfu/eslint-config defaults (no prettier, no semicolons, single quotes)
 - Type-first: prefer explicit types on exports
 - JSDoc comments on public APIs (TypeDoc will generate docs from them)
+- Do not add official novel, animation, or game assets; setting copy must be independently paraphrased

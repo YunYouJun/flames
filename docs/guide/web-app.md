@@ -1,8 +1,17 @@
----
-title: Nuxt Web Application
-description: Add a Nuxt 4 application to the monorepo using Vitesse Nuxt as a reference.
----
+# Nuxt Web Experience
 
-# Nuxt Web Application
+The Nuxt application lives in `apps/web`. It owns routing, copy, local progress, responsive layout, and accessibility controls. The `.client.vue` stage component is intentionally thin: it translates Vue props and pointer events into the framework-agnostic engine API.
 
-<!--@include: ../../apps/web/README.md#docs-->
+Run it from the repository root:
+
+```bash
+pnpm dev
+```
+
+Generate the static EdgeOne Pages artifact with:
+
+```bash
+pnpm generate
+```
+
+The resulting site is located at `apps/web/.output/public`.

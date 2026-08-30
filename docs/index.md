@@ -2,57 +2,33 @@
 layout: home
 
 hero:
-  name: "starter-monorepo"
-  text: "Monorepo Starter Template"
-  tagline: TypeScript Monorepo Starter with VitePress Documentation
-  image:
-    src: /hero.png
-    alt: Connected package cubes representing a monorepo workspace
+  name: "Flames"
+  text: "Procedural flame runtime"
+  tagline: Framework-agnostic Three.js kernels for real-time fictional flame experiences.
   actions:
     - theme: brand
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/YunYouJun/starter-monorepo
+      text: Chinese Guide
+      link: /zh/
 
 features:
-  - icon: 📦
-    title: Monorepo Architecture
-    details: pnpm workspace for efficient package management
-  - icon: 🚀
-    title: Fast Build
-    details: Powered by tsdown and Rolldown for rapid development
-  - icon: 📝
-    title: TypeScript
-    details: Full TypeScript support with type safety
-  - icon: ✅
-    title: Testing
-    details: Built-in Vitest for unit testing
-  - icon: 📚
-    title: Auto Documentation
-    details: API docs generated via TypeDoc + VitePress
-  - icon: 🔧
-    title: Developer Experience
-    details: ESLint, Git hooks, and modern tooling
+  - icon: ◉
+    title: Real-time
+    details: Procedural WebGL rendering without pre-rendered loop assets.
+  - icon: ◇
+    title: Preset driven
+    details: Shared shader kernels keep each flame expressive and maintainable.
+  - icon: ↯
+    title: Interactive
+    details: Pointer, hold, and drag input are first-class runtime controls.
 ---
 
-## Quick Start
-
-[![npm version](https://img.shields.io/npm/v/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669)](https://npmjs.com/package/pkg-placeholder)
-
-[![npm downloads](https://img.shields.io/npm/dm/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669)](https://npmjs.com/package/pkg-placeholder)
-
-[![bundle](https://img.shields.io/bundlephobia/minzip/pkg-placeholder?style=flat&colorA=080f12&colorB=1fa669&label=minzip)](https://bundlephobia.com/result?p=pkg-placeholder)
-
-[![License](https://img.shields.io/github/license/YunYouJun/starter-monorepo.svg?style=flat&colorA=080f12&colorB=1fa669)](https://github.com/YunYouJun/starter-monorepo/blob/main/LICENSE)
+## Install
 
 ```bash
-pnpm add pkg-placeholder
+pnpm add @yunyoujun/flame-engine three
 ```
 
-```typescript
-import { one, two } from 'pkg-placeholder'
-
-console.log(one, two) // 1 2
-```
+The package is private while the full visual catalog is being developed.
