@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "nr -r build",
+    "budget:web": "node scripts/check-web-budgets.mjs",
     "dev": "pnpm --filter @yunyoujun/flames-web dev",
     "dev:all": "nr -r dev",
     "generate": "pnpm --filter @yunyoujun/flame-engine build && pnpm --filter @yunyoujun/flames-web generate",

@@ -5,22 +5,64 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 })
 
-test('switches between the three MVP flames', async ({ page }) => {
+test('navigates between approved flames from the short roster', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '净莲妖火' })).toBeVisible()
 
-  await page.getByRole('button', { name: /02.*虚无吞炎/ }).click()
+  await page.getByRole('link', { name: /02.*虚无吞炎/ }).click()
   await expect(page).toHaveURL(/\/flames\/nihility$/)
   await expect(page.getByRole('heading', { name: '虚无吞炎' })).toBeVisible()
 
-  await page.getByRole('button', { name: /11.*骨灵冷火/ }).click()
+  await page.getByRole('button', { name: '展开全榜' }).click()
+  const roster = page.getByRole('dialog', { name: '廿三席' })
+  await expect(roster).toBeVisible()
+  await expect(roster.getByRole('link')).toHaveCount(23)
+  await expect(roster).toContainText('基础已现世 3 / 22 · 帝炎未启')
+
+  await roster.getByRole('link', { name: /11.*骨灵冷火/ }).click()
   await expect(page).toHaveURL(/\/flames\/bone-chilling$/)
   await expect(page.getByRole('heading', { name: '骨灵冷火' })).toBeVisible()
 })
 
-test('opens the independently written setting summary', async ({ page }) => {
+test('renders reserved seats without initializing WebGL', async ({ page }) => {
+  await page.goto('/flames/golden-emperor')
+
+  await expect(page.getByRole('heading', { name: '金帝焚天炎' })).toBeVisible()
+  await expect(page.getByRole('paragraph').filter({ hasText: '尚未凝聚' })).toBeVisible()
+  await expect(page.locator('canvas')).toHaveCount(0)
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  await expect(page.getByText('基础异火已现世 3 / 22')).toBeVisible()
+  await expect(page.getByText('帝炎未启')).toBeVisible()
+})
+
+test('opens the independently written setting summary and source tier', async ({ page }) => {
   await page.getByRole('button', { name: /阅览设定/ }).click()
-  await expect(page.getByRole('dialog')).toContainText('视觉演绎')
-  await expect(page.getByRole('dialog')).toContainText('不替代原作')
+  const details = page.getByRole('dialog', { name: '净莲妖火' })
+
+  await expect(details).toContainText('视觉演绎')
+  await expect(details).toContainText('原著明确')
+  await expect(details).toContainText('不替代原作')
+})
+
+test('labels extension-only identities and derived alternatives', async ({ page }) => {
+  await page.goto('/flames/wind-fury-dragon')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+  await page.getByRole('button', { name: /阅览设定/ }).click()
+  const details = page.getByRole('dialog', { name: '风怒龙炎' })
+
+  await expect(details).toContainText('授权扩展')
+  await expect(details).toContainText('衍生版本')
+  await expect(details).toContainText('风雷怒焱')
+})
+
+test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
+  const response = await page.goto('/flames/not-a-flame')
+
+  expect(response?.status()).toBe(404)
+  await expect(page.getByRole('heading', { name: '此席未录' })).toBeVisible()
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  await page.getByRole('button', { name: /返回廿三席/ }).click()
+  await expect(page).toHaveURL('/')
+  await expect(page.getByRole('heading', { name: '净莲妖火' })).toBeVisible()
 })
 
 test('initializes WebGL or presents an explicit fallback', async ({ page }) => {
@@ -40,5 +82,30 @@ test('initializes WebGL or presents an explicit fallback', async ({ page }) => {
   }
   else {
     await expect(page.getByText('当前环境未启用 WebGL')).toBeVisible()
+  }
+})
+
+test('keeps approved kernels inside the foundation renderer budgets', async ({ page }) => {
+  const representatives = [
+    '/',
+    '/flames/nihility',
+    '/flames/bone-chilling',
+  ]
+
+  for (const path of representatives) {
+    await page.goto(`${path}?benchmark=1&quality=balanced`)
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+
+    const diagnostics = await canvas.evaluate((element) => {
+      const { programs, calls } = (element as HTMLCanvasElement).dataset
+      return {
+        programs: Number(programs),
+        calls: Number(calls),
+      }
+    })
+
+    expect(diagnostics.programs).toBeLessThanOrEqual(16)
+    expect(diagnostics.calls).toBeLessThanOrEqual(24)
   }
 })
