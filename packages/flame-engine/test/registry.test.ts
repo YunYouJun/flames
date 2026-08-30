@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics } from '../src/types'
+import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -32,5 +32,6 @@ describe('kernel registry', () => {
       geometries: number
       textures: number
     }>()
+    expectTypeOf<FlameRuntimeOptions['benchmarkTime']>().toEqualTypeOf<number | undefined>()
   })
 })

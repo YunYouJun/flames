@@ -1,7 +1,5 @@
 ---
-title: 虚无吞炎
-rank: 2
-slug: nihility
+flameId: nihility
 ---
 
 ## 设定摘要

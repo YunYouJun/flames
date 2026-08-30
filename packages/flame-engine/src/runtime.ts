@@ -59,11 +59,13 @@ export class FlameRuntime {
   private paused: boolean
   private status: FlameRuntimeStatus = 'idle'
   private readonly onStatusChange?: (status: FlameRuntimeStatus) => void
+  private readonly benchmarkTime?: number
 
   constructor(options: FlameRuntimeOptions) {
     this.preset = validateFlamePreset(options.preset)
     this.quality = options.quality ?? 'balanced'
     this.paused = options.paused ?? false
+    this.benchmarkTime = options.benchmarkTime
     this.onStatusChange = options.onStatusChange
 
     this.renderer = new WebGLRenderer({
@@ -260,12 +262,13 @@ export class FlameRuntime {
     this.drag += (this.dragTarget - this.drag) * 0.08
 
     const material = this.mesh.material
-    this.uniform<number>(material, 'uTime').value += this.timer.getDelta()
+    const time = this.uniform<number>(material, 'uTime')
+    time.value = this.benchmarkTime ?? time.value + this.timer.getDelta()
     this.uniform<Vector2>(material, 'uPointer').value.copy(this.pointer)
     this.uniform<number>(material, 'uPressed').value = this.pressed
     this.uniform<number>(material, 'uDrag').value = this.drag
     this.sculptures[this.preset.kernel]?.update(
-      this.uniform<number>(material, 'uTime').value,
+      time.value,
       this.pointer,
       this.pressed,
       this.drag,

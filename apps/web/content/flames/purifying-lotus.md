@@ -1,7 +1,5 @@
 ---
-title: 净莲妖火
-rank: 3
-slug: purifying-lotus
+flameId: purifying-lotus
 ---
 
 ## 设定摘要

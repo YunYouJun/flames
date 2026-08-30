@@ -583,7 +583,7 @@ export function formatFlameRank(rank: number): string {
   return `第二十${digits[rank - 20]}`
 }
 
-function toFlameEntry(flame: FlameSeat): FlameEntry | undefined {
+export function getFlameEntry(flame: FlameSeat): FlameEntry | undefined {
   const preset = getFlamePreset(flame)
   if (!preset || (flame.visual.state !== 'prototype' && flame.visual.state !== 'approved'))
     return undefined
@@ -607,7 +607,7 @@ function toFlameEntry(flame: FlameSeat): FlameEntry | undefined {
 export const flameCatalog: FlameEntry[] = flameRoster.flatMap((flame) => {
   if (flame.visual.state !== 'approved')
     return []
-  const entry = toFlameEntry(flame)
+  const entry = getFlameEntry(flame)
   return entry ? [entry] : []
 })
 

@@ -44,6 +44,8 @@ export interface FlameRuntimeOptions {
   preset: FlamePreset
   quality?: FlameQuality
   paused?: boolean
+  /** Locks the animated uniforms to one repeatable frame for visual and performance checks. */
+  benchmarkTime?: number
   onStatusChange?: (status: FlameRuntimeStatus) => void
 }
 

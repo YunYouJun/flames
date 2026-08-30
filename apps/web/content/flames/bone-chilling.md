@@ -1,7 +1,5 @@
 ---
-title: 骨灵冷火
-rank: 11
-slug: bone-chilling
+flameId: bone-chilling
 ---
 
 ## 设定摘要

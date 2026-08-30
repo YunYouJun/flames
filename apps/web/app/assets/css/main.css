@@ -207,6 +207,13 @@ select:focus-visible {
   letter-spacing: 0.28em;
 }
 
+.identity-state {
+  margin: 0.8rem 0 0;
+  color: rgba(168, 138, 85, 0.7);
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+}
+
 .text-action {
   display: inline-flex;
   align-items: center;
@@ -366,6 +373,56 @@ select:focus-visible {
   letter-spacing: 0.1em;
 }
 
+.sealed-status {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--brass-dim);
+  color: rgba(168, 138, 85, 0.72);
+  font-family: var(--display);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+}
+
+.sealed-guide {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 0.9rem;
+  align-items: center;
+  justify-self: end;
+  width: 12.5rem;
+  color: var(--bone-dim);
+}
+
+.sealed-guide > span {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid var(--brass-dim);
+  color: var(--brass);
+  font-family: var(--display);
+}
+
+.sealed-guide p {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.sealed-guide strong {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+}
+
+.sealed-guide small {
+  color: rgba(232, 224, 208, 0.4);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+}
+
 .rank-dock {
   position: relative;
   z-index: 10;
@@ -377,78 +434,14 @@ select:focus-visible {
 }
 
 .progress-mark {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  justify-content: center;
   margin: 0 0 0.65rem;
   color: rgba(232, 224, 208, 0.35);
   font-size: 0.56rem;
   letter-spacing: 0.28em;
-}
-
-.flame-selector {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(9.5rem, 13rem));
-  gap: 0.6rem;
-  justify-content: center;
-}
-
-.flame-seat {
-  position: relative;
-  display: grid;
-  grid-template-columns: 2.9rem 1fr;
-  align-items: center;
-  min-height: 3.9rem;
-  padding: 0 1.1rem;
-  overflow: hidden;
-  border: 0;
-  border-top: 1px solid rgba(232, 224, 208, 0.16);
-  color: rgba(232, 224, 208, 0.46);
-  background: linear-gradient(115deg, rgba(25, 32, 34, 0.8), rgba(4, 7, 8, 0.76));
-  cursor: pointer;
-  transform: perspective(15rem) rotateX(4deg);
-  transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-
-.flame-seat::before {
-  position: absolute;
-  inset: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
-  content: '';
-}
-
-.flame-seat:hover,
-.flame-seat.is-active {
-  border-color: var(--brass);
-  color: var(--bone);
-  transform: perspective(15rem) rotateX(0deg) translateY(-0.2rem);
-}
-
-.flame-seat.is-active {
-  background: linear-gradient(115deg, rgba(40, 51, 53, 0.88), rgba(7, 12, 14, 0.88));
-  box-shadow: 0 1.2rem 2.8rem rgba(0, 0, 0, 0.45);
-}
-
-.seat-rank {
-  color: var(--brass);
-  font-family: var(--display);
-  font-size: 1rem;
-  letter-spacing: 0.08em;
-}
-
-.seat-name {
-  font-family: var(--display);
-  font-size: 0.82rem;
-  letter-spacing: 0.22em;
-  text-align: left;
-}
-
-.flame-seat i {
-  position: absolute;
-  right: 1rem;
-  bottom: 0.52rem;
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.28;
 }
 
 .details-backdrop {
@@ -528,6 +521,36 @@ select:focus-visible {
   border-top: 1px solid var(--line);
 }
 
+.source-list {
+  display: grid;
+  gap: 1.1rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.7rem;
+  align-items: baseline;
+}
+
+.source-list strong {
+  color: var(--brass);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.source-list small {
+  grid-column: 1 / -1;
+  color: rgba(232, 224, 208, 0.38);
+  font-family: var(--display);
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
 @media (max-width: 960px) {
   .site-header {
     min-height: 7rem;
@@ -591,33 +614,15 @@ select:focus-visible {
     display: none;
   }
 
+  .sealed-guide {
+    display: none;
+  }
+
   .rank-dock {
     margin: 0;
     padding: 0 1rem 1rem;
   }
 
-  .flame-selector {
-    grid-template-columns: repeat(3, minmax(6.5rem, 1fr));
-    width: 100%;
-  }
-
-  .flame-seat {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 0.18rem;
-    min-height: 4rem;
-    padding: 0.35rem 0.3rem;
-  }
-
-  .seat-name {
-    font-size: 0.68rem;
-    letter-spacing: 0.11em;
-    text-align: center;
-  }
-
-  .seat-rank {
-    font-size: 0.82rem;
-  }
 }
 
 @media (max-width: 520px) {
@@ -669,15 +674,6 @@ select:focus-visible {
 
   .rank-dock {
     padding: 0 0.65rem 0.7rem;
-  }
-
-  .flame-selector {
-    gap: 0.32rem;
-  }
-
-  .flame-seat {
-    min-width: 0;
-    min-height: 3.65rem;
   }
 
   .details-panel {

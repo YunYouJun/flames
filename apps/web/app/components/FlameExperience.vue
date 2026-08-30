@@ -1,28 +1,41 @@
 <script setup lang="ts">
 import type { FlameQuality, FlameRuntimeStatus } from '@yunyoujun/flame-engine'
-import { defaultFlame, flameCatalog, flameCatalogBySlug } from '~/data/flames'
+import type { FlameSeat } from '~/data/flames'
+import {
+  flameCatalog,
+  flameRoster,
+  getFlameEntry,
+} from '~/data/flames'
 
 const props = defineProps<{
-  initialSlug: string
+  flame: FlameSeat
 }>()
 
-const activeFlame = computed(() => flameCatalogBySlug.get(props.initialSlug) ?? defaultFlame)
+const route = useRoute()
 const paused = shallowRef(false)
 const muted = shallowRef(true)
 const quality = shallowRef<FlameQuality>('balanced')
 const runtimeStatus = shallowRef<FlameRuntimeStatus>('idle')
 const showDetails = shallowRef(false)
+const showRoster = shallowRef(false)
 const hydrated = shallowRef(false)
+
+const activeFlame = computed(() => {
+  const state = props.flame.visual.state
+  if (state === 'approved' || (state === 'prototype' && import.meta.dev))
+    return getFlameEntry(props.flame)
+  return undefined
+})
+const activeFamily = computed(() => props.flame.visual.plannedFamily)
+const completedBaseCount = computed(() => flameCatalog.filter(flame => flame.rank > 1).length)
+const benchmarkTime = computed(() => route.query.benchmark === '1' ? 4.25 : undefined)
+const benchmarkQuality = computed<FlameQuality>(() => {
+  const requested = route.query.quality
+  return requested === 'high' || requested === 'lite' ? requested : 'balanced'
+})
 
 const { markSeen, seenCount } = useFlameProgress()
 const sound = useAmbientSound()
-
-function selectFlame(slug: string) {
-  markSeen(slug)
-  if (slug === 'purifying-lotus')
-    return navigateTo('/')
-  return navigateTo(`/flames/${slug}`)
-}
 
 async function toggleSound() {
   muted.value = !muted.value
@@ -31,21 +44,33 @@ async function toggleSound() {
 
 onMounted(() => {
   hydrated.value = true
-  markSeen(activeFlame.value.slug)
+  if (activeFlame.value)
+    markSeen(activeFlame.value.slug)
+  if (benchmarkTime.value !== undefined) {
+    paused.value = false
+    quality.value = benchmarkQuality.value
+    return
+  }
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const coarsePointer = window.matchMedia('(pointer: coarse)').matches
   paused.value = reducedMotion
   quality.value = coarsePointer ? 'balanced' : 'high'
 })
 
-watch(() => activeFlame.value.slug, markSeen)
+watch(() => activeFlame.value?.slug, (slug) => {
+  if (slug)
+    markSeen(slug)
+})
 </script>
 
 <template>
   <main
     class="experience-shell"
     :data-hydrated="hydrated || undefined"
-    :data-kernel="activeFlame.kernel"
+    :data-kernel="activeFlame?.kernel"
+    :data-family="activeFamily"
+    :data-visual-state="flame.visual.state"
+    :data-benchmark="benchmarkTime !== undefined || undefined"
   >
     <div class="atmosphere" aria-hidden="true" />
 
@@ -56,6 +81,7 @@ watch(() => activeFlame.value.slug, markSeen)
       </NuxtLink>
 
       <ExperienceControls
+        v-if="activeFlame && benchmarkTime === undefined"
         :muted="muted"
         :paused="paused"
         :quality="quality"
@@ -63,20 +89,26 @@ watch(() => activeFlame.value.slug, markSeen)
         @toggle-sound="toggleSound"
         @update:quality="quality = $event"
       />
+      <span v-else-if="activeFlame" class="sealed-status">固定基准帧</span>
+      <span v-else class="sealed-status">封印席</span>
     </header>
 
     <section class="flame-composition" aria-live="polite">
-      <FlameIdentity :flame="activeFlame" @show-details="showDetails = true" />
+      <FlameIdentity :flame="flame" @show-details="showDetails = true" />
 
       <div class="stage-wrap">
         <FlameStage
+          v-if="activeFlame"
           :preset="activeFlame"
           :paused="paused"
           :quality="quality"
+          :benchmark-time="benchmarkTime"
           @status-change="runtimeStatus = $event"
           @interact="markSeen(activeFlame.slug)"
         />
-        <div v-if="runtimeStatus !== 'ready'" class="flame-fallback" aria-label="正在唤醒异火">
+        <SealedFlameStage v-else :flame="flame" />
+
+        <div v-if="activeFlame && runtimeStatus !== 'ready'" class="flame-fallback" aria-label="正在唤醒异火">
           <span />
         </div>
 
@@ -85,31 +117,48 @@ watch(() => activeFlame.value.slug, markSeen)
           <i class="altar-body" />
         </div>
 
-        <p v-if="runtimeStatus === 'context-lost'" class="runtime-notice">
+        <p v-if="activeFlame && runtimeStatus === 'context-lost'" class="runtime-notice">
           灵力波动中断，正在重新凝聚异火……
         </p>
-        <p v-else-if="runtimeStatus === 'error'" class="runtime-notice">
+        <p v-else-if="activeFlame && runtimeStatus === 'error'" class="runtime-notice">
           当前环境未启用 WebGL，已呈现轻量火焰意象
         </p>
       </div>
 
-      <InteractionGuide :kernel="activeFlame.kernel" />
+      <InteractionGuide v-if="activeFlame" :kernel="activeFlame.kernel" />
+      <aside v-else class="sealed-guide" aria-label="凝聚状态">
+        <span aria-hidden="true">封</span>
+        <p>
+          <strong>{{ flame.rank === 1 ? '终局未启' : '异火未现世' }}</strong>
+          <small>席位与设定已经锁定，实时视觉仍待正式验收。</small>
+        </p>
+      </aside>
     </section>
 
     <footer class="rank-dock">
       <p class="progress-mark">
-        已观测 {{ seenCount }} / {{ flameCatalog.length }}
+        <span>基础异火已现世 {{ completedBaseCount }} / 22</span>
+        <span>已观测 {{ seenCount }} / {{ flameCatalog.length }}</span>
+        <span>帝炎未启</span>
       </p>
-      <FlameSelector
-        :flames="flameCatalog"
-        :active-slug="activeFlame.slug"
-        @select="selectFlame"
+      <FlameRosterRail
+        :flames="flameRoster"
+        :active-slug="flame.slug"
+        @open-roster="showRoster = true"
       />
     </footer>
 
+    <FlameRosterGallery
+      v-if="showRoster"
+      :flames="flameRoster"
+      :active-slug="flame.slug"
+      :approved-count="flameCatalog.length"
+      @close="showRoster = false"
+    />
+
     <FlameDetails
       v-if="showDetails"
-      :flame="activeFlame"
+      :flame="flame"
       @close="showDetails = false"
     />
   </main>

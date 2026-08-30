@@ -3,6 +3,7 @@ import type {
   FlamePreset,
   FlameQuality,
   FlameRuntime,
+  FlameRuntimeDiagnostics,
   FlameRuntimeStatus,
 } from '@yunyoujun/flame-engine'
 
@@ -10,6 +11,7 @@ const props = defineProps<{
   preset: FlamePreset
   paused: boolean
   quality: FlameQuality
+  benchmarkTime?: number
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const canvas = useTemplateRef<HTMLCanvasElement>('flameCanvas')
+const diagnostics = shallowRef<FlameRuntimeDiagnostics>()
 let runtime: FlameRuntime | undefined
 let pointerOrigin: { x: number, y: number } | undefined
 
@@ -65,7 +68,7 @@ onMounted(async () => {
   }
 
   try {
-    const { FlameRuntime: Runtime } = await import('@yunyoujun/flame-engine')
+    const { FlameRuntime: Runtime, flameKernelIds } = await import('@yunyoujun/flame-engine')
     if (canvas.value !== mountedCanvas)
       return
 
@@ -74,9 +77,13 @@ onMounted(async () => {
       preset: props.preset,
       paused: props.paused,
       quality: props.quality,
+      benchmarkTime: props.benchmarkTime,
       onStatusChange: status => emit('statusChange', status),
     })
-    void runtime.warmup(['void', 'lotus', 'cold'])
+    await runtime.warmup(flameKernelIds)
+    requestAnimationFrame(() => {
+      diagnostics.value = runtime?.getDiagnostics()
+    })
   }
   catch (error) {
     console.error('Unable to initialize the flame runtime.', error)
@@ -96,6 +103,12 @@ onBeforeUnmount(() => runtime?.dispose())
     ref="flameCanvas"
     class="flame-canvas"
     aria-label="可交互的实时异火模拟"
+    :data-benchmark-ready="benchmarkTime !== undefined && diagnostics ? 'true' : undefined"
+    :data-programs="diagnostics?.programs"
+    :data-calls="diagnostics?.calls"
+    :data-triangles="diagnostics?.triangles"
+    :data-geometries="diagnostics?.geometries"
+    :data-textures="diagnostics?.textures"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"

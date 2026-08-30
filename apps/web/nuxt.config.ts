@@ -1,3 +1,7 @@
+import { flameRoster } from './app/data/flames'
+
+const flameRoutes = flameRoster.map(flame => `/flames/${flame.slug}`)
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-30',
   devtools: { enabled: false },
@@ -17,7 +21,7 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-        { rel: 'canonical', href: 'https://flames.yunyoujun.cn/' },
+        { key: 'canonical', rel: 'canonical', href: 'https://flames.yunyoujun.cn/' },
       ],
     },
   },
@@ -36,9 +40,7 @@ export default defineNuxtConfig({
     prerender: {
       routes: [
         '/',
-        '/flames/nihility',
-        '/flames/purifying-lotus',
-        '/flames/bone-chilling',
+        ...flameRoutes,
       ],
       crawlLinks: true,
     },
