@@ -27,7 +27,7 @@
 
 1. 虚无吞炎：黑心、吞噬边缘、拖拽涡流。
 2. 净莲妖火：乳白莲瓣、长按盛放、指针偏移。
-3. 骨灵冷火：冷白焰身、冰晶裂芒、霜环扩散。
+3. 骨灵冷火：紊乱冷白焰身、炽白焰心、霜环扩散。
 
 ## 参考概念图
 
@@ -35,3 +35,13 @@
 - [移动端](https://assets.yunyoujun.cn/published/flames/concept-mobile-14039802.webp)
 
 概念图仅作为构图与美术方向基准，生产页面的火焰必须由实时 Shader 生成。
+
+## Shader 参考
+
+- [Fires](https://www.shadertoy.com/view/XsXSWS)：参考二维火苗轮廓、焰心分层与多种火焰形态。
+- [Procedural fire with sparks](https://www.shadertoy.com/view/MlKSWm)：当前主要参考；学习以网格、伪随机数、生命周期和单元内旋转生成程序化火星，以及用噪声位移塑造上升气流。
+- [Combustible Voronoi Layers](https://www.shadertoy.com/view/4tlSzl)：参考 Voronoi 层叠的燃烧纹理与温度色板。
+- [Flame](https://www.shadertoy.com/view/MdX3zr)：参考三维噪声扰动 SDF、ray marching 与步进累积辉光。
+- [Bring the Heat](https://www.shadertoy.com/view/4sfBWj)：参考火焰生成、模糊和最终合成的多 Pass 管线。
+
+这些作品用于研究表现方法并指导独立实现。引入具体源码前，必须检查原作者在作品中声明的许可证与署名要求。

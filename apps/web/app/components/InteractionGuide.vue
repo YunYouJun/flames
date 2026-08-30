@@ -8,7 +8,7 @@ const props = defineProps<{
 const reactions: Record<FlameKernelId, [string, string, string]> = {
   void: ['焰身追随灵识', '吞噬核心显现', '虚空涡流收束'],
   lotus: ['焰心追随灵识', '莲瓣缓缓盛放', '妖火随势偏移'],
-  cold: ['冷焰追随灵识', '霜环向外凝结', '冰晶裂芒偏转'],
+  cold: ['冷焰追随灵识', '冷热边界外扩', '紊流焰舌回卷'],
 }
 
 function reactionAt(index: 0 | 1 | 2) {

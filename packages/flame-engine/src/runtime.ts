@@ -1,4 +1,5 @@
 import type { IUniform } from 'three'
+import type { FlameSculpture } from './objects/flame-sculpture'
 import type {
   FlameKernelId,
   FlamePointerInput,
@@ -10,7 +11,7 @@ import type {
 import {
   Color,
   Mesh,
-  OrthographicCamera,
+  PerspectiveCamera,
   PlaneGeometry,
   Scene,
   ShaderMaterial,
@@ -18,6 +19,8 @@ import {
   Vector2,
   WebGLRenderer,
 } from 'three'
+import { LotusBloom } from './objects/lotus-bloom'
+import { VoidVortex } from './objects/void-vortex'
 import { validateFlamePreset } from './preset'
 import { coldFragmentShader } from './shaders/cold'
 import { lotusFragmentShader } from './shaders/lotus'
@@ -36,14 +39,21 @@ const pixelRatioCaps: Record<FlameQuality, number> = {
   lite: 1,
 }
 
+const shaderQuality: Record<FlameQuality, number> = {
+  high: 1,
+  balanced: 0.55,
+  lite: 0,
+}
+
 export class FlameRuntime {
   readonly renderer: WebGLRenderer
   readonly scene = new Scene()
-  readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
+  readonly camera = new PerspectiveCamera(32, 1, 0.1, 20)
 
   private readonly timer = new Timer()
   private readonly geometry = new PlaneGeometry(2, 2)
   private readonly mesh: Mesh<PlaneGeometry, ShaderMaterial>
+  private readonly sculptures: Partial<Record<FlameKernelId, FlameSculpture>>
   private readonly materials = new Map<FlameKernelId, ShaderMaterial>()
   private readonly resizeObserver: ResizeObserver
   private readonly pointer = new Vector2()
@@ -74,8 +84,17 @@ export class FlameRuntime {
     })
     this.renderer.setClearColor(0x000000, 0)
     this.timer.connect(document)
+    this.camera.position.set(0, 0.68, 3.35)
+    this.camera.lookAt(0, -0.18, 0)
     this.mesh = new Mesh(this.geometry, this.materialFor(this.preset.kernel))
+    this.mesh.renderOrder = -10
     this.scene.add(this.mesh)
+    this.sculptures = {
+      lotus: new LotusBloom(this.preset.palette, this.quality),
+      void: new VoidVortex(this.preset.palette, this.quality),
+    }
+    for (const sculpture of Object.values(this.sculptures))
+      this.scene.add(sculpture.group)
 
     this.resizeObserver = new ResizeObserver(() => this.resize())
     this.resizeObserver.observe(options.canvas)
@@ -108,6 +127,10 @@ export class FlameRuntime {
 
   setQuality(quality: FlameQuality): void {
     this.quality = quality
+    for (const material of this.materials.values())
+      this.uniform<number>(material, 'uQuality').value = shaderQuality[quality]
+    for (const sculpture of Object.values(this.sculptures))
+      sculpture.setQuality(quality)
     this.resize()
   }
 
@@ -115,9 +138,11 @@ export class FlameRuntime {
     const currentMaterial = this.mesh.material
     for (const kernel of kernels) {
       this.mesh.material = this.materialFor(kernel)
+      this.setActiveSculpture(kernel)
       this.renderer.compile(this.scene, this.camera)
     }
     this.mesh.material = currentMaterial
+    this.setActiveSculpture(this.preset.kernel)
   }
 
   dispose(): void {
@@ -129,6 +154,8 @@ export class FlameRuntime {
     this.renderer.domElement.removeEventListener('webglcontextlost', this.handleContextLost)
     this.renderer.domElement.removeEventListener('webglcontextrestored', this.handleContextRestored)
     this.geometry.dispose()
+    for (const sculpture of Object.values(this.sculptures))
+      sculpture.dispose()
     for (const material of this.materials.values())
       material.dispose()
     this.materials.clear()
@@ -146,6 +173,8 @@ export class FlameRuntime {
   private readonly handleContextRestored = (): void => {
     for (const material of this.materials.values())
       material.needsUpdate = true
+    for (const sculpture of Object.values(this.sculptures))
+      sculpture.restore()
     this.setStatus('ready')
     this.start()
   }
@@ -171,6 +200,7 @@ export class FlameRuntime {
         uSpeed: { value: 1 },
         uTurbulence: { value: 1 },
         uIntensity: { value: 1 },
+        uQuality: { value: shaderQuality[this.quality] },
         uCore: { value: new Color(0xFFFFFF) },
         uInner: { value: new Color(0xFFFFFF) },
         uOuter: { value: new Color(0xFFFFFF) },
@@ -190,6 +220,8 @@ export class FlameRuntime {
     this.uniform<Color>(material, 'uCore').value.set(preset.palette.core)
     this.uniform<Color>(material, 'uInner').value.set(preset.palette.inner)
     this.uniform<Color>(material, 'uOuter').value.set(preset.palette.outer)
+    this.sculptures[preset.kernel]?.setAppearance(preset.palette, preset.speed, preset.intensity)
+    this.setActiveSculpture(preset.kernel)
   }
 
   private resize(): void {
@@ -199,6 +231,10 @@ export class FlameRuntime {
     const ratio = Math.min(window.devicePixelRatio || 1, pixelRatioCaps[this.quality])
     this.renderer.setPixelRatio(ratio)
     this.renderer.setSize(width, height, false)
+    this.camera.aspect = width / height
+    this.camera.updateProjectionMatrix()
+    for (const sculpture of Object.values(this.sculptures))
+      sculpture.setViewport(width / height)
 
     for (const material of this.materials.values())
       this.uniform<Vector2>(material, 'uResolution').value.set(width * ratio, height * ratio)
@@ -225,7 +261,18 @@ export class FlameRuntime {
     this.uniform<Vector2>(material, 'uPointer').value.copy(this.pointer)
     this.uniform<number>(material, 'uPressed').value = this.pressed
     this.uniform<number>(material, 'uDrag').value = this.drag
+    this.sculptures[this.preset.kernel]?.update(
+      this.uniform<number>(material, 'uTime').value,
+      this.pointer,
+      this.pressed,
+      this.drag,
+    )
     this.renderer.render(this.scene, this.camera)
+  }
+
+  private setActiveSculpture(kernel: FlameKernelId): void {
+    for (const [id, sculpture] of Object.entries(this.sculptures))
+      sculpture.setActive(id === kernel)
   }
 
   private uniform<T>(material: ShaderMaterial, name: string): IUniform<T> {

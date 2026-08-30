@@ -58,15 +58,19 @@ function onPointerLeave() {
 }
 
 onMounted(async () => {
-  if (!canvas.value) {
+  const mountedCanvas = canvas.value
+  if (!mountedCanvas) {
     emit('statusChange', 'error')
     return
   }
 
   try {
     const { FlameRuntime: Runtime } = await import('@yunyoujun/flame-engine')
+    if (canvas.value !== mountedCanvas)
+      return
+
     runtime = new Runtime({
-      canvas: canvas.value,
+      canvas: mountedCanvas,
       preset: props.preset,
       paused: props.paused,
       quality: props.quality,
