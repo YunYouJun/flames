@@ -31,7 +31,7 @@
 
 ## 参考概念图
 
-- [桌面端](https://yunyoujun-assets-prod-1325586649.cos.ap-shanghai.myqcloud.com/published/flames/concept-desktop-cede0c9e.webp)
-- [移动端](https://yunyoujun-assets-prod-1325586649.cos.ap-shanghai.myqcloud.com/published/flames/concept-mobile-14039802.webp)
+- [桌面端](https://assets.yunyoujun.cn/published/flames/concept-desktop-cede0c9e.webp)
+- [移动端](https://assets.yunyoujun.cn/published/flames/concept-mobile-14039802.webp)
 
 概念图仅作为构图与美术方向基准，生产页面的火焰必须由实时 Shader 生成。

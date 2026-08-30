@@ -13,7 +13,7 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:title', content: '异火榜 · 非官方实时视觉演绎' },
         { property: 'og:description', content: '以实时 Shader 重构异火的形、色与气息。' },
-        { property: 'og:image', content: 'https://yunyoujun-assets-prod-1325586649.cos.ap-shanghai.myqcloud.com/published/flames/og-default-a0d0c90e.jpg' },
+        { property: 'og:image', content: 'https://assets.yunyoujun.cn/published/flames/og-default-a0d0c90e.jpg' },
       ],
       link: [
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
