@@ -57,7 +57,7 @@ export const coldFragmentShader = /* glsl */ `
     float ringWarp = (fbmFast(ringPoint * 5.6 + vec2(-clock * 0.42, clock * 0.18)) - 0.5) * 0.055;
     float frostRadius = length(ringPoint) + ringWarp;
     float frostRing = exp(-abs(frostRadius - 0.18 - uPressed * 0.15) * 38.0) * uPressed;
-    frostRing *= 0.56 + fineTexture.x * 0.44;
+    frostRing *= 0.42 + fineTexture.x * 0.34;
 
     vec2 mistPoint = point - vec2(uPointer.x * 0.035, 0.0);
     mistPoint.x *= mix(1.0, 0.72, uPressed);
@@ -75,12 +75,12 @@ export const coldFragmentShader = /* glsl */ `
     float flicker = mix(0.86, flameFlicker(flowingPoint, clock), 0.68);
     float temperaturePulse = 0.5 + 0.5 * sin(clock * 1.52 - flowingPoint.y * 8.0 + textureField.x * 4.0);
     vec3 color = uOuter * (coldShell * (0.74 + temperaturePulse * 0.24) + aura * 0.95 + baseMist * 0.24);
-    color += uInner * (livingBody * 0.33 + filaments * 0.74 + frostRing * 0.98 + vaporRibbons * 0.24);
-    color += uCore * (hotCore * (1.08 + temperaturePulse * 0.32) + filaments * 0.28 + frostRing * 0.52 + motes * 1.46);
+    color += uInner * (livingBody * 0.33 + filaments * 0.74 + frostRing * 0.84 + vaporRibbons * 0.24);
+    color += uCore * (hotCore * (1.08 + temperaturePulse * 0.32) + filaments * 0.28 + frostRing * 0.42 + motes * 1.46);
     color *= uIntensity * flicker;
 
     float alpha = saturate(livingBody * (0.64 + textureField.z * 0.30) + hotCore * 0.30);
-    alpha += aura * 0.24 + filaments * 0.22 + frostRing * 0.46 + baseMist * 0.11 + vaporRibbons * 0.12 + motes * 0.88;
+    alpha += aura * 0.24 + filaments * 0.22 + frostRing * 0.38 + baseMist * 0.11 + vaporRibbons * 0.12 + motes * 0.88;
     alpha = saturate(alpha);
     if (alpha < 0.012) discard;
     gl_FragColor = vec4(color, alpha);
