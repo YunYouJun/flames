@@ -5,6 +5,7 @@ import type {
   FlamePointerInput,
   FlamePreset,
   FlameQuality,
+  FlameRuntimeDiagnostics,
   FlameRuntimeOptions,
   FlameRuntimeStatus,
 } from './types'
@@ -19,19 +20,9 @@ import {
   Vector2,
   WebGLRenderer,
 } from 'three'
-import { LotusBloom } from './objects/lotus-bloom'
-import { VoidVortex } from './objects/void-vortex'
+import { flameKernelIds, getFlameKernelDefinition } from './kernel-registry'
 import { validateFlamePreset } from './preset'
-import { coldFragmentShader } from './shaders/cold'
-import { lotusFragmentShader } from './shaders/lotus'
 import { vertexShader } from './shaders/shared'
-import { voidFragmentShader } from './shaders/void'
-
-const fragmentShaders: Record<FlameKernelId, string> = {
-  void: voidFragmentShader,
-  lotus: lotusFragmentShader,
-  cold: coldFragmentShader,
-}
 
 const pixelRatioCaps: Record<FlameQuality, number> = {
   high: 2,
@@ -89,10 +80,10 @@ export class FlameRuntime {
     this.mesh = new Mesh(this.geometry, this.materialFor(this.preset.kernel))
     this.mesh.renderOrder = -10
     this.scene.add(this.mesh)
-    this.sculptures = {
-      lotus: new LotusBloom(this.preset.palette, this.quality),
-      void: new VoidVortex(this.preset.palette, this.quality),
-    }
+    this.sculptures = Object.fromEntries(flameKernelIds.flatMap((kernel) => {
+      const sculpture = getFlameKernelDefinition(kernel).createSculpture?.(this.preset.palette, this.quality)
+      return sculpture ? [[kernel, sculpture]] : []
+    }))
     for (const sculpture of Object.values(this.sculptures))
       this.scene.add(sculpture.group)
 
@@ -134,7 +125,7 @@ export class FlameRuntime {
     this.resize()
   }
 
-  async warmup(kernels: FlameKernelId[]): Promise<void> {
+  async warmup(kernels: readonly FlameKernelId[] = flameKernelIds): Promise<void> {
     const currentMaterial = this.mesh.material
     for (const kernel of kernels) {
       this.mesh.material = this.materialFor(kernel)
@@ -143,6 +134,18 @@ export class FlameRuntime {
     }
     this.mesh.material = currentMaterial
     this.setActiveSculpture(this.preset.kernel)
+  }
+
+  getDiagnostics(): FlameRuntimeDiagnostics {
+    const info = this.renderer.info
+    return {
+      activeKernel: this.preset.kernel,
+      programs: info.programs?.length ?? 0,
+      calls: info.render.calls,
+      triangles: info.render.triangles,
+      geometries: info.memory.geometries,
+      textures: info.memory.textures,
+    }
   }
 
   dispose(): void {
@@ -186,7 +189,7 @@ export class FlameRuntime {
 
     const material = new ShaderMaterial({
       vertexShader,
-      fragmentShader: fragmentShaders[kernel],
+      fragmentShader: getFlameKernelDefinition(kernel).fragmentShader,
       transparent: true,
       depthWrite: false,
       depthTest: false,

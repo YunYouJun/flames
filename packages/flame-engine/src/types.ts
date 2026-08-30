@@ -4,16 +4,27 @@ export type FlameKernelId = 'void' | 'lotus' | 'cold'
 export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
+/**
+ * Kernel-specific controls are added here as a kernel gains reviewed variants.
+ * `never` keeps today's presets unchanged while preserving a typed extension point.
+ */
+export interface FlameKernelOptionsMap {
+  void: never
+  lotus: never
+  cold: never
+}
+
 export interface FlamePalette {
   core: ColorRepresentation
   inner: ColorRepresentation
   outer: ColorRepresentation
 }
 
-export interface FlamePreset {
+export interface FlamePreset<K extends FlameKernelId = FlameKernelId> {
   id: string
   rank: number
-  kernel: FlameKernelId
+  kernel: K
+  kernelOptions?: FlameKernelOptionsMap[K]
   palette: FlamePalette
   speed: number
   scale: number
@@ -34,4 +45,14 @@ export interface FlameRuntimeOptions {
   quality?: FlameQuality
   paused?: boolean
   onStatusChange?: (status: FlameRuntimeStatus) => void
+}
+
+/** Read-only renderer counters used by performance checks and diagnostics UIs. */
+export interface FlameRuntimeDiagnostics {
+  activeKernel: FlameKernelId
+  programs: number
+  calls: number
+  triangles: number
+  geometries: number
+  textures: number
 }
