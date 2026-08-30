@@ -60,11 +60,11 @@ export const flameCatalog: FlameEntry[] = [
     sourceLabel: '《斗破苍穹》原著设定；百度百科“骨灵冷火”条目交叉核对',
     sourceUrl: 'https://baike.baidu.com/item/%E9%AA%A8%E7%81%B5%E5%86%B7%E7%81%AB',
     kernel: 'cold',
-    palette: { core: '#ffffff', inner: '#c9f9ff', outer: '#498f9d' },
+    palette: { core: '#ffffff', inner: '#f2f8ff', outer: '#c2cdd2' },
     speed: 0.72,
-    scale: 0.72,
+    scale: 0.92,
     turbulence: 1.12,
-    intensity: 0.98,
+    intensity: 1.02,
   },
 ]
 
