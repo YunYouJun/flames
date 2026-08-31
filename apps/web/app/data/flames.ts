@@ -147,6 +147,14 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
+function prototypeVisual(
+  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
+  brief: FlameVisualBrief,
+  preset: FlameRenderPreset,
+): FlameVisual {
+  return { state: 'prototype', plannedFamily, brief, preset }
+}
+
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -210,6 +218,22 @@ const visualBriefs = {
     fallback: '以低伏青莲、淡金焰心与三道熔隙根焰保持识别。',
     differentiation: '低矮厚重且扎根地脉，区别于净莲的开放白冠与红莲的高耸火茧。',
     specialPasses: ['lotus-petals'],
+    reviewScenes,
+  },
+  seaHeart: {
+    facts: ['深蓝色异火，升腾时具有清澈海水般的液态质感。', '原著未赋予它额外的控水权能。'],
+    interpretation: '以低位深蓝潮盆托起三道液膜焰舌；火体边缘像水波一样翻卷，内部以横向涟漪和冷亮焦散强调“流火”而非普通蓝焰。',
+    silhouette: '宽阔椭圆潮盆上升起一主两辅三道光滑焰潮，整体低宽，顶部收束成被风卷起的水峰。',
+    palette: '冰白焰心、亮青液膜、深钴蓝外焰与近黑蓝潮底。',
+    motion: '潮盆缓慢呼吸，涟漪向外扩散；焰潮以连续液膜起伏，减少普通火焰的碎裂抖动。',
+    interactions: {
+      pointer: '主焰潮朝指针方向倾斜，近侧涟漪随之偏移。',
+      hold: '潮盆外扩并连续泛起同心潮环，中央液焰向上涌升。',
+      drag: '潮面与焰潮反向剪切，拖出短暂的蓝色飞沫。',
+    },
+    fallback: '以深蓝椭圆潮盆、三道液膜焰舌和两层同心波纹保留流火识别。',
+    differentiation: '唯一以横向潮盆、同心涟漪和连续液膜作为主轮廓的家族，区别于莲瓣、冷壳与普通上升焰舌。',
+    specialPasses: ['tidal-rings'],
     reviewScenes,
   },
   boneChilling: {
@@ -438,7 +462,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('深蓝色、液态感与高温表现的相关描写。')],
-    visual: reservedVisual('fluid'),
+    visual: prototypeVisual('fluid', visualBriefs.seaHeart, {
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'tidal' },
+      palette: { core: '#d9ffff', inner: '#25b9ef', outer: '#08245f' },
+      speed: 0.68,
+      scale: 0.86,
+      turbulence: 0.72,
+      intensity: 1.04,
+    }),
   },
   {
     id: 'fire-cloud-water',

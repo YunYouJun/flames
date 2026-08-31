@@ -1,5 +1,5 @@
 import type { IUniform, Vector2 } from 'three'
-import type { FlameKernelOptions, FlamePalette, FlameQuality } from '../types'
+import type { FlameKernelOptions, FlamePalette, FlameQuality, LotusKernelOptions } from '../types'
 import type { FlameSculpture } from './flame-sculpture'
 import {
   BufferAttribute,
@@ -205,9 +205,10 @@ export class LotusBloom implements FlameSculpture {
   }
 
   setAppearance(palette: FlamePalette, speed: number, intensity: number, options?: FlameKernelOptions): void {
+    const lotusOptions = options as LotusKernelOptions | undefined
     this.speed = speed
     this.intensity = intensity
-    this.variant = options?.bloomMode === 'karmic' ? 1 : options?.bloomMode === 'earthcore' ? 2 : 0
+    this.variant = lotusOptions?.bloomMode === 'karmic' ? 1 : lotusOptions?.bloomMode === 'earthcore' ? 2 : 0
     this.uniform<Color>('uCore').value.set(palette.core)
     this.uniform<Color>('uInner').value.set(palette.inner)
     this.uniform<Color>('uOuter').value.set(palette.outer)

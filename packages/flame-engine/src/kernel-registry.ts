@@ -1,8 +1,10 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality } from './types'
+import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, LotusKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
+import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
 import { coldFragmentShader } from './shaders/cold'
+import { fluidFragmentShader } from './shaders/fluid'
 import { lotusFragmentShader } from './shaders/lotus'
 import { voidFragmentShader } from './shaders/void'
 
@@ -27,6 +29,11 @@ export const flameKernelRegistry = {
     id: 'cold',
     fragmentShader: coldFragmentShader,
   },
+  fluid: {
+    id: 'fluid',
+    fragmentShader: fluidFragmentShader,
+    createSculpture: (palette, quality) => new TidalBasin(palette, quality),
+  },
 } satisfies Record<FlameKernelId, FlameKernelDefinition>
 
 export const flameKernelIds = Object.keys(flameKernelRegistry) as FlameKernelId[]
@@ -37,9 +44,10 @@ export function getFlameKernelDefinition(kernel: FlameKernelId): FlameKernelDefi
 
 export function getFlameKernelVariant(preset: FlamePreset): number {
   if (preset.kernel === 'lotus') {
-    if (preset.kernelOptions?.bloomMode === 'karmic')
+    const options = preset.kernelOptions as LotusKernelOptions | undefined
+    if (options?.bloomMode === 'karmic')
       return 1
-    if (preset.kernelOptions?.bloomMode === 'earthcore')
+    if (options?.bloomMode === 'earthcore')
       return 2
   }
   return 0

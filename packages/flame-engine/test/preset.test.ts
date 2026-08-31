@@ -42,6 +42,24 @@ describe('flame preset validation', () => {
     expect(validateFlamePreset(earthcorePreset)).toBe(earthcorePreset)
   })
 
+  it('accepts the tidal fluid flow mode', () => {
+    const tidalPreset = {
+      ...preset,
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'tidal' },
+    } as unknown as FlamePreset
+
+    expect(validateFlamePreset(tidalPreset)).toBe(tidalPreset)
+  })
+
+  it('rejects unsupported fluid flow modes', () => {
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/flowMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

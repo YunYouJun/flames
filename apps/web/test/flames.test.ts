@@ -66,6 +66,7 @@ describe('flame roster', () => {
       'purifying-lotus',
       'karmic-lotus',
       'bone-chilling',
+      'sea-heart',
       'green-lotus',
     ])
     expect(flameCatalog.map(flame => flame.id)).toEqual([
@@ -105,6 +106,21 @@ describe('flame roster', () => {
       },
     })
     expect(flameCatalog.map(flame => flame.id)).toContain('green-lotus')
+  })
+
+  it('keeps the sea heart implementation dev-only until visual approval', () => {
+    const seaHeart = flameRosterBySlug.get('sea-heart')
+
+    expect(seaHeart?.visual.state).toBe('prototype')
+    expect(getFlamePreset(seaHeart!)).toMatchObject({
+      id: 'sea-heart',
+      rank: 15,
+      kernel: 'fluid',
+      kernelOptions: {
+        flowMode: 'tidal',
+      },
+    })
+    expect(flameCatalog.map(flame => flame.id)).not.toContain('sea-heart')
   })
 
   it('assigns one representative to every visual family', () => {

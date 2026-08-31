@@ -100,6 +100,29 @@ test('renders the approved green lotus with its earthcore interaction contract',
   expect(consoleErrors).toEqual([])
 })
 
+test('renders the sea heart prototype with its tidal interaction contract', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  await page.goto('/flames/sea-heart?benchmark=1&quality=balanced')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+
+  const experience = page.locator('main[data-visual-state="prototype"][data-kernel="fluid"]')
+  await expect(experience).toHaveAttribute('data-flow-mode', 'tidal')
+  const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+  await expect(canvas).toBeVisible()
+  expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+  expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+  await page.getByRole('button', { name: /阅览设定/ }).click()
+  await expect(page.getByRole('dialog', { name: '海心焰' })).toContainText('火体边缘像水波一样翻卷')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 

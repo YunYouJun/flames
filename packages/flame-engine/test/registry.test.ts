@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, LotusKernelOptions } from '../src/types'
+import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, LotusKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -9,7 +9,7 @@ import {
 
 describe('kernel registry', () => {
   it('registers every implemented kernel exactly once', () => {
-    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold'])
+    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid'])
     expect(Object.keys(flameKernelRegistry)).toEqual(flameKernelIds)
 
     for (const id of flameKernelIds) {
@@ -22,6 +22,7 @@ describe('kernel registry', () => {
   it('keeps kernel options typed without changing existing presets', () => {
     expectTypeOf<FlamePreset<'lotus'>['kernel']>().toEqualTypeOf<'lotus'>()
     expectTypeOf<FlamePreset<'lotus'>['kernelOptions']>().toEqualTypeOf<LotusKernelOptions | undefined>()
+    expectTypeOf<FlamePreset<'fluid'>['kernelOptions']>().toEqualTypeOf<FluidKernelOptions | undefined>()
   })
 
   it('maps reviewed lotus modes to stable shader variants', () => {

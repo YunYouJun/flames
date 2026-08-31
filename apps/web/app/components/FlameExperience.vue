@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { FlameQuality, FlameRuntimeStatus } from '@yunyoujun/flame-engine'
+import type {
+  FlameQuality,
+  FlameRuntimeStatus,
+  FluidKernelOptions,
+  LotusKernelOptions,
+} from '@yunyoujun/flame-engine'
 import type { FlameSeat } from '~/data/flames'
 import {
   flameCatalog,
@@ -27,6 +32,18 @@ const activeFlame = computed(() => {
   return undefined
 })
 const activeFamily = computed(() => props.flame.visual.plannedFamily)
+const activeBloomMode = computed(() => {
+  if (activeFlame.value?.kernel !== 'lotus')
+    return undefined
+  const options = activeFlame.value.kernelOptions as LotusKernelOptions | undefined
+  return options?.bloomMode ?? 'purifying'
+})
+const activeFlowMode = computed(() => {
+  if (activeFlame.value?.kernel !== 'fluid')
+    return undefined
+  const options = activeFlame.value.kernelOptions as FluidKernelOptions | undefined
+  return options?.flowMode ?? 'tidal'
+})
 const completedBaseCount = computed(() => flameCatalog.filter(flame => flame.rank > 1).length)
 const benchmarkTime = computed(() => route.query.benchmark === '1' ? 4.25 : undefined)
 const benchmarkQuality = computed<FlameQuality>(() => {
@@ -69,7 +86,8 @@ watch(() => activeFlame.value?.slug, (slug) => {
     :data-hydrated="hydrated || undefined"
     :data-kernel="activeFlame?.kernel"
     :data-family="activeFamily"
-    :data-bloom-mode="activeFlame?.kernel === 'lotus' ? activeFlame.kernelOptions?.bloomMode ?? 'purifying' : undefined"
+    :data-bloom-mode="activeBloomMode"
+    :data-flow-mode="activeFlowMode"
     :data-visual-state="flame.visual.state"
     :data-benchmark="benchmarkTime !== undefined || undefined"
   >

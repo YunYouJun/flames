@@ -1,4 +1,4 @@
-import type { FlamePreset } from './types'
+import type { FlamePreset, FluidKernelOptions, LotusKernelOptions } from './types'
 import { Color } from 'three'
 
 export function validateFlamePreset(preset: FlamePreset): FlamePreset {
@@ -22,10 +22,16 @@ export function validateFlamePreset(preset: FlamePreset): FlamePreset {
     new Color(color).getHex()
 
   if (preset.kernel === 'lotus' && preset.kernelOptions) {
-    if (preset.kernelOptions.bloomMode !== 'purifying' && preset.kernelOptions.bloomMode !== 'karmic' && preset.kernelOptions.bloomMode !== 'earthcore')
+    const options = preset.kernelOptions as LotusKernelOptions
+    if (options.bloomMode !== 'purifying' && options.bloomMode !== 'karmic' && options.bloomMode !== 'earthcore')
       throw new Error(`Flame preset "${preset.id}" has an unsupported lotus bloomMode.`)
   }
-  else if (preset.kernel !== 'lotus' && preset.kernelOptions !== undefined) {
+  else if (preset.kernel === 'fluid' && preset.kernelOptions) {
+    const options = preset.kernelOptions as FluidKernelOptions
+    if (options.flowMode !== 'tidal')
+      throw new Error(`Flame preset "${preset.id}" has an unsupported fluid flowMode.`)
+  }
+  else if (preset.kernelOptions !== undefined) {
     throw new Error(`Flame preset "${preset.id}" does not support kernelOptions.`)
   }
 
