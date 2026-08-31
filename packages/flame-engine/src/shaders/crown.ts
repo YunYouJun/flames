@@ -9,55 +9,32 @@ export const crownFragmentShader = /* glsl */ `
   }
 
   vec3 goldenCrown(vec2 point, float clock) {
-    vec2 royalPoint = point - vec2(uPointer.x * 0.014, uPointer.y * 0.008);
-    vec3 plume = plumeLayers(royalPoint * vec2(0.88, 0.82), clock * 0.42, 1.02, 0.026);
-    float vertical = royalPoint.y + 0.50;
-    float liquidWave = 0.5 + 0.5 * sin(vertical * 19.0 - clock * 1.08 + sin(royalPoint.x * 8.0) * 1.15);
-    float liquid = smoothstep(0.62, 0.96, liquidWave) * plume.x;
-    liquid += smoothstep(0.72, 0.97, fbmFast(royalPoint * vec2(8.0, 5.0) - vec2(0.0, clock * 0.52))) * plume.x * 0.74;
-
-    vec2 crownPoint = royalPoint - vec2(0.0, -0.22);
-    float crownBand = 1.0 - smoothstep(0.020, 0.052, abs(crownPoint.y + 0.07 + crownPoint.x * crownPoint.x * 0.42));
-    crownBand *= 1.0 - smoothstep(0.50, 0.58, abs(crownPoint.x));
-    float crownFill = 0.0;
-    for (int index = 0; index < 5; index += 1) {
-      float center = (float(index) - 2.0) * 0.19;
-      float distanceFromCenter = abs(float(index) - 2.0);
-      float spireHeight = 0.31 + (1.0 - distanceFromCenter * 0.22) * 0.24 + uPressed * 0.055;
-      float rise = crownPoint.y + 0.07;
-      float halfWidth = mix(0.105, 0.008, saturate(rise / spireHeight));
-      float spire = 1.0 - smoothstep(halfWidth - 0.012, halfWidth + 0.018, abs(crownPoint.x - center));
-      spire *= smoothstep(-0.035, 0.018, rise) * (1.0 - smoothstep(spireHeight - 0.035, spireHeight + 0.025, rise));
-      crownFill = max(crownFill, spire);
+    vec2 royalPoint = point - vec2(uPointer.x * 0.028, uPointer.y * 0.012);
+    vec3 plume = plumeLayers(royalPoint * vec2(0.86, 0.82), clock * 0.94, 1.06, 0.028);
+    float tongues = 0.0;
+    for (int index = 0; index < 7; index += 1) {
+      float unit = float(index) - 3.0;
+      float center = unit * 0.115;
+      float height = 0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12;
+      float tongue = flameTongue(royalPoint, clock * 1.26, center, float(index) * 1.37 + 0.6, height, 0.14 - abs(unit) * 0.008);
+      tongues = max(tongues, tongue);
     }
 
-    float crown = max(crownBand, crownFill);
+    float moltenBase = ellipseMask(royalPoint, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
+    float flameBody = max(max(plume.x, tongues), moltenBase);
+    float liquidWave = 0.5 + 0.5 * sin(royalPoint.y * 21.0 - clock * 2.1 + sin(royalPoint.x * 10.0) * 1.35);
+    float liquid = smoothstep(0.54, 0.94, liquidWave) * flameBody;
+    liquid += smoothstep(0.67, 0.94, fbmFast(royalPoint * vec2(8.0, 5.6) - vec2(0.0, clock * 0.94))) * flameBody * 0.82;
 
-    vec2 haloPoint = royalPoint - vec2(0.0, 0.02);
-    float haloRadius = length(haloPoint * vec2(1.0, 1.04));
-    float haloAngle = atan(haloPoint.y, haloPoint.x);
-    float halo = 1.0 - smoothstep(0.014, 0.044, abs(haloRadius - (0.49 + uPressed * 0.045)));
-    float rays = pow(abs(cos(haloAngle * 12.0 - clock * 0.13)), 22.0);
-    rays *= smoothstep(0.48, 0.54, haloRadius) * (1.0 - smoothstep(0.66, 0.78, haloRadius));
-    float solarDisc = softGlow(haloPoint, vec2(0.0), vec2(1.82, 1.90), 1.0) * (1.0 - smoothstep(0.34, 0.56, haloRadius));
-
-    float crownJewels = 0.0;
-    for (int index = 0; index < 12; index += 1) {
-      float unit = float(index) / 12.0;
-      float angle = unit * PI * 2.0 + clock * 0.08;
-      vec2 jewelCenter = vec2(cos(angle), sin(angle)) * vec2(0.49, 0.47) + vec2(0.0, 0.02);
-      float jewel = 1.0 - smoothstep(0.012, 0.032, length(royalPoint - jewelCenter));
-      jewel *= 0.60 + 0.40 * sin(clock * 3.2 + unit * 29.0);
-      crownJewels = max(crownJewels, jewel);
-    }
-
-    float riftDistance = abs(royalPoint.x) - 0.62 - sin(royalPoint.y * 8.0 + clock * 0.20) * 0.022;
+    float haloRadius = length(royalPoint * vec2(1.0, 1.04));
+    float haloAngle = atan(royalPoint.y, royalPoint.x);
+    float halo = 1.0 - smoothstep(0.016, 0.052, abs(haloRadius - (0.51 + uPressed * 0.04)));
+    float rays = pow(abs(cos(haloAngle * 12.0 - clock * 0.18)), 24.0);
+    rays *= smoothstep(0.50, 0.56, haloRadius) * (1.0 - smoothstep(0.65, 0.77, haloRadius));
+    float riftDistance = abs(royalPoint.x) - 0.64 - sin(royalPoint.y * 9.0 + clock * 0.36) * 0.024;
     float rifts = 1.0 - smoothstep(0.008, 0.023, abs(riftDistance));
     rifts *= smoothstep(-0.30, -0.04, royalPoint.y) * (1.0 - smoothstep(0.54, 0.76, royalPoint.y));
-    float silhouette = max(plume.x * 0.92, crown);
-    float shimmer = max(liquid, crownJewels);
-    float authority = max(max(halo, rays), max(rifts, solarDisc * 0.38));
-    return vec3(silhouette, shimmer, authority);
+    return vec3(flameBody, liquid, max(max(halo, rays), rifts));
   }
 
   vec3 desolationWings(vec2 point, float clock) {
@@ -151,6 +128,11 @@ export const crownFragmentShader = /* glsl */ `
     vec3 color = uOuter * (mask * 0.38 + wingField.x * 0.24 + sealField.x * 0.30);
     color += uInner * (mask * 0.43 + goldField.x * 0.62 + goldField.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emperorField.x * 0.68);
     color += uCore * (filament * 0.72 + goldField.x * 0.24 + goldField.y * 1.18 + goldField.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emperorField.z * 1.28 + motes * 1.32);
+    if (golden > 0.5) {
+      color = uOuter * (goldField.x * 0.62 + goldField.z * 0.30);
+      color += uInner * (goldField.x * 0.78 + goldField.y * 1.12 + goldField.z * 0.54);
+      color += uCore * (filament * 0.82 + goldField.y * 0.74 + motes * 1.36);
+    }
     if (emperor > 0.5) {
       float spectrum = 0.5 + 0.5 * sin(atan(point.y, point.x) * 3.0 + clock * 0.48);
       color += mix(vec3(0.18, 0.52, 1.0), vec3(1.0, 0.18, 0.36), spectrum) * emperorField.x * 0.72;

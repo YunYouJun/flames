@@ -249,7 +249,7 @@ test('renders distinct crown family and terminal prototypes inside renderer budg
 
   const prototypes = [
     ['emperor', '帝炎', '四层同心万火冠环汇聚到无色焰核'],
-    ['golden-emperor', '金帝焚天炎', '五峰鎏金冠托起白金主焰'],
+    ['golden-emperor', '金帝焚天炎', '七重流金火苗直接构成冠形'],
     ['eight-desolation', '八荒破灭焱', '左右展开的淡黑宽翼占据画面'],
     ['nether-golden', '九幽金祖火', '沉凝暗金祖焰构成碑状火印'],
   ] as const
