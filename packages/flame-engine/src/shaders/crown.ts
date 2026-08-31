@@ -28,10 +28,11 @@ export const crownFragmentShader = /* glsl */ `
       float unit = float(index) - 3.0;
       float phase = float(index) * 1.37 + 0.6;
       float pulse = noise21(vec2(clock * 0.72 + phase, phase * 2.71));
-      float center = unit * 0.115 + (pulse - 0.5) * 0.10;
-      float height = (0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12) * (0.78 + pulse * 0.36);
-      float width = 0.14 - abs(unit) * 0.008;
-      float tongue = flameTongue(flow, clock * 1.72, center, phase, height, width);
+      float drift = noise21(vec2(clock * 0.41 + phase * 1.9, phase * 0.83));
+      float life = smoothstep(0.12, 0.64, pulse);
+      float center = unit * 0.105 + (drift - 0.5) * 0.18;
+      float height = (0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12) * (0.58 + pulse * 0.62);
+      float tongue = flameTongue(flow, clock * 1.72, center, phase, height, (0.14 - abs(unit) * 0.008) * (0.72 + drift * 0.46)) * life;
       tongues = max(tongues, tongue);
       cores = max(cores, pow(tongue, 2.2));
     }
@@ -122,7 +123,7 @@ export const crownFragmentShader = /* glsl */ `
     vec3 gold = vec3(0.0);
     vec3 wingField = vec3(0.0);
     vec3 sealField = vec3(0.0);
-    vec3 emperorField = vec3(0.0);
+    vec3 emp = vec3(0.0);
     if (golden > 0.5)
       gold = goldenCrown(point, clock);
     if (desolation > 0.5)
@@ -130,20 +131,20 @@ export const crownFragmentShader = /* glsl */ `
     if (ancestral > 0.5)
       sealField = ancestralSeal(point, clock);
     if (emperor > 0.5)
-      emperorField = emperorConvergence(point, clock);
+      emp = emperorConvergence(point, clock);
 
     float mask = max(max(gold.x, max(gold.y, gold.z)) * golden, max(wingField.x, max(wingField.y, wingField.z)) * desolation);
     mask = max(mask, max(sealField.x, max(sealField.y, sealField.z)) * ancestral);
-    mask = max(mask, max(emperorField.x, max(emperorField.y, emperorField.z)) * emperor);
-    vec3 textureField = fireTexture(point, clock * 0.82);
-    float filament = smoothstep(0.58, 0.86, textureField.y) * mask;
+    mask = max(mask, max(emp.x, max(emp.y, emp.z)) * emperor);
+    vec3 tex = fireTexture(point, clock * 0.82);
+    float filament = smoothstep(0.58, 0.86, tex.y) * mask;
     float motes = 0.0;
     if (uQuality > 0.25)
       motes = emberField(point * vec2(0.84, 0.68), clock * mix(0.68, 0.82, emperor), 0.042 + golden * 0.075 + emperor * 0.045);
 
     vec3 color = uOuter * (mask * 0.38 + wingField.x * 0.24 + sealField.x * 0.30);
-    color += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emperorField.x * 0.68);
-    color += uCore * (filament * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emperorField.z * 1.28 + motes * 1.32);
+    color += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emp.x * 0.68);
+    color += uCore * (filament * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emp.z * 1.28 + motes * 1.32);
     if (golden > 0.5) {
       color = uOuter * (gold.x * 0.88 + gold.z * 0.10);
       color += uInner * (gold.x * 0.18 + gold.y * 0.86 + gold.z * 0.24);
@@ -151,14 +152,14 @@ export const crownFragmentShader = /* glsl */ `
     }
     if (emperor > 0.5) {
       float spectrum = 0.5 + 0.5 * sin(atan(point.y, point.x) * 3.0 + clock * 0.48);
-      color += mix(vec3(0.18, 0.52, 1.0), vec3(1.0, 0.18, 0.36), spectrum) * emperorField.x * 0.72;
+      color += mix(vec3(0.18, 0.52, 1.0), vec3(1.0, 0.18, 0.36), spectrum) * emp.x * 0.72;
     }
     color *= uIntensity * (0.88 + 0.12 * sin(clock * mix(1.7, 1.1, ancestral)));
 
-    float alpha = mask * (0.45 + textureField.x * 0.18 + textureField.z * 0.17);
-    alpha += filament * 0.22 + motes * 0.70 + emperorField.z * 0.16;
+    float alpha = mask * (0.45 + tex.x * 0.18 + tex.z * 0.17);
+    alpha += filament * 0.22 + motes * 0.70 + emp.z * 0.16;
     if (golden > 0.5) {
-      float flameAlpha = gold.x * (0.62 + textureField.x * 0.06 + textureField.z * 0.12);
+      float flameAlpha = gold.x * (0.62 + tex.x * 0.06 + tex.z * 0.12);
       alpha = flameAlpha + gold.y * 0.26 + filament * 0.12 + motes * 0.54 + gold.z * 0.08;
     }
     alpha = saturate(alpha);
