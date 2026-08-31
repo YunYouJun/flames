@@ -54,26 +54,28 @@ export const crownFragmentShader = /* glsl */ `
     return vec3(body, heat, halo);
   }
 
-  vec3 desolationWings(vec2 point, float clock) {
-    vec2 wingPoint = point - vec2(uPointer.x * 0.02, -0.08 + uPointer.y * 0.012);
-    float spread = 0.72 + uPressed * 0.12;
-    float upper = 0.30 - abs(wingPoint.x) * 0.46 + sin(abs(wingPoint.x) * 12.0 - clock * 0.82) * 0.035;
-    float lower = -0.12 - abs(wingPoint.x) * 0.16;
-    float wing = smoothstep(lower - 0.06, lower + 0.035, wingPoint.y);
-    wing *= 1.0 - smoothstep(upper - 0.035, upper + 0.07, wingPoint.y);
-    wing *= smoothstep(0.10, 0.24, abs(wingPoint.x)) * (1.0 - smoothstep(spread * 0.82, spread, abs(wingPoint.x)));
-    float feathers = smoothstep(0.34, 0.90, 0.5 + 0.5 * sin(abs(wingPoint.x) * 29.0 + wingPoint.y * 8.0 - clock));
-    wing *= 0.58 + feathers * 0.42;
-
-    vec3 plume = plumeLayers(point * vec2(1.28, 0.94), clock, 0.60, 0.030);
-    float storm = 0.0;
-    for (int index = 0; index < 5; index += 1) {
-      float level = -0.38 + float(index) * 0.18;
-      float ribbon = 1.0 - smoothstep(0.018, 0.052, abs(point.y - level - sin(point.x * 7.0 + float(index) - clock * 1.4) * 0.055));
-      ribbon *= 1.0 - smoothstep(0.48, 0.86, abs(point.x));
-      storm = max(storm, ribbon);
+  vec3 desolationWings(vec2 q, float t) {
+    vec2 p = q - vec2(uPointer.x * 0.018, -0.04 + uPointer.y * 0.012);
+    float x = abs(p.x);
+    float e = 0.84 + uPressed * 0.12;
+    float a = x / e;
+    float h = 0.22 - a * 0.32 + sin(t * 0.92 + x * 5.0) * 0.028;
+    h += sign(p.x) * (uPointer.x * x + uDrag * sin(a * PI)) * 0.05;
+    float w = 0.025 + sin(saturate(a) * PI) * (0.18 + uPressed * 0.025);
+    w = max(w + (sin(x * 33.0 - t * 2.1) + sin(x * 51.0 + t * 1.6)) * 0.010 * a, 0.015);
+    float d = max((p.y - h) / (w * 0.72), (h - p.y) / (w * 1.28));
+    float v = (1.0 - smoothstep(0.84, 1.03, d)) * smoothstep(0.04, 0.13, x);
+    v *= (1.0 - smoothstep(e - 0.10, e, x)) * (0.76 + 0.24 * smoothstep(-0.5, 0.72, sin(x * 35.0 - (p.y - h) * 17.0 - t * 1.2)));
+    float c = flameTongue(q, t * 1.18, 0.0, 1.9, 0.94 + uPressed * 0.12, 0.105);
+    float s = 0.0;
+    for (int n = 0; n < 5; n += 1) {
+      float i = float(n);
+      float r = 1.0 - smoothstep(0.008, 0.027, abs(q.y + 0.38 - i * 0.055 - sin(q.x * (8.0 + i * 0.8) + i * 1.7 - t * (2.1 + i * 0.19)) * 0.028));
+      r *= (1.0 - smoothstep(0.64, 0.88, abs(q.x))) * smoothstep(0.12, 0.22, abs(q.x));
+      r *= 0.45 + 0.55 * smoothstep(-0.25, 0.65, sin(q.x * 19.0 - t * 3.1 + i));
+      s = max(s, r);
     }
-    return vec3(wing, plume.x, storm);
+    return vec3(v, max(c, v * smoothstep(0.66, 0.94, d) * 0.56), s);
   }
 
   vec3 ancestralSeal(vec2 point, float clock) {
@@ -121,30 +123,30 @@ export const crownFragmentShader = /* glsl */ `
     point.y += 0.02;
 
     vec3 gold = vec3(0.0);
-    vec3 wingField = vec3(0.0);
-    vec3 sealField = vec3(0.0);
+    vec3 wing = vec3(0.0);
+    vec3 seal = vec3(0.0);
     vec3 emp = vec3(0.0);
     if (golden > 0.5)
       gold = goldenCrown(point, clock);
     if (desolation > 0.5)
-      wingField = desolationWings(point, clock);
+      wing = desolationWings(point, clock);
     if (ancestral > 0.5)
-      sealField = ancestralSeal(point, clock);
+      seal = ancestralSeal(point, clock);
     if (emperor > 0.5)
       emp = emperorConvergence(point, clock);
 
-    float mask = max(max(gold.x, max(gold.y, gold.z)) * golden, max(wingField.x, max(wingField.y, wingField.z)) * desolation);
-    mask = max(mask, max(sealField.x, max(sealField.y, sealField.z)) * ancestral);
+    float mask = max(max(gold.x, max(gold.y, gold.z)) * golden, max(wing.x, max(wing.y, wing.z)) * desolation);
+    mask = max(mask, max(seal.x, max(seal.y, seal.z)) * ancestral);
     mask = max(mask, max(emp.x, max(emp.y, emp.z)) * emperor);
     vec3 tex = fireTexture(point, clock * 0.82);
-    float filament = smoothstep(0.58, 0.86, tex.y) * mask;
+    float filament = smoothstep(0.58, 0.86, tex.y) * mask * (1.0 - desolation * 0.88);
     float motes = 0.0;
     if (uQuality > 0.25)
       motes = emberField(point * vec2(0.84, 0.68), clock * mix(0.68, 0.82, emperor), 0.042 + golden * 0.075 + emperor * 0.045);
 
-    vec3 color = uOuter * (mask * 0.38 + wingField.x * 0.24 + sealField.x * 0.30);
-    color += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emp.x * 0.68);
-    color += uCore * (filament * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emp.z * 1.28 + motes * 1.32);
+    vec3 color = uOuter * (mask * 0.38 + wing.x * 0.30 + seal.x * 0.30);
+    color += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wing.z * 0.82 + seal.z * 0.52 + emp.x * 0.68);
+    color += uCore * (filament * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wing.y * 0.95 + seal.y * 1.10 + emp.z * 1.28 + motes * 1.32);
     if (golden > 0.5) {
       color = uOuter * (gold.x * 0.88 + gold.z * 0.10);
       color += uInner * (gold.x * 0.18 + gold.y * 0.86 + gold.z * 0.24);
@@ -157,7 +159,7 @@ export const crownFragmentShader = /* glsl */ `
     color *= uIntensity * (0.88 + 0.12 * sin(clock * mix(1.7, 1.1, ancestral)));
 
     float alpha = mask * (0.45 + tex.x * 0.18 + tex.z * 0.17);
-    alpha += filament * 0.22 + motes * 0.70 + emp.z * 0.16;
+    alpha += filament * 0.22 + motes * 0.70 + emp.z * 0.16 + wing.y * 0.30;
     if (golden > 0.5) {
       float flameAlpha = gold.x * (0.62 + tex.x * 0.06 + tex.z * 0.12);
       alpha = flameAlpha + gold.y * 0.26 + filament * 0.12 + motes * 0.54 + gold.z * 0.08;

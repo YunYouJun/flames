@@ -634,11 +634,11 @@ const roster = [
     visual: prototypeVisual('crown', visualBriefs.eightDesolation, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'desolation' },
-      palette: { core: '#e8eeee', inner: '#77747d', outer: '#141217' },
+      palette: { core: '#edf3f3', inner: '#8a8790', outer: '#16131a' },
       speed: 1.08,
       scale: 1.02,
       turbulence: 1.28,
-      intensity: 0.94,
+      intensity: 1.02,
     }),
   },
   {
