@@ -147,14 +147,6 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
-function prototypeVisual(
-  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
-  brief: FlameVisualBrief,
-  preset: FlameRenderPreset,
-): FlameVisual {
-  return { state: 'prototype', plannedFamily, brief, preset }
-}
-
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -494,7 +486,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('青色莲形、地心来源、成形周期与引发火山活动的相关描写。')],
-    visual: prototypeVisual('lotus', visualBriefs.greenLotus, {
+    visual: approvedVisual('lotus', visualBriefs.greenLotus, {
       kernel: 'lotus',
       kernelOptions: { bloomMode: 'earthcore' },
       palette: { core: '#fff2a8', inner: '#34dc96', outer: '#006149' },
