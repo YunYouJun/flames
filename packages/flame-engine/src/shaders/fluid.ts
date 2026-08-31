@@ -73,11 +73,11 @@ export const fluidFragmentShader = /* glsl */ `
   }
 
   float fluidLeaf(vec2 point, vec2 center, float angle, vec2 scale) {
-    point -= center;
-    point = rotate2d(angle) * point;
-    point /= scale;
-    float pointed = length(point) + abs(point.y) * 0.18;
-    return 1.0 - smoothstep(0.72, 1.0, pointed);
+    point = rotate2d(angle) * (point - center) / scale;
+    float y = saturate(point.y);
+    float w = sqrt(y) * (1.0 - y) * 1.70;
+    float leaf = smoothstep(-0.12, 0.06, w - abs(point.x));
+    return leaf * smoothstep(0.0, 0.12, point.y) * (1.0 - smoothstep(0.82, 1.0, point.y));
   }
 
   vec3 verdantGrowth(vec2 point, float clock) {
@@ -98,9 +98,9 @@ export const fluidFragmentShader = /* glsl */ `
 
       vec2 tip = vec2(center + bend, height - 0.40);
       float open = smoothstep(0.24, 0.58, cycle) * (1.0 - smoothstep(0.80, 0.98, cycle));
-      float leafAngle = mix(0.18, 0.72, open) * mix(-1.0, 1.0, mod(float(index), 2.0));
-      leaves = max(leaves, fluidLeaf(point, tip + vec2(-0.035, -0.015), leafAngle, vec2(0.055, 0.13) * (0.18 + open * 0.82)) * open);
-      leaves = max(leaves, fluidLeaf(point, tip + vec2(0.040, 0.005), -leafAngle, vec2(0.052, 0.12) * (0.18 + open * 0.82)) * open);
+      float angle = mix(0.08, 0.48, open);
+      leaves = max(leaves, fluidLeaf(point, tip, angle, vec2(0.055, 0.13) * (0.18 + open * 0.82)) * open);
+      leaves = max(leaves, fluidLeaf(point, tip, -angle, vec2(0.052, 0.12) * (0.18 + open * 0.82)) * open);
     }
     float seed = softGlow(point, vec2(0.0, -0.31), vec2(1.4, 4.4), 2.8);
     return vec3(stems, leaves, seed);
