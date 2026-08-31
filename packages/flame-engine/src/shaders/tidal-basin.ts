@@ -72,10 +72,10 @@ export const tidalRingFragmentShader = /* glsl */ `
     gaps = mix(gaps, smoothstep(0.66, 0.88, noise21(vec2(angle * 4.0 + clock * 0.12, 13.7))), venom);
 
     vec3 color = mix(uOuter, uInner, 0.44 + filament * 0.46);
-    color = mix(color, uCore, smoothstep(0.72, 1.0, filament + uPressed * 0.16));
+    color = mix(color, uCore, smoothstep(0.72, 1.0, filament + uPressed * 0.16) * (1.0 - verdant * 0.78));
     color *= (0.56 + filament * 0.72 + uPressed * 0.20 + uDrag * 0.08) * uIntensity;
 
-    float alpha = edge * (0.26 + filament * 0.58 + cloudwater * 0.08) * (1.0 - gaps * mix(0.72, 0.48, venom));
+    float alpha = edge * (0.26 + filament * 0.58 + cloudwater * 0.08) * (1.0 - gaps * mix(0.72, 0.48, venom)) * (1.0 - verdant * 0.58);
     if (alpha < 0.025) discard;
     gl_FragColor = vec4(color, alpha);
     #include <colorspace_fragment>

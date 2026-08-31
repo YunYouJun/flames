@@ -151,6 +151,7 @@ export class TidalBasin implements FlameSculpture {
     this.group.position.y = -0.43 + pointer.y * 0.012 + cloudwater * 0.06 - venom * 0.025
 
     for (const [index, ring] of this.rings.entries()) {
+      ring.group.visible = qualityRank[this.quality] >= ring.minimumQuality && (!verdant || index === 0)
       const clock = time * this.speed
       const breath = 1 + Math.sin(clock * 0.72 + ring.phase) * 0.018
       const pressExpansion = pressed * (0.10 + index * 0.025 + venom * 0.014)

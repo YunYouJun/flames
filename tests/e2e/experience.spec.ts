@@ -131,7 +131,7 @@ test('renders distinct fluid sibling prototypes inside renderer budgets', async 
   page.on('pageerror', error => consoleErrors.push(error.message))
 
   const prototypes = [
-    ['life-spirit', 'verdant', '生灵之焱', '细长焰茎与双叶从潮面逐次萌发'],
+    ['life-spirit', 'verdant', '生灵之焱', '五枚火种错峰萌发'],
     ['fire-cloud-water', 'cloudwater', '火云水炎', '上下两层薄焰云之间垂落水线般的火丝'],
     ['nether-poison', 'venom', '幽冥毒火', '毒泡在池面周期鼓起破裂'],
   ] as const

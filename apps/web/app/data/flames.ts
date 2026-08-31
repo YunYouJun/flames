@@ -234,10 +234,10 @@ const visualBriefs = {
   },
   lifeSpirit: {
     facts: ['翠绿色异火具有液态火海与绿雾意象，能够催生药材，并展现出罕见灵性。'],
-    interpretation: '将翠绿液态火海收束成一座会生长的焰圃：主焰保持流体底座，细长焰茎与双叶从潮面逐次萌发。',
-    silhouette: '扁平翠绿焰湖中生出五株高低错落的焰芽，中心保留柔和而明亮的生命焰心。',
-    palette: '淡金生命焰心、鲜翠内焰、深林绿潮底与少量黄绿孢光。',
-    motion: '整体节奏缓慢，焰芽像植物趋光般摆动；长按时新叶连续舒展，而不是猛烈爆燃。',
+    interpretation: '将翠绿液态火海收束成一枚会呼吸的生命种核：五枚火种错峰萌发，焰茎与绿焰叶经历舒展、凋散和再生。',
+    silhouette: '低位翠绿焰湖托起轮番生长的焰芽，数量与高度持续变化，中心保留柔和生命焰心。',
+    palette: '黄绿生命焰心、鲜翠内焰、深林绿潮底与少量嫩绿孢光。',
+    motion: '焰芽错峰经历萌芽、伸展、开叶与消隐，并缓慢趋光；长按时生长周期整体抬升。',
     interactions: {
       pointer: '焰芽与液态火海朝指针方向缓慢趋光。',
       hold: '潮面亮起生命脉冲，焰茎升高并舒展双叶。',
@@ -614,7 +614,7 @@ const roster = [
     visual: prototypeVisual('fluid', visualBriefs.lifeSpirit, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'verdant' },
-      palette: { core: '#f5ffd0', inner: '#39e482', outer: '#07523b' },
+      palette: { core: '#dfff8a', inner: '#35ef77', outer: '#063d2c' },
       speed: 0.58,
       scale: 0.88,
       turbulence: 0.62,
