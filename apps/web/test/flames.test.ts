@@ -70,14 +70,15 @@ describe('flame roster', () => {
     expect(flameCatalog.map(flame => flame.id)).toEqual([
       'nihility',
       'purifying-lotus',
+      'karmic-lotus',
       'bone-chilling',
     ])
   })
 
-  it('keeps the red lotus implementation dev-only until visual approval', () => {
+  it('publishes the red lotus implementation after visual approval', () => {
     const redLotus = flameRosterBySlug.get('karmic-lotus')
 
-    expect(redLotus?.visual.state).toBe('prototype')
+    expect(redLotus?.visual.state).toBe('approved')
     expect(getFlamePreset(redLotus!)).toMatchObject({
       id: 'karmic-lotus',
       rank: 8,
@@ -86,7 +87,7 @@ describe('flame roster', () => {
         bloomMode: 'karmic',
       },
     })
-    expect(flameCatalog.map(flame => flame.id)).not.toContain('karmic-lotus')
+    expect(flameCatalog.map(flame => flame.id)).toContain('karmic-lotus')
   })
 
   it('assigns one representative to every visual family', () => {

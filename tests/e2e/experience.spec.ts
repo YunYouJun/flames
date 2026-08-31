@@ -16,7 +16,7 @@ test('navigates between approved flames from the short roster', async ({ page })
   const roster = page.getByRole('dialog', { name: '廿三席' })
   await expect(roster).toBeVisible()
   await expect(roster.getByRole('link')).toHaveCount(23)
-  await expect(roster).toContainText('基础已现世 3 / 22 · 帝炎未启')
+  await expect(roster).toContainText('基础已现世 4 / 22 · 帝炎未启')
 
   await roster.getByRole('link', { name: /11.*骨灵冷火/ }).click()
   await expect(page).toHaveURL(/\/flames\/bone-chilling$/)
@@ -30,7 +30,7 @@ test('renders reserved seats without initializing WebGL', async ({ page }) => {
   await expect(page.getByRole('paragraph').filter({ hasText: '尚未凝聚' })).toBeVisible()
   await expect(page.locator('canvas')).toHaveCount(0)
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
-  await expect(page.getByText('基础异火已现世 3 / 22')).toBeVisible()
+  await expect(page.getByText('基础异火已现世 4 / 22')).toBeVisible()
   await expect(page.getByText('帝炎未启')).toBeVisible()
 })
 
@@ -54,7 +54,7 @@ test('labels extension-only identities and derived alternatives', async ({ page 
   await expect(details).toContainText('风雷怒焱')
 })
 
-test('renders the red lotus prototype with its karmic interaction contract', async ({ page }) => {
+test('renders the approved red lotus with its karmic interaction contract', async ({ page }) => {
   const consoleErrors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error')
@@ -65,7 +65,7 @@ test('renders the red lotus prototype with its karmic interaction contract', asy
   await page.goto('/flames/karmic-lotus?benchmark=1&quality=balanced')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 
-  const experience = page.locator('main[data-visual-state="prototype"]')
+  const experience = page.locator('main[data-visual-state="approved"]')
   await expect(experience).toHaveAttribute('data-bloom-mode', 'karmic')
   const canvas = page.locator('canvas[data-benchmark-ready="true"]')
   await expect(canvas).toBeVisible()
@@ -73,7 +73,7 @@ test('renders the red lotus prototype with its karmic interaction contract', asy
   expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
   await page.getByRole('button', { name: /阅览设定/ }).click()
   await expect(page.getByRole('dialog', { name: '红莲业火' })).toContainText('业纹从莲座逐层向上点燃')
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow')
   expect(consoleErrors).toEqual([])
 })
 
