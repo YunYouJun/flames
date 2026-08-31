@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions } from '../src/types'
+import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SpiritKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -9,7 +9,7 @@ import {
 
 describe('kernel registry', () => {
   it('registers every implemented kernel exactly once', () => {
-    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale'])
+    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit'])
     expect(Object.keys(flameKernelRegistry)).toEqual(flameKernelIds)
 
     for (const id of flameKernelIds) {
@@ -24,6 +24,7 @@ describe('kernel registry', () => {
     expectTypeOf<FlamePreset<'lotus'>['kernelOptions']>().toEqualTypeOf<LotusKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'fluid'>['kernelOptions']>().toEqualTypeOf<FluidKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'gale'>['kernelOptions']>().toEqualTypeOf<GaleKernelOptions | undefined>()
+    expectTypeOf<FlamePreset<'spirit'>['kernelOptions']>().toEqualTypeOf<SpiritKernelOptions | undefined>()
   })
 
   it('maps reviewed lotus modes to stable shader variants', () => {
@@ -75,6 +76,24 @@ describe('kernel registry', () => {
 
     expect(getFlameKernelVariant({ ...galePreset, kernelOptions: { galeMode: 'nether' } })).toBe(0)
     expect(getFlameKernelVariant({ ...galePreset, kernelOptions: { galeMode: 'dragon' } })).toBe(1)
+  })
+
+  it('maps reviewed spirit modes to stable shader variants', () => {
+    const spiritPreset: FlamePreset<'spirit'> = {
+      id: 'spirit-variant',
+      rank: 1,
+      kernel: 'spirit',
+      palette: { core: '#ffffff', inner: '#b9d9ff', outer: '#3d4668' },
+      speed: 1,
+      scale: 1,
+      turbulence: 1,
+      intensity: 1,
+    }
+
+    expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'thunder' } })).toBe(0)
+    expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'starlit' } })).toBe(1)
+    expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'turtle' } })).toBe(2)
+    expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'beasts' } })).toBe(3)
   })
 
   it('exposes a stable diagnostics contract', () => {

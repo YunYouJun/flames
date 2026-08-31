@@ -1,5 +1,5 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions } from './types'
+import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SpiritKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
@@ -7,6 +7,7 @@ import { coldFragmentShader } from './shaders/cold'
 import { fluidFragmentShader } from './shaders/fluid'
 import { galeFragmentShader } from './shaders/gale'
 import { lotusFragmentShader } from './shaders/lotus'
+import { spiritFragmentShader } from './shaders/spirit'
 import { voidFragmentShader } from './shaders/void'
 
 export interface FlameKernelDefinition {
@@ -39,6 +40,10 @@ export const flameKernelRegistry = {
     id: 'gale',
     fragmentShader: galeFragmentShader,
   },
+  spirit: {
+    id: 'spirit',
+    fragmentShader: spiritFragmentShader,
+  },
 } satisfies Record<FlameKernelId, FlameKernelDefinition>
 
 export const flameKernelIds = Object.keys(flameKernelRegistry) as FlameKernelId[]
@@ -68,6 +73,15 @@ export function getFlameKernelVariant(preset: FlamePreset): number {
     const options = preset.kernelOptions as GaleKernelOptions | undefined
     if (options?.galeMode === 'dragon')
       return 1
+  }
+  if (preset.kernel === 'spirit') {
+    const options = preset.kernelOptions as SpiritKernelOptions | undefined
+    if (options?.spiritMode === 'starlit')
+      return 1
+    if (options?.spiritMode === 'turtle')
+      return 2
+    if (options?.spiritMode === 'beasts')
+      return 3
   }
   return 0
 }

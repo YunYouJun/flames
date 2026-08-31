@@ -79,6 +79,23 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/galeMode/)
   })
 
+  it('accepts reviewed spirit modes and rejects unknown variants', () => {
+    for (const spiritMode of ['thunder', 'starlit', 'turtle', 'beasts'] as const) {
+      const spiritPreset = {
+        ...preset,
+        kernel: 'spirit',
+        kernelOptions: { spiritMode },
+      } as unknown as FlamePreset
+      expect(validateFlamePreset(spiritPreset)).toBe(spiritPreset)
+    }
+
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'spirit',
+      kernelOptions: { spiritMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/spiritMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

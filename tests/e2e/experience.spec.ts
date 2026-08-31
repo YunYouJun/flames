@@ -182,6 +182,36 @@ test('renders distinct gale family prototypes inside renderer budgets', async ({
   expect(consoleErrors).toEqual([])
 })
 
+test('renders distinct spirit family prototypes inside renderer budgets', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  const prototypes = [
+    ['three-thousand', '三千焱炎火', '紫黑焰身拉成长距离星轨火龙'],
+    ['nine-dragon-thunder', '九龙雷罡火', '九枚龙首沿三层轨道巡游'],
+    ['turtle-spirit', '龟灵地火', '厚重龟甲作为主体'],
+    ['myriad-beasts', '万兽灵火', '七枚抽象兽面在红色主焰外围交替浮现'],
+  ] as const
+
+  for (const [slug, name, interpretation] of prototypes) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('main[data-visual-state="prototype"][data-kernel="spirit"]')).toBeVisible()
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+    expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+    expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+    await page.getByRole('button', { name: /阅览设定/ }).click()
+    await expect(page.getByRole('dialog', { name })).toContainText(interpretation)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  }
+
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 
