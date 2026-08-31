@@ -11,6 +11,13 @@ defineEmits<{
 }>()
 
 const rankLabel = computed(() => formatFlameRank(props.flame.rank))
+const stateLabel = computed(() => {
+  if (props.flame.rank === 1)
+    return '终局封印'
+  if (props.flame.visual.state === 'prototype' && import.meta.dev)
+    return '凝聚中 · 仅供评审'
+  return '尚未凝聚'
+})
 </script>
 
 <template>
@@ -23,7 +30,7 @@ const rankLabel = computed(() => formatFlameRank(props.flame.rank))
       {{ flame.epithet }}
     </p>
     <p v-if="flame.visual.state !== 'approved'" class="identity-state">
-      {{ flame.rank === 1 ? '终局封印' : '尚未凝聚' }}
+      {{ stateLabel }}
     </p>
     <button class="text-action" type="button" @click="$emit('showDetails')">
       阅览设定

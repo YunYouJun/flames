@@ -69,6 +69,7 @@ watch(() => activeFlame.value?.slug, (slug) => {
     :data-hydrated="hydrated || undefined"
     :data-kernel="activeFlame?.kernel"
     :data-family="activeFamily"
+    :data-bloom-mode="activeFlame?.kernel === 'lotus' ? activeFlame.kernelOptions?.bloomMode ?? 'purifying' : undefined"
     :data-visual-state="flame.visual.state"
     :data-benchmark="benchmarkTime !== undefined || undefined"
   >
@@ -125,7 +126,7 @@ watch(() => activeFlame.value?.slug, (slug) => {
         </p>
       </div>
 
-      <InteractionGuide v-if="activeFlame" :kernel="activeFlame.kernel" />
+      <InteractionGuide v-if="activeFlame" :interactions="activeFlame.interactions" />
       <aside v-else class="sealed-guide" aria-label="凝聚状态">
         <span aria-hidden="true">封</span>
         <p>

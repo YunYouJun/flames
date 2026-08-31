@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions } from '../src/types'
+import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, LotusKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -20,7 +20,7 @@ describe('kernel registry', () => {
 
   it('keeps kernel options typed without changing existing presets', () => {
     expectTypeOf<FlamePreset<'lotus'>['kernel']>().toEqualTypeOf<'lotus'>()
-    expectTypeOf<FlamePreset<'lotus'>['kernelOptions']>().toEqualTypeOf<undefined>()
+    expectTypeOf<FlamePreset<'lotus'>['kernelOptions']>().toEqualTypeOf<LotusKernelOptions | undefined>()
   })
 
   it('exposes a stable diagnostics contract', () => {

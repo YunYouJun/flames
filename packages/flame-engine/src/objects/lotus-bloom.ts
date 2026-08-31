@@ -1,5 +1,5 @@
 import type { IUniform, Vector2 } from 'three'
-import type { FlamePalette, FlameQuality } from '../types'
+import type { FlameKernelOptions, FlamePalette, FlameQuality } from '../types'
 import type { FlameSculpture } from './flame-sculpture'
 import {
   BufferAttribute,
@@ -136,6 +136,7 @@ export class LotusBloom implements FlameSculpture {
   private intensity = 1
   private quality: FlameQuality
   private speed = 1
+  private variant = 0
   private viewportScale = 1
 
   constructor(palette: FlamePalette, quality: FlameQuality) {
@@ -153,6 +154,7 @@ export class LotusBloom implements FlameSculpture {
         uPressed: { value: 0 },
         uIntensity: { value: 1 },
         uQuality: { value: qualityRank[quality] / 2 },
+        uVariant: { value: 0 },
         uCore: { value: new Color(palette.core) },
         uInner: { value: new Color(palette.inner) },
         uOuter: { value: new Color(palette.outer) },
@@ -202,14 +204,16 @@ export class LotusBloom implements FlameSculpture {
     this.group.visible = active && this.quality !== 'lite'
   }
 
-  setAppearance(palette: FlamePalette, speed: number, intensity: number): void {
+  setAppearance(palette: FlamePalette, speed: number, intensity: number, options?: FlameKernelOptions): void {
     this.speed = speed
     this.intensity = intensity
+    this.variant = options?.bloomMode === 'karmic' ? 1 : 0
     this.uniform<Color>('uCore').value.set(palette.core)
     this.uniform<Color>('uInner').value.set(palette.inner)
     this.uniform<Color>('uOuter').value.set(palette.outer)
     this.uniform<number>('uSpeed').value = speed
     this.uniform<number>('uIntensity').value = intensity
+    this.uniform<number>('uVariant').value = this.variant
   }
 
   setQuality(quality: FlameQuality): void {
@@ -237,9 +241,10 @@ export class LotusBloom implements FlameSculpture {
     this.uniform<number>('uIntensity').value = this.intensity
     this.uniform<number>('uPressed').value = pressed
 
-    const scale = this.viewportScale * (1 + pressed * 0.055)
+    const scale = this.viewportScale * mix(1, 0.94, this.variant) * (1 + pressed * mix(0.055, 0.09, this.variant))
     this.group.scale.setScalar(scale)
-    this.group.rotation.x = -0.04 - pointer.y * 0.075
+    this.group.position.y = mix(-0.26, -0.31, this.variant)
+    this.group.rotation.x = mix(-0.04, -0.075, this.variant) - pointer.y * 0.075
     this.group.rotation.z = -pointer.x * 0.035
 
     for (const [index, layer] of this.layerGroups.entries()) {
@@ -247,7 +252,11 @@ export class LotusBloom implements FlameSculpture {
       if (!spec)
         continue
       const pointerTurn = pointer.x * (0.11 + index * 0.025)
-      layer.rotation.y = time * this.speed * spec.spin + pointerTurn + drag * spec.spin * 0.72
+      const karmicOffset = this.variant * (index - 1) * 0.22
+      const karmicPulse = this.variant * Math.sin(time * this.speed * 1.8 + index * 1.7) * 0.025
+      layer.rotation.y = time * this.speed * spec.spin + pointerTurn + drag * spec.spin * mix(0.72, 1.24, this.variant) + karmicOffset + karmicPulse
+      const layerScale = 1 - this.variant * index * 0.045 + pressed * this.variant * (0.015 + index * 0.012)
+      layer.scale.setScalar(layerScale)
     }
   }
 
@@ -257,4 +266,8 @@ export class LotusBloom implements FlameSculpture {
       throw new Error(`Missing lotus bloom uniform: ${name}`)
     return uniform
   }
+}
+
+function mix(from: number, to: number, amount: number): number {
+  return from + (to - from) * amount
 }

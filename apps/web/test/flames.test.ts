@@ -1,6 +1,7 @@
 import { validateFlamePreset } from '@yunyoujun/flame-engine'
 import { describe, expect, it } from 'vitest'
 import {
+  flameCatalog,
   flameRoster,
   flameRosterBySlug,
   getFlamePreset,
@@ -54,7 +55,7 @@ describe('flame roster', () => {
     }
   })
 
-  it('keeps only implemented, reviewed seats renderable', () => {
+  it('keeps implemented seats renderable while the public catalog stays approved-only', () => {
     const renderable = flameRoster.flatMap((flame) => {
       const preset = getFlamePreset(flame)
       return preset ? [validateFlamePreset(preset)] : []
@@ -63,8 +64,29 @@ describe('flame roster', () => {
     expect(renderable.map(preset => preset.id)).toEqual([
       'nihility',
       'purifying-lotus',
+      'karmic-lotus',
       'bone-chilling',
     ])
+    expect(flameCatalog.map(flame => flame.id)).toEqual([
+      'nihility',
+      'purifying-lotus',
+      'bone-chilling',
+    ])
+  })
+
+  it('keeps the red lotus implementation dev-only until visual approval', () => {
+    const redLotus = flameRosterBySlug.get('karmic-lotus')
+
+    expect(redLotus?.visual.state).toBe('prototype')
+    expect(getFlamePreset(redLotus!)).toMatchObject({
+      id: 'karmic-lotus',
+      rank: 8,
+      kernel: 'lotus',
+      kernelOptions: {
+        bloomMode: 'karmic',
+      },
+    })
+    expect(flameCatalog.map(flame => flame.id)).not.toContain('karmic-lotus')
   })
 
   it('assigns one representative to every visual family', () => {

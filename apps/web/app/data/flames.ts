@@ -46,7 +46,9 @@ export interface FlameVisualBrief {
   reviewScenes: FlameReviewScene[]
 }
 
-export type FlameRenderPreset = Omit<FlamePreset, 'id' | 'rank'>
+export type FlameRenderPreset = {
+  [K in FlameKernelId]: Omit<FlamePreset<K>, 'id' | 'rank'>
+}[FlameKernelId]
 
 export type FlameVisual
   = | {
@@ -86,6 +88,7 @@ export interface FlameEntry extends FlamePreset {
   epithet: string
   description: string
   interpretation: string
+  interactions: FlameInteractionBrief
   sourceLabel: string
   sourceUrl: string
   identityBasis: FlameIdentityBasis
@@ -144,7 +147,15 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
-const approvedBriefs = {
+function prototypeVisual(
+  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
+  brief: FlameVisualBrief,
+  preset: FlameRenderPreset,
+): FlameVisual {
+  return { state: 'prototype', plannedFamily, brief, preset }
+}
+
+const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
     interpretation: '以近乎无光的火心、被吞没的边缘与随拖拽收束的涡流，表现“吞噬”而非普通燃烧。',
@@ -174,6 +185,22 @@ const approvedBriefs = {
     },
     fallback: '以三层 CSS 莲瓣与乳白焰心保持莲形识别。',
     differentiation: '开放、洁净的乳白花冠区别于红莲与低矮青莲。',
+    specialPasses: ['lotus-petals'],
+    reviewScenes,
+  },
+  karmicLotus: {
+    facts: ['深红色异火，升腾时会形成鲜明的红莲纹样。'],
+    interpretation: '以向上叠合的深红焰片逐层结成红莲；长按时业纹从莲心向外点燃，拖拽时外层焰瓣产生错位回旋。',
+    silhouette: '收束的多层红莲托起尖锐主焰，外缘保留灼烧后的暗色缺口。',
+    palette: '炽白金焰心、猩红内焰、深绯外瓣与近黑焦边。',
+    motion: '焰片由下至上错相叠合，呼吸节奏比净莲妖火更急促、更具压迫感。',
+    interactions: {
+      pointer: '莲心与焰纹朝指针方向偏转。',
+      hold: '业纹沿层叠焰瓣向外点燃。',
+      drag: '外层红莲发生错位回旋。',
+    },
+    fallback: '以收束的深红莲瓣、金白焰心与焦黑边缘保留业火识别。',
+    differentiation: '层叠、收束且带焦边的深红业纹，区别于净莲妖火开放平稳的乳白花冠。',
     specialPasses: ['lotus-petals'],
     reviewScenes,
   },
@@ -218,7 +245,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('虚无吞炎的颜色、吞噬特征与榜位相关描写。')],
-    visual: approvedVisual('void', approvedBriefs.nihility, {
+    visual: approvedVisual('void', visualBriefs.nihility, {
       kernel: 'void',
       palette: { core: '#d8a8ff', inner: '#6e3d92', outer: '#110917' },
       speed: 0.72,
@@ -237,7 +264,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('净莲妖火的颜色、净化特征与榜位相关描写。')],
-    visual: approvedVisual('lotus', approvedBriefs.purifyingLotus, {
+    visual: approvedVisual('lotus', visualBriefs.purifyingLotus, {
       kernel: 'lotus',
       palette: { core: '#fffef4', inner: '#d8ffff', outer: '#76bfc5' },
       speed: 0.86,
@@ -304,7 +331,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('深红色、红莲纹样与压制九幽风炎的相关描写。')],
-    visual: reservedVisual('lotus'),
+    visual: prototypeVisual('lotus', visualBriefs.karmicLotus, {
+      kernel: 'lotus',
+      kernelOptions: { bloomMode: 'karmic' },
+      palette: { core: '#fff1c2', inner: '#ff3a20', outer: '#5a000b' },
+      speed: 0.96,
+      scale: 0.76,
+      turbulence: 1.14,
+      intensity: 1.08,
+    }),
   },
   {
     id: 'three-thousand',
@@ -340,7 +375,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('白色、极寒与极热并存及其诞生环境的相关描写。')],
-    visual: approvedVisual('cold', approvedBriefs.boneChilling, {
+    visual: approvedVisual('cold', visualBriefs.boneChilling, {
       kernel: 'cold',
       palette: { core: '#ffffff', inner: '#f2f8ff', outer: '#c2cdd2' },
       speed: 0.72,
@@ -597,6 +632,7 @@ export function getFlameEntry(flame: FlameSeat): FlameEntry | undefined {
     epithet: flame.epithet,
     description: flame.summary,
     interpretation: flame.visual.brief.interpretation,
+    interactions: flame.visual.brief.interactions,
     sourceLabel: flame.sources.map(source => source.label).join('；'),
     sourceUrl: primarySource?.url ?? QIDIAN_NOVEL_URL,
     identityBasis: flame.identityBasis,

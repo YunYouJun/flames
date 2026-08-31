@@ -22,6 +22,7 @@ export const sharedFragment = /* glsl */ `
   uniform float uTurbulence;
   uniform float uIntensity;
   uniform float uQuality;
+  uniform float uVariant;
   uniform vec3 uCore;
   uniform vec3 uInner;
   uniform vec3 uOuter;

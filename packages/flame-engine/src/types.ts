@@ -4,15 +4,21 @@ export type FlameKernelId = 'void' | 'lotus' | 'cold'
 export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
+export interface LotusKernelOptions {
+  bloomMode: 'purifying' | 'karmic'
+}
+
 /**
  * Kernel-specific controls are added here as a kernel gains reviewed variants.
  * `never` keeps today's presets unchanged while preserving a typed extension point.
  */
 export interface FlameKernelOptionsMap {
   void: never
-  lotus: never
+  lotus: LotusKernelOptions
   cold: never
 }
+
+export type FlameKernelOptions = FlameKernelOptionsMap[FlameKernelId]
 
 export interface FlamePalette {
   core: ColorRepresentation

@@ -26,6 +26,13 @@ describe('flame preset validation', () => {
     expect(() => validateFlamePreset({ ...preset, speed: 0 })).toThrow(/speed/)
   })
 
+  it('rejects unsupported lotus bloom modes', () => {
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernelOptions: { bloomMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/bloomMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

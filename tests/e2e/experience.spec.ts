@@ -54,6 +54,29 @@ test('labels extension-only identities and derived alternatives', async ({ page 
   await expect(details).toContainText('风雷怒焱')
 })
 
+test('renders the red lotus prototype with its karmic interaction contract', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  await page.goto('/flames/karmic-lotus?benchmark=1&quality=balanced')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+
+  const experience = page.locator('main[data-visual-state="prototype"]')
+  await expect(experience).toHaveAttribute('data-bloom-mode', 'karmic')
+  const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+  await expect(canvas).toBeVisible()
+  expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+  expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+  await page.getByRole('button', { name: /阅览设定/ }).click()
+  await expect(page.getByRole('dialog', { name: '红莲业火' })).toContainText('业纹从莲心向外点燃')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 

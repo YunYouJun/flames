@@ -8,6 +8,7 @@ export { validateFlameCatalog, validateFlamePreset } from './preset'
 export { FlameRuntime } from './runtime'
 export type {
   FlameKernelId,
+  FlameKernelOptions,
   FlameKernelOptionsMap,
   FlamePalette,
   FlamePointerInput,
@@ -16,4 +17,5 @@ export type {
   FlameRuntimeDiagnostics,
   FlameRuntimeOptions,
   FlameRuntimeStatus,
+  LotusKernelOptions,
 } from './types'

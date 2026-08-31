@@ -1,5 +1,5 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlameQuality } from './types'
+import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { VoidVortex } from './objects/void-vortex'
 import { coldFragmentShader } from './shaders/cold'
@@ -33,4 +33,10 @@ export const flameKernelIds = Object.keys(flameKernelRegistry) as FlameKernelId[
 
 export function getFlameKernelDefinition(kernel: FlameKernelId): FlameKernelDefinition {
   return flameKernelRegistry[kernel]
+}
+
+export function getFlameKernelVariant(preset: FlamePreset): number {
+  if (preset.kernel === 'lotus' && preset.kernelOptions?.bloomMode === 'karmic')
+    return 1
+  return 0
 }

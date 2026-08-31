@@ -20,7 +20,7 @@ import {
   Vector2,
   WebGLRenderer,
 } from 'three'
-import { flameKernelIds, getFlameKernelDefinition } from './kernel-registry'
+import { flameKernelIds, getFlameKernelDefinition, getFlameKernelVariant } from './kernel-registry'
 import { validateFlamePreset } from './preset'
 import { vertexShader } from './shaders/shared'
 
@@ -206,6 +206,7 @@ export class FlameRuntime {
         uTurbulence: { value: 1 },
         uIntensity: { value: 1 },
         uQuality: { value: shaderQuality[this.quality] },
+        uVariant: { value: 0 },
         uCore: { value: new Color(0xFFFFFF) },
         uInner: { value: new Color(0xFFFFFF) },
         uOuter: { value: new Color(0xFFFFFF) },
@@ -222,10 +223,11 @@ export class FlameRuntime {
     this.uniform<number>(material, 'uSpeed').value = preset.speed
     this.uniform<number>(material, 'uTurbulence').value = preset.turbulence
     this.uniform<number>(material, 'uIntensity').value = preset.intensity
+    this.uniform<number>(material, 'uVariant').value = getFlameKernelVariant(preset)
     this.uniform<Color>(material, 'uCore').value.set(preset.palette.core)
     this.uniform<Color>(material, 'uInner').value.set(preset.palette.inner)
     this.uniform<Color>(material, 'uOuter').value.set(preset.palette.outer)
-    this.sculptures[preset.kernel]?.setAppearance(preset.palette, preset.speed, preset.intensity)
+    this.sculptures[preset.kernel]?.setAppearance(preset.palette, preset.speed, preset.intensity, preset.kernelOptions)
     this.setActiveSculpture(preset.kernel)
   }
 
