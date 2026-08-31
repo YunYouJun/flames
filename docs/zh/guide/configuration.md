@@ -1,6 +1,6 @@
 # 预设配置
 
-每种异火通过 `FlamePreset` 选择 `void`、`lotus`、`cold` 或 `fluid` kernel，并调整下列参数：
+每种异火通过 `FlamePreset` 从 `void`、`lotus`、`cold`、`fluid`、`gale`、`spirit`、`soul`、`crown`、`geofire` 九个 kernel 中选择其一，并调整下列参数：
 
 | 字段 | 用途 |
 | --- | --- |
@@ -11,7 +11,7 @@
 
 开发预设时使用 `validateFlamePreset`，整理目录时使用 `validateFlameCatalog` 拒绝重复 id 与名次。
 
-已评审的变体通过类型化 kernel options 表达：莲相使用 `bloomMode`，流火目前使用 `tidal` 流动模式。
+同族变体通过类型化 kernel options 表达，分别使用 `bloomMode`、`flowMode`、`galeMode`、`spiritMode`、`soulMode`、`crownMode` 与 `earthMode`；`void` 和 `cold` 不需要变体参数。
 
 运行时画质分为 `high`、`balanced` 与 `lite`，设备像素比上限分别为 2、1.5 与 1。移动端默认使用均衡档，且所有环境都支持暂停与 `prefers-reduced-motion`。
 
