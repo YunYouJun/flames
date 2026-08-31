@@ -1,4 +1,4 @@
-import type { FlamePreset, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
+import type { CrownKernelOptions, FlamePreset, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
 import { Color } from 'three'
 
 export function validateFlamePreset(preset: FlamePreset): FlamePreset {
@@ -45,6 +45,11 @@ export function validateFlamePreset(preset: FlamePreset): FlamePreset {
     const options = preset.kernelOptions as SoulKernelOptions
     if (options.soulMode !== 'heart' && options.soulMode !== 'duality')
       throw new Error(`Flame preset "${preset.id}" has an unsupported soul soulMode.`)
+  }
+  else if (preset.kernel === 'crown' && preset.kernelOptions) {
+    const options = preset.kernelOptions as CrownKernelOptions
+    if (options.crownMode !== 'golden' && options.crownMode !== 'desolation' && options.crownMode !== 'ancestral' && options.crownMode !== 'emperor')
+      throw new Error(`Flame preset "${preset.id}" has an unsupported crown crownMode.`)
   }
   else if (preset.kernelOptions !== undefined) {
     throw new Error(`Flame preset "${preset.id}" does not support kernelOptions.`)

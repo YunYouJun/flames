@@ -23,12 +23,11 @@ test('navigates between approved flames from the short roster', async ({ page })
   await expect(page.getByRole('heading', { name: '骨灵冷火' })).toBeVisible()
 })
 
-test('renders reserved seats without initializing WebGL', async ({ page }) => {
-  await page.goto('/flames/golden-emperor')
+test('keeps development prototypes sealed from search indexing', async ({ page }) => {
+  await page.goto('/flames/golden-emperor?benchmark=1&quality=balanced')
 
-  await expect(page.getByRole('heading', { name: '金帝焚天炎' })).toBeVisible()
-  await expect(page.getByRole('paragraph').filter({ hasText: '尚未凝聚' })).toBeVisible()
-  await expect(page.locator('canvas')).toHaveCount(0)
+  await expect(page.locator('main[data-visual-state="prototype"][data-kernel="crown"]')).toBeVisible()
+  await expect(page.locator('canvas[data-benchmark-ready="true"]')).toBeVisible()
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
   await expect(page.getByText('基础异火已现世 6 / 22')).toBeVisible()
   await expect(page.getByText('帝炎未启')).toBeVisible()
@@ -228,6 +227,36 @@ test('renders distinct soul family prototypes inside renderer budgets', async ({
   for (const [slug, name, interpretation] of prototypes) {
     await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="prototype"][data-kernel="soul"]')).toBeVisible()
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+    expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+    expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+    await page.getByRole('button', { name: /阅览设定/ }).click()
+    await expect(page.getByRole('dialog', { name })).toContainText(interpretation)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  }
+
+  expect(consoleErrors).toEqual([])
+})
+
+test('renders distinct crown family and terminal prototypes inside renderer budgets', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  const prototypes = [
+    ['emperor', '帝炎', '四层同心万火冠环汇聚到无色焰核'],
+    ['golden-emperor', '金帝焚天炎', '流金主焰收束为五尖焰冠'],
+    ['eight-desolation', '八荒破灭焱', '左右展开的淡黑宽翼占据画面'],
+    ['nether-golden', '九幽金祖火', '沉凝暗金祖焰构成碑状火印'],
+  ] as const
+
+  for (const [slug, name, interpretation] of prototypes) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('main[data-visual-state="prototype"][data-kernel="crown"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
     expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)

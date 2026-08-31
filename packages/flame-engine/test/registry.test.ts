@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from '../src/types'
+import type { CrownKernelOptions, FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -9,7 +9,7 @@ import {
 
 describe('kernel registry', () => {
   it('registers every implemented kernel exactly once', () => {
-    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit', 'soul'])
+    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit', 'soul', 'crown'])
     expect(Object.keys(flameKernelRegistry)).toEqual(flameKernelIds)
 
     for (const id of flameKernelIds) {
@@ -26,6 +26,7 @@ describe('kernel registry', () => {
     expectTypeOf<FlamePreset<'gale'>['kernelOptions']>().toEqualTypeOf<GaleKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'spirit'>['kernelOptions']>().toEqualTypeOf<SpiritKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'soul'>['kernelOptions']>().toEqualTypeOf<SoulKernelOptions | undefined>()
+    expectTypeOf<FlamePreset<'crown'>['kernelOptions']>().toEqualTypeOf<CrownKernelOptions | undefined>()
   })
 
   it('maps reviewed lotus modes to stable shader variants', () => {
@@ -111,6 +112,24 @@ describe('kernel registry', () => {
 
     expect(getFlameKernelVariant({ ...soulPreset, kernelOptions: { soulMode: 'heart' } })).toBe(0)
     expect(getFlameKernelVariant({ ...soulPreset, kernelOptions: { soulMode: 'duality' } })).toBe(1)
+  })
+
+  it('maps reviewed crown modes to stable shader variants', () => {
+    const crownPreset: FlamePreset<'crown'> = {
+      id: 'crown-variant',
+      rank: 1,
+      kernel: 'crown',
+      palette: { core: '#ffffff', inner: '#ffbf32', outer: '#5f2800' },
+      speed: 1,
+      scale: 1,
+      turbulence: 1,
+      intensity: 1,
+    }
+
+    expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'golden' } })).toBe(0)
+    expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'desolation' } })).toBe(1)
+    expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'ancestral' } })).toBe(2)
+    expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'emperor' } })).toBe(3)
   })
 
   it('exposes a stable diagnostics contract', () => {

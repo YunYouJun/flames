@@ -113,6 +113,23 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/soulMode/)
   })
 
+  it('accepts reviewed crown modes and rejects unknown variants', () => {
+    for (const crownMode of ['golden', 'desolation', 'ancestral', 'emperor'] as const) {
+      const crownPreset = {
+        ...preset,
+        kernel: 'crown',
+        kernelOptions: { crownMode },
+      } as unknown as FlamePreset
+      expect(validateFlamePreset(crownPreset)).toBe(crownPreset)
+    }
+
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'crown',
+      kernelOptions: { crownMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/crownMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

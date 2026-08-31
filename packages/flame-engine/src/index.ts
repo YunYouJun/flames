@@ -7,6 +7,7 @@ export type { FlameKernelDefinition } from './kernel-registry'
 export { validateFlameCatalog, validateFlamePreset } from './preset'
 export { FlameRuntime } from './runtime'
 export type {
+  CrownKernelOptions,
   FlameKernelId,
   FlameKernelOptions,
   FlameKernelOptionsMap,

@@ -62,9 +62,13 @@ describe('flame roster', () => {
     })
 
     expect(renderable.map(preset => preset.id)).toEqual([
+      'emperor',
       'nihility',
       'purifying-lotus',
+      'golden-emperor',
       'life-spirit',
+      'eight-desolation',
+      'nether-golden',
       'karmic-lotus',
       'three-thousand',
       'nether-gale',
@@ -209,6 +213,27 @@ describe('flame roster', () => {
         rank,
         kernel: 'soul',
         kernelOptions: { soulMode },
+      })
+      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+    }
+  })
+
+  it('keeps the crown family and terminal emperor dev-only until final visual approval', () => {
+    const prototypes = [
+      ['emperor', 1, 'emperor'],
+      ['golden-emperor', 4, 'golden'],
+      ['eight-desolation', 6, 'desolation'],
+      ['nether-golden', 7, 'ancestral'],
+    ] as const
+
+    for (const [id, rank, crownMode] of prototypes) {
+      const flame = flameRosterBySlug.get(id)
+      expect(flame?.visual.state).toBe('prototype')
+      expect(getFlamePreset(flame!)).toMatchObject({
+        id,
+        rank,
+        kernel: 'crown',
+        kernelOptions: { crownMode },
       })
       expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
     }

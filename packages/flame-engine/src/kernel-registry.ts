@@ -1,9 +1,10 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
+import type { CrownKernelOptions, FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
 import { coldFragmentShader } from './shaders/cold'
+import { crownFragmentShader } from './shaders/crown'
 import { fluidFragmentShader } from './shaders/fluid'
 import { galeFragmentShader } from './shaders/gale'
 import { lotusFragmentShader } from './shaders/lotus'
@@ -49,6 +50,10 @@ export const flameKernelRegistry = {
     id: 'soul',
     fragmentShader: soulFragmentShader,
   },
+  crown: {
+    id: 'crown',
+    fragmentShader: crownFragmentShader,
+  },
 } satisfies Record<FlameKernelId, FlameKernelDefinition>
 
 export const flameKernelIds = Object.keys(flameKernelRegistry) as FlameKernelId[]
@@ -92,6 +97,15 @@ export function getFlameKernelVariant(preset: FlamePreset): number {
     const options = preset.kernelOptions as SoulKernelOptions | undefined
     if (options?.soulMode === 'duality')
       return 1
+  }
+  if (preset.kernel === 'crown') {
+    const options = preset.kernelOptions as CrownKernelOptions | undefined
+    if (options?.crownMode === 'desolation')
+      return 1
+    if (options?.crownMode === 'ancestral')
+      return 2
+    if (options?.crownMode === 'emperor')
+      return 3
   }
   return 0
 }
