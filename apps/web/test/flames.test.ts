@@ -248,7 +248,7 @@ describe('flame roster', () => {
       },
       speed: 1.24,
       scale: 1,
-      turbulence: 1.02,
+      turbulence: 1.18,
       intensity: 1.42,
     })
   })

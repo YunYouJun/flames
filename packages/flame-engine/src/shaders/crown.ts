@@ -9,42 +9,46 @@ export const crownFragmentShader = /* glsl */ `
   }
 
   vec3 goldenCrown(vec2 point, float clock) {
-    vec2 royalPoint = point - vec2(uPointer.x * 0.028, uPointer.y * 0.012);
-    vec2 flamePoint = royalPoint;
-    float lift = smoothstep(-0.52, 0.86, flamePoint.y);
-    float risingNoise = fbmFast(flamePoint * vec2(2.8, 1.7) + vec2(clock * 0.10, -clock * 1.72));
-    float crossingNoise = fbmFast(flamePoint * vec2(3.7, 2.1) + vec2(-clock * 0.22, -clock * 1.28) + 13.7);
-    flamePoint.x += (risingNoise - 0.5) * (0.08 + lift * 0.16) * uTurbulence;
-    flamePoint.y += (crossingNoise - 0.5) * 0.065 * uTurbulence;
+    vec2 royal = point - vec2(uPointer.x * 0.028, uPointer.y * 0.012);
+    vec2 flow = advectFlame(royal, clock * 1.34);
+    vec2 eddy = royal * 1.72 + vec2(6.4, -3.1);
+    flow += (advectFlame(eddy, clock * 2.18) - eddy) * (0.18 + smoothstep(-0.52, 0.86, royal.y) * 0.56);
 
-    vec3 plume = plumeLayers(flamePoint * vec2(0.86, 0.82), clock * 1.28, 1.06, 0.028);
+    vec3 plume = plumeLayers(flow * vec2(0.86, 0.82), clock * 1.28, 1.06, 0.028);
     float tongues = 0.0;
+    float cores = 0.0;
     for (int index = 0; index < 7; index += 1) {
       float unit = float(index) - 3.0;
-      float center = unit * 0.115;
-      float height = 0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12;
-      float tongue = flameTongue(flamePoint, clock * 1.72, center, float(index) * 1.37 + 0.6, height, 0.14 - abs(unit) * 0.008);
+      float phase = float(index) * 1.37 + 0.6;
+      float pulse = noise21(vec2(clock * 0.72 + phase, phase * 2.71));
+      float center = unit * 0.115 + (pulse - 0.5) * 0.10;
+      float height = (0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12) * (0.78 + pulse * 0.36);
+      float width = 0.14 - abs(unit) * 0.008;
+      float tongue = flameTongue(flow, clock * 1.72, center, phase, height, width);
       tongues = max(tongues, tongue);
+      cores = max(cores, pow(tongue, 2.2));
     }
 
-    float moltenBase = ellipseMask(flamePoint, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
-    float flameBody = max(max(plume.x * (0.72 + risingNoise * 0.34), tongues), moltenBase);
-    float breakupNoise = fbmFast(flamePoint * vec2(5.2, 3.1) + vec2(-clock * 0.28, -clock * 2.24));
-    float breakup = smoothstep(0.66, 0.90, breakupNoise) * smoothstep(-0.18, 0.82, flamePoint.y);
-    flameBody *= 1.0 - breakup * 0.64;
-    float liquidWave = 0.5 + 0.5 * sin(flamePoint.y * 21.0 - clock * 3.2 + sin(flamePoint.x * 10.0) * 1.35);
-    float liquid = smoothstep(0.54, 0.94, liquidWave) * flameBody;
-    liquid += smoothstep(0.62, 0.92, fbmFast(flamePoint * vec2(8.0, 5.6) - vec2(0.0, clock * 1.62))) * flameBody * 0.86;
+    float base = ellipseMask(flow, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
+    float support = plume.x * (1.0 - smoothstep(0.04, 0.72, flow.y));
+    float body = max(max(support, tongues), base);
+    float erosion = fbmFast(flow * vec2(5.8, 3.7) + vec2(-clock * 0.44, -clock * 2.36));
+    float breakup = smoothstep(0.60, 0.84, erosion) * smoothstep(-0.22, 0.86, flow.y);
+    body *= 1.0 - breakup * 0.76;
+    float glow = fbmFast(flow * vec2(7.4, 4.6) + vec2(clock * 0.32, -clock * 2.08));
+    float heat = max(cores, pow(support, 1.65));
+    heat = max(heat, ellipseMask(flow, vec2(0.0, -0.49), vec2(0.33, 0.065), 0.42));
+    heat *= 0.42 + smoothstep(0.32, 0.78, glow) * 0.78;
 
-    float haloRadius = length(royalPoint * vec2(1.0, 1.04));
-    float haloAngle = atan(royalPoint.y, royalPoint.x);
+    float haloRadius = length(royal * vec2(1.0, 1.04));
+    float haloAngle = atan(royal.y, royal.x);
     float halo = 1.0 - smoothstep(0.016, 0.052, abs(haloRadius - (0.51 + uPressed * 0.04)));
     float rays = pow(abs(cos(haloAngle * 12.0 - clock * 0.18)), 24.0);
     rays *= smoothstep(0.50, 0.56, haloRadius) * (1.0 - smoothstep(0.65, 0.77, haloRadius));
-    float riftDistance = abs(royalPoint.x) - 0.64 - sin(royalPoint.y * 9.0 + clock * 0.36) * 0.024;
+    float riftDistance = abs(royal.x) - 0.64 - sin(royal.y * 9.0 + clock * 0.36) * 0.024;
     float rifts = 1.0 - smoothstep(0.008, 0.023, abs(riftDistance));
-    rifts *= smoothstep(-0.30, -0.04, royalPoint.y) * (1.0 - smoothstep(0.54, 0.76, royalPoint.y));
-    return vec3(flameBody, liquid, max(max(halo, rays), rifts));
+    rifts *= smoothstep(-0.30, -0.04, royal.y) * (1.0 - smoothstep(0.54, 0.76, royal.y));
+    return vec3(body, heat, max(max(halo, rays), rifts));
   }
 
   vec3 desolationWings(vec2 point, float clock) {
@@ -139,9 +143,9 @@ export const crownFragmentShader = /* glsl */ `
     color += uInner * (mask * 0.43 + goldField.x * 0.62 + goldField.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emperorField.x * 0.68);
     color += uCore * (filament * 0.72 + goldField.x * 0.24 + goldField.y * 1.18 + goldField.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emperorField.z * 1.28 + motes * 1.32);
     if (golden > 0.5) {
-      color = uOuter * (goldField.x * 0.62 + goldField.z * 0.30);
-      color += uInner * (goldField.x * 0.78 + goldField.y * 1.12 + goldField.z * 0.54);
-      color += uCore * (filament * 0.82 + goldField.y * 0.74 + motes * 1.36);
+      color = uOuter * (goldField.x * 0.48 + goldField.z * 0.26);
+      color += uInner * (goldField.x * 0.86 + goldField.y * 0.62 + goldField.z * 0.46);
+      color += uCore * (filament * 0.28 + goldField.y * 0.58 + motes * 1.28);
     }
     if (emperor > 0.5) {
       float spectrum = 0.5 + 0.5 * sin(atan(point.y, point.x) * 3.0 + clock * 0.48);
@@ -152,8 +156,8 @@ export const crownFragmentShader = /* glsl */ `
     float alpha = mask * (0.45 + textureField.x * 0.18 + textureField.z * 0.17);
     alpha += filament * 0.22 + motes * 0.70 + emperorField.z * 0.16;
     if (golden > 0.5) {
-      float flameAlpha = goldField.x * (0.30 + textureField.x * 0.18 + textureField.z * 0.34);
-      alpha = flameAlpha + goldField.y * 0.32 + filament * 0.28 + motes * 0.58 + goldField.z * 0.10;
+      float flameAlpha = goldField.x * (0.50 + textureField.x * 0.08 + textureField.z * 0.16);
+      alpha = flameAlpha + goldField.y * 0.26 + filament * 0.12 + motes * 0.54 + goldField.z * 0.08;
     }
     alpha = saturate(alpha);
     if (alpha < 0.012) discard;
