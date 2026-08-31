@@ -1,4 +1,4 @@
-import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SpiritKernelOptions } from '../src/types'
+import type { FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -9,7 +9,7 @@ import {
 
 describe('kernel registry', () => {
   it('registers every implemented kernel exactly once', () => {
-    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit'])
+    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit', 'soul'])
     expect(Object.keys(flameKernelRegistry)).toEqual(flameKernelIds)
 
     for (const id of flameKernelIds) {
@@ -25,6 +25,7 @@ describe('kernel registry', () => {
     expectTypeOf<FlamePreset<'fluid'>['kernelOptions']>().toEqualTypeOf<FluidKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'gale'>['kernelOptions']>().toEqualTypeOf<GaleKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'spirit'>['kernelOptions']>().toEqualTypeOf<SpiritKernelOptions | undefined>()
+    expectTypeOf<FlamePreset<'soul'>['kernelOptions']>().toEqualTypeOf<SoulKernelOptions | undefined>()
   })
 
   it('maps reviewed lotus modes to stable shader variants', () => {
@@ -94,6 +95,22 @@ describe('kernel registry', () => {
     expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'starlit' } })).toBe(1)
     expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'turtle' } })).toBe(2)
     expect(getFlameKernelVariant({ ...spiritPreset, kernelOptions: { spiritMode: 'beasts' } })).toBe(3)
+  })
+
+  it('maps reviewed soul modes to stable shader variants', () => {
+    const soulPreset: FlamePreset<'soul'> = {
+      id: 'soul-variant',
+      rank: 1,
+      kernel: 'soul',
+      palette: { core: '#ffffff', inner: '#ffe3b5', outer: '#4c2030' },
+      speed: 1,
+      scale: 1,
+      turbulence: 1,
+      intensity: 1,
+    }
+
+    expect(getFlameKernelVariant({ ...soulPreset, kernelOptions: { soulMode: 'heart' } })).toBe(0)
+    expect(getFlameKernelVariant({ ...soulPreset, kernelOptions: { soulMode: 'duality' } })).toBe(1)
   })
 
   it('exposes a stable diagnostics contract', () => {

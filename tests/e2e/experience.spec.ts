@@ -212,6 +212,34 @@ test('renders distinct spirit family prototypes inside renderer budgets', async 
   expect(consoleErrors).toEqual([])
 })
 
+test('renders distinct soul family prototypes inside renderer budgets', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  const prototypes = [
+    ['fallen-heart', '陨落心炎', '透明火蟒环绕心火脉冲'],
+    ['yin-yang', '阴阳双炎', '一黑一白两道小焰围绕阴阳火印互相追逐'],
+  ] as const
+
+  for (const [slug, name, interpretation] of prototypes) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('main[data-visual-state="prototype"][data-kernel="soul"]')).toBeVisible()
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+    expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+    expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+    await page.getByRole('button', { name: /阅览设定/ }).click()
+    await expect(page.getByRole('dialog', { name })).toContainText(interpretation)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  }
+
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 

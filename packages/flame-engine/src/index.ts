@@ -20,5 +20,6 @@ export type {
   FluidKernelOptions,
   GaleKernelOptions,
   LotusKernelOptions,
+  SoulKernelOptions,
   SpiritKernelOptions,
 } from './types'

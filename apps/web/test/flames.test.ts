@@ -71,11 +71,13 @@ describe('flame roster', () => {
       'bone-chilling',
       'nine-dragon-thunder',
       'turtle-spirit',
+      'fallen-heart',
       'sea-heart',
       'fire-cloud-water',
       'wind-fury-dragon',
       'green-lotus',
       'nether-poison',
+      'yin-yang',
       'myriad-beasts',
     ])
     expect(flameCatalog.map(flame => flame.id)).toEqual([
@@ -188,6 +190,25 @@ describe('flame roster', () => {
         rank,
         kernel: 'spirit',
         kernelOptions: { spiritMode },
+      })
+      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+    }
+  })
+
+  it('keeps the soul family dev-only until final visual approval', () => {
+    const prototypes = [
+      ['fallen-heart', 14, 'heart'],
+      ['yin-yang', 21, 'duality'],
+    ] as const
+
+    for (const [id, rank, soulMode] of prototypes) {
+      const flame = flameRosterBySlug.get(id)
+      expect(flame?.visual.state).toBe('prototype')
+      expect(getFlamePreset(flame!)).toMatchObject({
+        id,
+        rank,
+        kernel: 'soul',
+        kernelOptions: { soulMode },
       })
       expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
     }

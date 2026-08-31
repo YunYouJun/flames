@@ -96,6 +96,23 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/spiritMode/)
   })
 
+  it('accepts reviewed soul modes and rejects unknown variants', () => {
+    for (const soulMode of ['heart', 'duality'] as const) {
+      const soulPreset = {
+        ...preset,
+        kernel: 'soul',
+        kernelOptions: { soulMode },
+      } as unknown as FlamePreset
+      expect(validateFlamePreset(soulPreset)).toBe(soulPreset)
+    }
+
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'soul',
+      kernelOptions: { soulMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/soulMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

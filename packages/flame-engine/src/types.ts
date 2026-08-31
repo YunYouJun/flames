@@ -1,6 +1,6 @@
 import type { ColorRepresentation } from 'three'
 
-export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid' | 'gale' | 'spirit'
+export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid' | 'gale' | 'spirit' | 'soul'
 export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
@@ -20,6 +20,10 @@ export interface SpiritKernelOptions {
   spiritMode: 'thunder' | 'starlit' | 'turtle' | 'beasts'
 }
 
+export interface SoulKernelOptions {
+  soulMode: 'heart' | 'duality'
+}
+
 /**
  * Kernel-specific controls are added here as a kernel gains reviewed variants.
  * `never` keeps today's presets unchanged while preserving a typed extension point.
@@ -31,6 +35,7 @@ export interface FlameKernelOptionsMap {
   fluid: FluidKernelOptions
   gale: GaleKernelOptions
   spirit: SpiritKernelOptions
+  soul: SoulKernelOptions
 }
 
 export type FlameKernelOptions = FlameKernelOptionsMap[FlameKernelId]
