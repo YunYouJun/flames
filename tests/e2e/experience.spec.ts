@@ -123,6 +123,37 @@ test('renders the approved sea heart with its tidal interaction contract', async
   expect(consoleErrors).toEqual([])
 })
 
+test('renders distinct fluid sibling prototypes inside renderer budgets', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  const prototypes = [
+    ['life-spirit', 'verdant', '生灵之焱', '细长焰茎与双叶从潮面逐次萌发'],
+    ['fire-cloud-water', 'cloudwater', '火云水炎', '上下两层薄焰云之间垂落水线般的火丝'],
+    ['nether-poison', 'venom', '幽冥毒火', '毒泡在池面周期鼓起破裂'],
+  ] as const
+
+  for (const [slug, flowMode, name, interpretation] of prototypes) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+    const experience = page.locator('main[data-visual-state="prototype"][data-kernel="fluid"]')
+    await expect(experience).toHaveAttribute('data-flow-mode', flowMode)
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+    expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+    expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+    await page.getByRole('button', { name: /阅览设定/ }).click()
+    await expect(page.getByRole('dialog', { name })).toContainText(interpretation)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  }
+
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 

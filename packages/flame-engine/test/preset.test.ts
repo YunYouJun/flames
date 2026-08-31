@@ -42,14 +42,16 @@ describe('flame preset validation', () => {
     expect(validateFlamePreset(earthcorePreset)).toBe(earthcorePreset)
   })
 
-  it('accepts the tidal fluid flow mode', () => {
-    const tidalPreset = {
-      ...preset,
-      kernel: 'fluid',
-      kernelOptions: { flowMode: 'tidal' },
-    } as unknown as FlamePreset
+  it('accepts reviewed fluid flow modes', () => {
+    for (const flowMode of ['tidal', 'verdant', 'cloudwater', 'venom'] as const) {
+      const fluidPreset = {
+        ...preset,
+        kernel: 'fluid',
+        kernelOptions: { flowMode },
+      } as unknown as FlamePreset
 
-    expect(validateFlamePreset(tidalPreset)).toBe(tidalPreset)
+      expect(validateFlamePreset(fluidPreset)).toBe(fluidPreset)
+    }
   })
 
   it('rejects unsupported fluid flow modes', () => {

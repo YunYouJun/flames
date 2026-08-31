@@ -1,5 +1,5 @@
 import type { IUniform, Vector2 } from 'three'
-import type { FlamePalette, FlameQuality } from '../types'
+import type { FlameKernelOptions, FlamePalette, FlameQuality, FluidKernelOptions } from '../types'
 import type { FlameSculpture } from './flame-sculpture'
 import {
   AdditiveBlending,
@@ -43,6 +43,7 @@ export class TidalBasin implements FlameSculpture {
   private intensity = 1
   private quality: FlameQuality
   private speed = 1
+  private variant = 0
   private viewportScale = 1
 
   constructor(palette: FlamePalette, quality: FlameQuality) {
@@ -62,6 +63,7 @@ export class TidalBasin implements FlameSculpture {
         uDrag: { value: 0 },
         uIntensity: { value: 1 },
         uQuality: { value: qualityRank[quality] / 2 },
+        uVariant: { value: 0 },
         uCore: { value: new Color(palette.core) },
         uInner: { value: new Color(palette.inner) },
         uOuter: { value: new Color(palette.outer) },
@@ -98,14 +100,23 @@ export class TidalBasin implements FlameSculpture {
     this.group.visible = active && this.quality !== 'lite'
   }
 
-  setAppearance(palette: FlamePalette, speed: number, intensity: number): void {
+  setAppearance(palette: FlamePalette, speed: number, intensity: number, options?: FlameKernelOptions): void {
+    const fluidOptions = options as FluidKernelOptions | undefined
     this.speed = speed
     this.intensity = intensity
+    this.variant = fluidOptions?.flowMode === 'verdant'
+      ? 1
+      : fluidOptions?.flowMode === 'cloudwater'
+        ? 2
+        : fluidOptions?.flowMode === 'venom'
+          ? 3
+          : 0
     this.uniform<Color>('uCore').value.set(palette.core)
     this.uniform<Color>('uInner').value.set(palette.inner)
     this.uniform<Color>('uOuter').value.set(palette.outer)
     this.uniform<number>('uSpeed').value = speed
     this.uniform<number>('uIntensity').value = intensity
+    this.uniform<number>('uVariant').value = this.variant
   }
 
   setQuality(quality: FlameQuality): void {
@@ -131,19 +142,22 @@ export class TidalBasin implements FlameSculpture {
     this.uniform<number>('uDrag').value = drag
     this.uniform<number>('uIntensity').value = this.intensity
 
-    const scale = this.viewportScale * (1 + pressed * 0.08)
-    this.group.scale.setScalar(scale)
-    this.group.position.x = pointer.x * 0.025 + drag * 0.018
-    this.group.position.y = -0.43 + pointer.y * 0.012
+    const verdant = this.variant === 1 ? 1 : 0
+    const cloudwater = this.variant === 2 ? 1 : 0
+    const venom = this.variant === 3 ? 1 : 0
+    const scale = this.viewportScale * (1 - verdant * 0.08 + cloudwater * 0.06 + venom * 0.03) * (1 + pressed * (0.08 + venom * 0.04))
+    this.group.scale.set(scale, scale * (1 + cloudwater * 0.12), scale)
+    this.group.position.x = pointer.x * 0.025 + drag * (0.018 + venom * 0.022)
+    this.group.position.y = -0.43 + pointer.y * 0.012 + cloudwater * 0.06 - venom * 0.025
 
     for (const [index, ring] of this.rings.entries()) {
       const clock = time * this.speed
       const breath = 1 + Math.sin(clock * 0.72 + ring.phase) * 0.018
-      const pressExpansion = pressed * (0.10 + index * 0.025)
+      const pressExpansion = pressed * (0.10 + index * 0.025 + venom * 0.014)
       ring.group.scale.setScalar(ring.scale * (breath + pressExpansion))
       ring.group.rotation.set(
         -1.28 + pointer.y * 0.045,
-        clock * ring.spin + pointer.x * 0.055 + drag * ring.spin * 2.8,
+        clock * ring.spin * (1 - verdant * 0.35 + venom * 0.28) + pointer.x * 0.055 + drag * ring.spin * (2.8 + venom * 1.4),
         pointer.x * 0.022 + Math.sin(clock * 0.34 + ring.phase) * 0.012,
       )
     }

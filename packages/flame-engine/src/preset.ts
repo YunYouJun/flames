@@ -28,7 +28,7 @@ export function validateFlamePreset(preset: FlamePreset): FlamePreset {
   }
   else if (preset.kernel === 'fluid' && preset.kernelOptions) {
     const options = preset.kernelOptions as FluidKernelOptions
-    if (options.flowMode !== 'tidal')
+    if (options.flowMode !== 'tidal' && options.flowMode !== 'verdant' && options.flowMode !== 'cloudwater' && options.flowMode !== 'venom')
       throw new Error(`Flame preset "${preset.id}" has an unsupported fluid flowMode.`)
   }
   else if (preset.kernelOptions !== undefined) {

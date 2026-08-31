@@ -42,6 +42,24 @@ describe('kernel registry', () => {
     expect(getFlameKernelVariant({ ...lotusPreset, kernelOptions: { bloomMode: 'earthcore' } })).toBe(2)
   })
 
+  it('maps reviewed fluid modes to stable shader variants', () => {
+    const fluidPreset: FlamePreset<'fluid'> = {
+      id: 'fluid-variant',
+      rank: 1,
+      kernel: 'fluid',
+      palette: { core: '#ffffff', inner: '#44bbff', outer: '#08245f' },
+      speed: 1,
+      scale: 1,
+      turbulence: 1,
+      intensity: 1,
+    }
+
+    expect(getFlameKernelVariant({ ...fluidPreset, kernelOptions: { flowMode: 'tidal' } })).toBe(0)
+    expect(getFlameKernelVariant({ ...fluidPreset, kernelOptions: { flowMode: 'verdant' } })).toBe(1)
+    expect(getFlameKernelVariant({ ...fluidPreset, kernelOptions: { flowMode: 'cloudwater' } })).toBe(2)
+    expect(getFlameKernelVariant({ ...fluidPreset, kernelOptions: { flowMode: 'venom' } })).toBe(3)
+  })
+
   it('exposes a stable diagnostics contract', () => {
     expectTypeOf<FlameRuntimeDiagnostics>().toMatchTypeOf<{
       activeKernel: string

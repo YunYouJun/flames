@@ -9,7 +9,7 @@ export interface LotusKernelOptions {
 }
 
 export interface FluidKernelOptions {
-  flowMode: 'tidal'
+  flowMode: 'tidal' | 'verdant' | 'cloudwater' | 'venom'
 }
 
 /**

@@ -147,6 +147,14 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
+function prototypeVisual(
+  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
+  brief: FlameVisualBrief,
+  preset: FlameRenderPreset,
+): FlameVisual {
+  return { state: 'prototype', plannedFamily, brief, preset }
+}
+
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -225,6 +233,54 @@ const visualBriefs = {
     },
     fallback: '以深蓝椭圆潮盆、三道液膜焰舌和两层同心波纹保留流火识别。',
     differentiation: '唯一以横向潮盆、同心涟漪和连续液膜作为主轮廓的家族，区别于莲瓣、冷壳与普通上升焰舌。',
+    specialPasses: ['tidal-rings'],
+    reviewScenes,
+  },
+  lifeSpirit: {
+    facts: ['翠绿色异火具有液态火海与绿雾意象，能够催生药材，并展现出罕见灵性。'],
+    interpretation: '将翠绿液态火海收束成一座会生长的焰圃：主焰保持流体底座，细长焰茎与双叶从潮面逐次萌发。',
+    silhouette: '扁平翠绿焰湖中生出五株高低错落的焰芽，中心保留柔和而明亮的生命焰心。',
+    palette: '淡金生命焰心、鲜翠内焰、深林绿潮底与少量黄绿孢光。',
+    motion: '整体节奏缓慢，焰芽像植物趋光般摆动；长按时新叶连续舒展，而不是猛烈爆燃。',
+    interactions: {
+      pointer: '焰芽与液态火海朝指针方向缓慢趋光。',
+      hold: '潮面亮起生命脉冲，焰茎升高并舒展双叶。',
+      drag: '翠绿孢光沿拖拽方向播散，潮面形成柔和生长轨迹。',
+    },
+    fallback: '以翠绿焰湖、五株焰芽和淡金生命焰心保持识别。',
+    differentiation: '以液态生长和趋光焰芽为主识别，区别于海心焰的纯潮汐、火云水炎的双层焰幕与幽冥毒火的黏稠气泡。',
+    specialPasses: ['tidal-rings'],
+    reviewScenes,
+  },
+  fireCloudWater: {
+    facts: ['原著明确名称、榜位与持有者，但没有可靠细述颜色、独立形态或能力。'],
+    interpretation: '仅从“火云水炎”的名称出发做项目演绎：上下两层薄焰云之间垂落水线般的火丝，形成悬浮焰幕，不追加控水设定。',
+    silhouette: '宽阔下层焰云与收窄上层焰云相互错位，五道细长火丝从云底垂落。',
+    palette: '暖白云心、珊瑚橙内焰、深海蓝外缘，形成云火与水影的双色反差。',
+    motion: '上下焰云低速反向漂移，垂落火丝周期性收放；整体像悬空的燃烧云幕。',
+    interactions: {
+      pointer: '两层焰云产生不同幅度的水平漂移。',
+      hold: '云层增厚，垂落火丝延长并点亮银边。',
+      drag: '上下焰云反向剪切，火丝短暂倾斜成雨幕。',
+    },
+    fallback: '以橙蓝双层焰云和五道垂落火丝保持项目演绎轮廓。',
+    differentiation: '唯一采用上下分层、向下垂落的流火构图；其形态明确标注为项目演绎而非原著事实。',
+    specialPasses: ['tidal-rings'],
+    reviewScenes,
+  },
+  netherPoison: {
+    facts: ['小说正文未命名第二十席；幽冥毒火作为项目采用的扩展补位，不宣称为小说正文设定。'],
+    interpretation: '以近黑绿毒池承托紫色黏焰，毒泡在池面周期鼓起破裂，两道细长毒焰从两侧向上试探。',
+    silhouette: '低伏不规则毒池、密集大小毒泡与两侧蛇信般细焰，中央保持空腔感。',
+    palette: '酸黄泡心、幽紫黏焰、近黑绿毒池与少量病态荧光。',
+    motion: '池面黏滞缓流，毒泡随机鼓起；细焰运动迟缓但拖尾明显。',
+    interactions: {
+      pointer: '毒泡向近侧聚集，两道细焰追随指针。',
+      hold: '毒池膨胀，更多毒泡同时亮起并破裂。',
+      drag: '黏焰被拉成长尾，毒池留下扭曲的荧光沟痕。',
+    },
+    fallback: '以黑绿毒池、紫色黏焰和酸黄泡环保持扩展身份。',
+    differentiation: '黏稠毒池与破裂泡环是核心识别，避免与普通紫焰或海心焰的清澈潮汐混同。',
     specialPasses: ['tidal-rings'],
     reviewScenes,
   },
@@ -319,7 +375,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('翠绿液态火海、绿雾、催生药材与高灵智的相关描写。')],
-    visual: reservedVisual('fluid'),
+    visual: prototypeVisual('fluid', visualBriefs.lifeSpirit, {
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'verdant' },
+      palette: { core: '#f5ffd0', inner: '#39e482', outer: '#07523b' },
+      speed: 0.58,
+      scale: 0.88,
+      turbulence: 0.62,
+      intensity: 0.98,
+    }),
   },
   {
     id: 'eight-desolation',
@@ -474,7 +538,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('名称、榜位与炎族火曜持有的相关描写。')],
-    visual: reservedVisual('fluid'),
+    visual: prototypeVisual('fluid', visualBriefs.fireCloudWater, {
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'cloudwater' },
+      palette: { core: '#fff0c4', inner: '#ff795f', outer: '#286a9b' },
+      speed: 0.74,
+      scale: 0.90,
+      turbulence: 0.78,
+      intensity: 1.00,
+    }),
   },
   {
     id: 'volcanic-stone',
@@ -530,7 +602,15 @@ const roster = [
     identityBasis: 'extension',
     alternateNames: [{ name: '龙凤焱', context: '另一套正版衍生榜单采用的第二十席' }],
     sources: extensionSources('名称、毒性与形态均作为扩展补位处理，不宣称来自小说正文。'),
-    visual: reservedVisual('fluid'),
+    visual: prototypeVisual('fluid', visualBriefs.netherPoison, {
+      kernel: 'fluid',
+      kernelOptions: { flowMode: 'venom' },
+      palette: { core: '#eaff92', inner: '#9b3bd1', outer: '#082f25' },
+      speed: 0.64,
+      scale: 0.82,
+      turbulence: 1.05,
+      intensity: 1.02,
+    }),
   },
   {
     id: 'yin-yang',

@@ -64,10 +64,13 @@ describe('flame roster', () => {
     expect(renderable.map(preset => preset.id)).toEqual([
       'nihility',
       'purifying-lotus',
+      'life-spirit',
       'karmic-lotus',
       'bone-chilling',
       'sea-heart',
+      'fire-cloud-water',
       'green-lotus',
+      'nether-poison',
     ])
     expect(flameCatalog.map(flame => flame.id)).toEqual([
       'nihility',
@@ -122,6 +125,26 @@ describe('flame roster', () => {
       },
     })
     expect(flameCatalog.map(flame => flame.id)).toContain('sea-heart')
+  })
+
+  it('keeps reviewed fluid siblings dev-only until final visual approval', () => {
+    const prototypes = [
+      ['life-spirit', 5, 'verdant'],
+      ['fire-cloud-water', 16, 'cloudwater'],
+      ['nether-poison', 20, 'venom'],
+    ] as const
+
+    for (const [id, rank, flowMode] of prototypes) {
+      const flame = flameRosterBySlug.get(id)
+      expect(flame?.visual.state).toBe('prototype')
+      expect(getFlamePreset(flame!)).toMatchObject({
+        id,
+        rank,
+        kernel: 'fluid',
+        kernelOptions: { flowMode },
+      })
+      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+    }
   })
 
   it('assigns one representative to every visual family', () => {

@@ -1,5 +1,5 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, LotusKernelOptions } from './types'
+import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, LotusKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
@@ -49,6 +49,15 @@ export function getFlameKernelVariant(preset: FlamePreset): number {
       return 1
     if (options?.bloomMode === 'earthcore')
       return 2
+  }
+  if (preset.kernel === 'fluid') {
+    const options = preset.kernelOptions as FluidKernelOptions | undefined
+    if (options?.flowMode === 'verdant')
+      return 1
+    if (options?.flowMode === 'cloudwater')
+      return 2
+    if (options?.flowMode === 'venom')
+      return 3
   }
   return 0
 }
