@@ -19,6 +19,7 @@ const palettes: Record<FlameKernelId, FlamePreset['palette']> = {
   spirit: { core: '#ffffff', inner: '#b9d9ff', outer: '#3d4668' },
   soul: { core: '#ffffff', inner: '#ffe3b5', outer: '#4c2030' },
   crown: { core: '#ffffff', inner: '#ffbf32', outer: '#5f2800' },
+  geofire: { core: '#fff2ad', inner: '#ef6725', outer: '#24140e' },
 }
 
 function readPreset(): FlamePreset {

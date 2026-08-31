@@ -135,10 +135,6 @@ function extensionSources(citation: string): FlameSourceRef[] {
   ]
 }
 
-function reservedVisual(plannedFamily?: VisualFamilyId): FlameVisual {
-  return { state: 'reserved', plannedFamily }
-}
-
 function approvedVisual(
   plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
   brief: FlameVisualBrief,
@@ -473,6 +469,38 @@ const visualBriefs = {
     },
     fallback: '以无色焰核、四层同心冠环和十一道汇聚辐线保持终局识别。',
     differentiation: '多层万火归一结构只属于终局帝炎，并始终保持开发原型，等待全部基础席视觉审定。',
+    specialPasses: [],
+    reviewScenes,
+  },
+  volcanicStone: {
+    facts: ['原著明确名称、榜位与融合关系，但没有可靠细述独立颜色或岩浆形态。'],
+    interpretation: '仅从“火山石焰”名称做项目演绎：以破裂玄武岩丘包住岩浆焰口，熔光沿石隙渗出，少量火山弹从中央喷发。',
+    silhouette: '低宽黑褐岩丘围住扁平焰口，中央短焰上涌，表面交错裂隙构成主要细节。',
+    palette: '淡金熔核、橙红岩浆、黑褐玄武岩与暗红裂隙。',
+    motion: '岩丘保持稳定，熔光沿裂隙缓慢游走；中央焰口周期鼓动并抛出少量火山弹。',
+    interactions: {
+      pointer: '岩浆焰口朝指针偏移，近侧裂隙先行点亮。',
+      hold: '岩丘略微张开，裂隙增亮并提高火山弹喷发高度。',
+      drag: '熔光沿拖拽方向穿过石隙，焰口产生短暂横向喷流。',
+    },
+    fallback: '以黑褐岩丘、橙红焰口和发光裂隙保持项目演绎轮廓。',
+    differentiation: '玄武岩实体感与地表熔隙区别于流体、莲形和纯焰家族，并明确不将岩浆形态写成原著事实。',
+    specialPasses: [],
+    reviewScenes,
+  },
+  darkYellow: {
+    facts: ['深黄色异火在古帝广场仅余微弱火种，原著没有展开额外的厚土能力。'],
+    interpretation: '保留末席火种的弱小状态：一枚深黄种核贴近地面，只有短小灯芯焰与极少尘光，不把它放大成山岳或厚土神通。',
+    silhouette: '画面低位仅有椭圆火种、一道细裂与短小焰芯，上方大面积留空。',
+    palette: '浅黄种心、玄黄色种壳、深褐外缘与少量暗金尘光。',
+    motion: '种核低频呼吸，灯芯焰轻微摆动；尘光稀少且上升缓慢，整体保持克制。',
+    interactions: {
+      pointer: '短小焰芯向指针倾斜，种核本体只做极小位移。',
+      hold: '种壳裂隙短暂增亮，灯芯焰略微升高。',
+      drag: '焰芯拖出一缕短痕，种核仍停留在低位。',
+    },
+    fallback: '以低位深黄种核、细小裂隙和短焰芯保持末席火种识别。',
+    differentiation: '最小、最低、留空最多的异火轮廓，主动避免为末席补写宏大能力。',
     specialPasses: [],
     reviewScenes,
   },
@@ -822,7 +850,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('名称、榜位、持有者及其与九幽金祖火融合的相关描写。')],
-    visual: reservedVisual('geofire'),
+    visual: prototypeVisual('geofire', visualBriefs.volcanicStone, {
+      kernel: 'geofire',
+      kernelOptions: { earthMode: 'volcanic' },
+      palette: { core: '#fff2ad', inner: '#ef6725', outer: '#24140e' },
+      speed: 0.76,
+      scale: 0.92,
+      turbulence: 0.88,
+      intensity: 1.04,
+    }),
   },
   {
     id: 'wind-fury-dragon',
@@ -934,7 +970,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('深黄色与古帝广场弱小火种的相关描写。')],
-    visual: reservedVisual('geofire'),
+    visual: prototypeVisual('geofire', visualBriefs.darkYellow, {
+      kernel: 'geofire',
+      kernelOptions: { earthMode: 'seed' },
+      palette: { core: '#fff0a0', inner: '#c49a28', outer: '#39280d' },
+      speed: 0.46,
+      scale: 0.76,
+      turbulence: 0.48,
+      intensity: 0.76,
+    }),
   },
 ] satisfies FlameSeat[]
 

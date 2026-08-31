@@ -1,5 +1,5 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { CrownKernelOptions, FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
+import type { CrownKernelOptions, FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, GeoFireKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
@@ -7,6 +7,7 @@ import { coldFragmentShader } from './shaders/cold'
 import { crownFragmentShader } from './shaders/crown'
 import { fluidFragmentShader } from './shaders/fluid'
 import { galeFragmentShader } from './shaders/gale'
+import { geofireFragmentShader } from './shaders/geofire'
 import { lotusFragmentShader } from './shaders/lotus'
 import { soulFragmentShader } from './shaders/soul'
 import { spiritFragmentShader } from './shaders/spirit'
@@ -53,6 +54,10 @@ export const flameKernelRegistry = {
   crown: {
     id: 'crown',
     fragmentShader: crownFragmentShader,
+  },
+  geofire: {
+    id: 'geofire',
+    fragmentShader: geofireFragmentShader,
   },
 } satisfies Record<FlameKernelId, FlameKernelDefinition>
 
@@ -106,6 +111,11 @@ export function getFlameKernelVariant(preset: FlamePreset): number {
       return 2
     if (options?.crownMode === 'emperor')
       return 3
+  }
+  if (preset.kernel === 'geofire') {
+    const options = preset.kernelOptions as GeoFireKernelOptions | undefined
+    if (options?.earthMode === 'seed')
+      return 1
   }
   return 0
 }

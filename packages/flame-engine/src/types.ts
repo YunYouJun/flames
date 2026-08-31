@@ -1,6 +1,6 @@
 import type { ColorRepresentation } from 'three'
 
-export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid' | 'gale' | 'spirit' | 'soul' | 'crown'
+export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid' | 'gale' | 'spirit' | 'soul' | 'crown' | 'geofire'
 export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
@@ -28,6 +28,10 @@ export interface CrownKernelOptions {
   crownMode: 'golden' | 'desolation' | 'ancestral' | 'emperor'
 }
 
+export interface GeoFireKernelOptions {
+  earthMode: 'volcanic' | 'seed'
+}
+
 /**
  * Kernel-specific controls are added here as a kernel gains reviewed variants.
  * `never` keeps today's presets unchanged while preserving a typed extension point.
@@ -41,6 +45,7 @@ export interface FlameKernelOptionsMap {
   spirit: SpiritKernelOptions
   soul: SoulKernelOptions
   crown: CrownKernelOptions
+  geofire: GeoFireKernelOptions
 }
 
 export type FlameKernelOptions = FlameKernelOptionsMap[FlameKernelId]

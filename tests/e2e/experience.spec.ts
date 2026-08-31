@@ -269,6 +269,34 @@ test('renders distinct crown family and terminal prototypes inside renderer budg
   expect(consoleErrors).toEqual([])
 })
 
+test('renders distinct geofire family prototypes inside renderer budgets', async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error')
+      consoleErrors.push(message.text())
+  })
+  page.on('pageerror', error => consoleErrors.push(error.message))
+
+  const prototypes = [
+    ['volcanic-stone', '火山石焰', '破裂玄武岩丘包住岩浆焰口'],
+    ['dark-yellow', '玄黄炎', '一枚深黄种核贴近地面'],
+  ] as const
+
+  for (const [slug, name, interpretation] of prototypes) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('main[data-visual-state="prototype"][data-kernel="geofire"]')).toBeVisible()
+    const canvas = page.locator('canvas[data-benchmark-ready="true"]')
+    await expect(canvas).toBeVisible()
+    expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
+    expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
+    await page.getByRole('button', { name: /阅览设定/ }).click()
+    await expect(page.getByRole('dialog', { name })).toContainText(interpretation)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
+  }
+
+  expect(consoleErrors).toEqual([])
+})
+
 test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
   const response = await page.goto('/flames/not-a-flame')
 

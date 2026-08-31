@@ -1,4 +1,4 @@
-import type { CrownKernelOptions, FlamePreset, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
+import type { CrownKernelOptions, FlamePreset, FluidKernelOptions, GaleKernelOptions, GeoFireKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from './types'
 import { Color } from 'three'
 
 export function validateFlamePreset(preset: FlamePreset): FlamePreset {
@@ -50,6 +50,11 @@ export function validateFlamePreset(preset: FlamePreset): FlamePreset {
     const options = preset.kernelOptions as CrownKernelOptions
     if (options.crownMode !== 'golden' && options.crownMode !== 'desolation' && options.crownMode !== 'ancestral' && options.crownMode !== 'emperor')
       throw new Error(`Flame preset "${preset.id}" has an unsupported crown crownMode.`)
+  }
+  else if (preset.kernel === 'geofire' && preset.kernelOptions) {
+    const options = preset.kernelOptions as GeoFireKernelOptions
+    if (options.earthMode !== 'volcanic' && options.earthMode !== 'seed')
+      throw new Error(`Flame preset "${preset.id}" has an unsupported geofire earthMode.`)
   }
   else if (preset.kernelOptions !== undefined) {
     throw new Error(`Flame preset "${preset.id}" does not support kernelOptions.`)

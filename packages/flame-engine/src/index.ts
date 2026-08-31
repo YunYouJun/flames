@@ -20,6 +20,7 @@ export type {
   FlameRuntimeStatus,
   FluidKernelOptions,
   GaleKernelOptions,
+  GeoFireKernelOptions,
   LotusKernelOptions,
   SoulKernelOptions,
   SpiritKernelOptions,

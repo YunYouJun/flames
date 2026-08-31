@@ -78,11 +78,13 @@ describe('flame roster', () => {
       'fallen-heart',
       'sea-heart',
       'fire-cloud-water',
+      'volcanic-stone',
       'wind-fury-dragon',
       'green-lotus',
       'nether-poison',
       'yin-yang',
       'myriad-beasts',
+      'dark-yellow',
     ])
     expect(flameCatalog.map(flame => flame.id)).toEqual([
       'nihility',
@@ -234,6 +236,25 @@ describe('flame roster', () => {
         rank,
         kernel: 'crown',
         kernelOptions: { crownMode },
+      })
+      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+    }
+  })
+
+  it('keeps the geofire family dev-only until final visual approval', () => {
+    const prototypes = [
+      ['volcanic-stone', 17, 'volcanic'],
+      ['dark-yellow', 23, 'seed'],
+    ] as const
+
+    for (const [id, rank, earthMode] of prototypes) {
+      const flame = flameRosterBySlug.get(id)
+      expect(flame?.visual.state).toBe('prototype')
+      expect(getFlamePreset(flame!)).toMatchObject({
+        id,
+        rank,
+        kernel: 'geofire',
+        kernelOptions: { earthMode },
       })
       expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
     }

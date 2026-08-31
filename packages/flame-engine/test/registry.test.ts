@@ -1,4 +1,4 @@
-import type { CrownKernelOptions, FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from '../src/types'
+import type { CrownKernelOptions, FlamePreset, FlameRuntimeDiagnostics, FlameRuntimeOptions, FluidKernelOptions, GaleKernelOptions, GeoFireKernelOptions, LotusKernelOptions, SoulKernelOptions, SpiritKernelOptions } from '../src/types'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   flameKernelIds,
@@ -9,7 +9,7 @@ import {
 
 describe('kernel registry', () => {
   it('registers every implemented kernel exactly once', () => {
-    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit', 'soul', 'crown'])
+    expect(flameKernelIds).toEqual(['void', 'lotus', 'cold', 'fluid', 'gale', 'spirit', 'soul', 'crown', 'geofire'])
     expect(Object.keys(flameKernelRegistry)).toEqual(flameKernelIds)
 
     for (const id of flameKernelIds) {
@@ -27,6 +27,7 @@ describe('kernel registry', () => {
     expectTypeOf<FlamePreset<'spirit'>['kernelOptions']>().toEqualTypeOf<SpiritKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'soul'>['kernelOptions']>().toEqualTypeOf<SoulKernelOptions | undefined>()
     expectTypeOf<FlamePreset<'crown'>['kernelOptions']>().toEqualTypeOf<CrownKernelOptions | undefined>()
+    expectTypeOf<FlamePreset<'geofire'>['kernelOptions']>().toEqualTypeOf<GeoFireKernelOptions | undefined>()
   })
 
   it('maps reviewed lotus modes to stable shader variants', () => {
@@ -130,6 +131,22 @@ describe('kernel registry', () => {
     expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'desolation' } })).toBe(1)
     expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'ancestral' } })).toBe(2)
     expect(getFlameKernelVariant({ ...crownPreset, kernelOptions: { crownMode: 'emperor' } })).toBe(3)
+  })
+
+  it('maps reviewed geofire modes to stable shader variants', () => {
+    const geofirePreset: FlamePreset<'geofire'> = {
+      id: 'geofire-variant',
+      rank: 1,
+      kernel: 'geofire',
+      palette: { core: '#fff2ad', inner: '#ef6725', outer: '#24140e' },
+      speed: 1,
+      scale: 1,
+      turbulence: 1,
+      intensity: 1,
+    }
+
+    expect(getFlameKernelVariant({ ...geofirePreset, kernelOptions: { earthMode: 'volcanic' } })).toBe(0)
+    expect(getFlameKernelVariant({ ...geofirePreset, kernelOptions: { earthMode: 'seed' } })).toBe(1)
   })
 
   it('exposes a stable diagnostics contract', () => {

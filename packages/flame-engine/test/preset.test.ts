@@ -130,6 +130,23 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/crownMode/)
   })
 
+  it('accepts reviewed geofire modes and rejects unknown variants', () => {
+    for (const earthMode of ['volcanic', 'seed'] as const) {
+      const geofirePreset = {
+        ...preset,
+        kernel: 'geofire',
+        kernelOptions: { earthMode },
+      } as unknown as FlamePreset
+      expect(validateFlamePreset(geofirePreset)).toBe(geofirePreset)
+    }
+
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'geofire',
+      kernelOptions: { earthMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/earthMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,
