@@ -72,7 +72,7 @@ test('renders the red lotus prototype with its karmic interaction contract', asy
   expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(16)
   expect(Number(await canvas.getAttribute('data-calls'))).toBeLessThanOrEqual(24)
   await page.getByRole('button', { name: /阅览设定/ }).click()
-  await expect(page.getByRole('dialog', { name: '红莲业火' })).toContainText('业纹从莲心向外点燃')
+  await expect(page.getByRole('dialog', { name: '红莲业火' })).toContainText('业纹从莲座逐层向上点燃')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
   expect(consoleErrors).toEqual([])
 })

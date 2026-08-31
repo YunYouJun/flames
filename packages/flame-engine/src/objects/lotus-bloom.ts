@@ -241,10 +241,10 @@ export class LotusBloom implements FlameSculpture {
     this.uniform<number>('uIntensity').value = this.intensity
     this.uniform<number>('uPressed').value = pressed
 
-    const scale = this.viewportScale * mix(1, 0.94, this.variant) * (1 + pressed * mix(0.055, 0.09, this.variant))
+    const scale = this.viewportScale * mix(1, 0.90, this.variant) * (1 + pressed * mix(0.055, 0.075, this.variant))
     this.group.scale.setScalar(scale)
-    this.group.position.y = mix(-0.26, -0.31, this.variant)
-    this.group.rotation.x = mix(-0.04, -0.075, this.variant) - pointer.y * 0.075
+    this.group.position.y = mix(-0.26, -0.24, this.variant)
+    this.group.rotation.x = mix(-0.04, -0.025, this.variant) - pointer.y * 0.075
     this.group.rotation.z = -pointer.x * 0.035
 
     for (const [index, layer] of this.layerGroups.entries()) {
@@ -254,8 +254,9 @@ export class LotusBloom implements FlameSculpture {
       const pointerTurn = pointer.x * (0.11 + index * 0.025)
       const karmicOffset = this.variant * (index - 1) * 0.22
       const karmicPulse = this.variant * Math.sin(time * this.speed * 1.8 + index * 1.7) * 0.025
-      layer.rotation.y = time * this.speed * spec.spin + pointerTurn + drag * spec.spin * mix(0.72, 1.24, this.variant) + karmicOffset + karmicPulse
-      const layerScale = 1 - this.variant * index * 0.045 + pressed * this.variant * (0.015 + index * 0.012)
+      const karmicDragTurn = ((index % 2 === 0 ? -1 : 1) * (0.16 + index * 0.045)) * drag
+      layer.rotation.y = time * this.speed * spec.spin + pointerTurn + drag * spec.spin * 0.72 + this.variant * karmicDragTurn + karmicOffset + karmicPulse
+      const layerScale = 1 - this.variant * index * 0.055 + pressed * this.variant * (0.012 + index * 0.009)
       layer.scale.setScalar(layerScale)
     }
   }

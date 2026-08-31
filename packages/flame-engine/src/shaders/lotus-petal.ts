@@ -21,10 +21,10 @@ export const lotusPetalVertexShader = /* glsl */ `
     vec3 animated = position;
     animated.y += flutter * tip * (0.012 + uQuality * 0.014);
     animated.z += breathing * tip * 0.018;
-    animated.x *= mix(1.0, 0.88, karmic);
-    animated.z *= mix(1.0, 0.74 + tip * 0.08, karmic);
-    animated.y += karmic * tip * (0.14 + breathing * 0.022);
-    animated.z *= 1.0 + uPressed * tip * mix(0.075, 0.14, karmic);
+    animated.x *= mix(1.0, 0.72, karmic);
+    animated.z *= mix(1.0, 0.48 + tip * 0.06, karmic);
+    animated.y += karmic * tip * (0.30 + breathing * 0.030);
+    animated.z *= 1.0 + uPressed * tip * mix(0.075, 0.10, karmic);
 
     vec4 worldPosition = modelMatrix * vec4(animated, 1.0);
     vWorldPosition = worldPosition.xyz;
