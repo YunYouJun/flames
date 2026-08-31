@@ -13,6 +13,13 @@ export const crownFragmentShader = /* glsl */ `
     vec2 flow = advectFlame(royal, clock * 1.34);
     vec2 eddy = royal * 1.72 + vec2(6.4, -3.1);
     flow += (advectFlame(eddy, clock * 2.18) - eddy) * (0.18 + smoothstep(-0.52, 0.86, royal.y) * 0.56);
+    vec2 eye = vec2(-0.17 + sin(clock * 0.73) * 0.07, -0.02 + sin(clock * 0.43) * 0.13);
+    vec2 turn = flow - eye;
+    flow = eye + rotate2d(sin(clock * 1.62) * 0.92 * (1.0 - smoothstep(0.06, 0.48, length(turn)))) * turn;
+    eye = vec2(0.16 + sin(clock * 0.58 + 2.0) * 0.07, 0.24 + sin(clock * 0.51 + 1.3) * 0.12);
+    turn = flow - eye;
+    flow = eye + rotate2d(-sin(clock * 1.37 + 1.7) * 0.84 * (1.0 - smoothstep(0.05, 0.44, length(turn)))) * turn;
+    float coil = (1.0 - smoothstep(0.04, 0.17, abs(sin(atan(turn.y, turn.x) + length(turn) * 13.0 + clock * 2.7)))) * (1.0 - smoothstep(0.08, 0.43, length(turn)));
 
     vec3 plume = plumeLayers(flow * vec2(0.86, 0.82), clock * 1.28, 1.06, 0.028);
     float tongues = 0.0;
@@ -39,16 +46,11 @@ export const crownFragmentShader = /* glsl */ `
     float heat = max(cores, pow(support, 1.65));
     heat = max(heat, ellipseMask(flow, vec2(0.0, -0.49), vec2(0.33, 0.065), 0.42));
     heat *= 0.42 + smoothstep(0.32, 0.78, glow) * 0.78;
+    heat = max(heat, coil * body * 0.68);
 
     float haloRadius = length(royal * vec2(1.0, 1.04));
-    float haloAngle = atan(royal.y, royal.x);
     float halo = 1.0 - smoothstep(0.016, 0.052, abs(haloRadius - (0.51 + uPressed * 0.04)));
-    float rays = pow(abs(cos(haloAngle * 12.0 - clock * 0.18)), 24.0);
-    rays *= smoothstep(0.50, 0.56, haloRadius) * (1.0 - smoothstep(0.65, 0.77, haloRadius));
-    float riftDistance = abs(royal.x) - 0.64 - sin(royal.y * 9.0 + clock * 0.36) * 0.024;
-    float rifts = 1.0 - smoothstep(0.008, 0.023, abs(riftDistance));
-    rifts *= smoothstep(-0.30, -0.04, royal.y) * (1.0 - smoothstep(0.54, 0.76, royal.y));
-    return vec3(body, heat, max(max(halo, rays), rifts));
+    return vec3(body, heat, halo);
   }
 
   vec3 desolationWings(vec2 point, float clock) {
@@ -117,12 +119,12 @@ export const crownFragmentShader = /* glsl */ `
     float emperor = step(2.5, uVariant);
     point.y += 0.02;
 
-    vec3 goldField = vec3(0.0);
+    vec3 gold = vec3(0.0);
     vec3 wingField = vec3(0.0);
     vec3 sealField = vec3(0.0);
     vec3 emperorField = vec3(0.0);
     if (golden > 0.5)
-      goldField = goldenCrown(point, clock);
+      gold = goldenCrown(point, clock);
     if (desolation > 0.5)
       wingField = desolationWings(point, clock);
     if (ancestral > 0.5)
@@ -130,7 +132,7 @@ export const crownFragmentShader = /* glsl */ `
     if (emperor > 0.5)
       emperorField = emperorConvergence(point, clock);
 
-    float mask = max(max(goldField.x, max(goldField.y, goldField.z)) * golden, max(wingField.x, max(wingField.y, wingField.z)) * desolation);
+    float mask = max(max(gold.x, max(gold.y, gold.z)) * golden, max(wingField.x, max(wingField.y, wingField.z)) * desolation);
     mask = max(mask, max(sealField.x, max(sealField.y, sealField.z)) * ancestral);
     mask = max(mask, max(emperorField.x, max(emperorField.y, emperorField.z)) * emperor);
     vec3 textureField = fireTexture(point, clock * 0.82);
@@ -140,12 +142,12 @@ export const crownFragmentShader = /* glsl */ `
       motes = emberField(point * vec2(0.84, 0.68), clock * mix(0.68, 0.82, emperor), 0.042 + golden * 0.075 + emperor * 0.045);
 
     vec3 color = uOuter * (mask * 0.38 + wingField.x * 0.24 + sealField.x * 0.30);
-    color += uInner * (mask * 0.43 + goldField.x * 0.62 + goldField.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emperorField.x * 0.68);
-    color += uCore * (filament * 0.72 + goldField.x * 0.24 + goldField.y * 1.18 + goldField.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emperorField.z * 1.28 + motes * 1.32);
+    color += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wingField.z * 0.58 + sealField.z * 0.52 + emperorField.x * 0.68);
+    color += uCore * (filament * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wingField.y * 0.72 + sealField.y * 1.10 + emperorField.z * 1.28 + motes * 1.32);
     if (golden > 0.5) {
-      color = uOuter * (goldField.x * 0.48 + goldField.z * 0.26);
-      color += uInner * (goldField.x * 0.86 + goldField.y * 0.62 + goldField.z * 0.46);
-      color += uCore * (filament * 0.28 + goldField.y * 0.58 + motes * 1.28);
+      color = uOuter * (gold.x * 0.88 + gold.z * 0.10);
+      color += uInner * (gold.x * 0.18 + gold.y * 0.86 + gold.z * 0.24);
+      color += uCore * (filament * 0.12 + gold.y * 0.20 + motes * 1.18);
     }
     if (emperor > 0.5) {
       float spectrum = 0.5 + 0.5 * sin(atan(point.y, point.x) * 3.0 + clock * 0.48);
@@ -156,8 +158,8 @@ export const crownFragmentShader = /* glsl */ `
     float alpha = mask * (0.45 + textureField.x * 0.18 + textureField.z * 0.17);
     alpha += filament * 0.22 + motes * 0.70 + emperorField.z * 0.16;
     if (golden > 0.5) {
-      float flameAlpha = goldField.x * (0.50 + textureField.x * 0.08 + textureField.z * 0.16);
-      alpha = flameAlpha + goldField.y * 0.26 + filament * 0.12 + motes * 0.54 + goldField.z * 0.08;
+      float flameAlpha = gold.x * (0.62 + textureField.x * 0.06 + textureField.z * 0.12);
+      alpha = flameAlpha + gold.y * 0.26 + filament * 0.12 + motes * 0.54 + gold.z * 0.08;
     }
     alpha = saturate(alpha);
     if (alpha < 0.012) discard;

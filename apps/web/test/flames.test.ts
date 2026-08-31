@@ -242,14 +242,14 @@ describe('flame roster', () => {
 
     expect(getFlamePreset(flameRosterBySlug.get('golden-emperor')!)).toMatchObject({
       palette: {
-        core: '#fff2a6',
-        inner: '#ffd000',
-        outer: '#b97800',
+        core: '#fff0a3',
+        inner: '#ffc400',
+        outer: '#ff6b00',
       },
-      speed: 1.24,
+      speed: 1.36,
       scale: 1,
-      turbulence: 1.18,
-      intensity: 1.42,
+      turbulence: 1.28,
+      intensity: 1.34,
     })
   })
 
