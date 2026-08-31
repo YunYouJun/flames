@@ -246,7 +246,7 @@ describe('flame roster', () => {
         inner: '#ffd000',
         outer: '#b97800',
       },
-      speed: 1.04,
+      speed: 1.24,
       scale: 1,
       turbulence: 1.02,
       intensity: 1.42,

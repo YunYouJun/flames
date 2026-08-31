@@ -1,6 +1,7 @@
 import type { IUniform } from 'three'
 import type { FlameSculpture } from './objects/flame-sculpture'
 import type {
+  CrownKernelOptions,
   FlameKernelId,
   FlamePointerInput,
   FlamePreset,
@@ -10,8 +11,10 @@ import type {
   FlameRuntimeStatus,
 } from './types'
 import {
+  AdditiveBlending,
   Color,
   Mesh,
+  NormalBlending,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
@@ -219,6 +222,9 @@ export class FlameRuntime {
 
   private applyPreset(preset: FlamePreset): void {
     const material = this.mesh.material
+    const usesAdditiveFire = preset.kernel === 'crown'
+      && (preset.kernelOptions as CrownKernelOptions | undefined)?.crownMode === 'golden'
+    material.blending = usesAdditiveFire ? AdditiveBlending : NormalBlending
     this.uniform<number>(material, 'uScale').value = preset.scale
     this.uniform<number>(material, 'uSpeed').value = preset.speed
     this.uniform<number>(material, 'uTurbulence').value = preset.turbulence

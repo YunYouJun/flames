@@ -10,21 +10,31 @@ export const crownFragmentShader = /* glsl */ `
 
   vec3 goldenCrown(vec2 point, float clock) {
     vec2 royalPoint = point - vec2(uPointer.x * 0.028, uPointer.y * 0.012);
-    vec3 plume = plumeLayers(royalPoint * vec2(0.86, 0.82), clock * 0.94, 1.06, 0.028);
+    vec2 flamePoint = royalPoint;
+    float lift = smoothstep(-0.52, 0.86, flamePoint.y);
+    float risingNoise = fbmFast(flamePoint * vec2(2.8, 1.7) + vec2(clock * 0.10, -clock * 1.72));
+    float crossingNoise = fbmFast(flamePoint * vec2(3.7, 2.1) + vec2(-clock * 0.22, -clock * 1.28) + 13.7);
+    flamePoint.x += (risingNoise - 0.5) * (0.08 + lift * 0.16) * uTurbulence;
+    flamePoint.y += (crossingNoise - 0.5) * 0.065 * uTurbulence;
+
+    vec3 plume = plumeLayers(flamePoint * vec2(0.86, 0.82), clock * 1.28, 1.06, 0.028);
     float tongues = 0.0;
     for (int index = 0; index < 7; index += 1) {
       float unit = float(index) - 3.0;
       float center = unit * 0.115;
       float height = 0.76 + (1.0 - abs(unit) * 0.095) * 0.42 + uPressed * 0.12;
-      float tongue = flameTongue(royalPoint, clock * 1.26, center, float(index) * 1.37 + 0.6, height, 0.14 - abs(unit) * 0.008);
+      float tongue = flameTongue(flamePoint, clock * 1.72, center, float(index) * 1.37 + 0.6, height, 0.14 - abs(unit) * 0.008);
       tongues = max(tongues, tongue);
     }
 
-    float moltenBase = ellipseMask(royalPoint, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
-    float flameBody = max(max(plume.x, tongues), moltenBase);
-    float liquidWave = 0.5 + 0.5 * sin(royalPoint.y * 21.0 - clock * 2.1 + sin(royalPoint.x * 10.0) * 1.35);
+    float moltenBase = ellipseMask(flamePoint, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
+    float flameBody = max(max(plume.x * (0.72 + risingNoise * 0.34), tongues), moltenBase);
+    float breakupNoise = fbmFast(flamePoint * vec2(5.2, 3.1) + vec2(-clock * 0.28, -clock * 2.24));
+    float breakup = smoothstep(0.66, 0.90, breakupNoise) * smoothstep(-0.18, 0.82, flamePoint.y);
+    flameBody *= 1.0 - breakup * 0.64;
+    float liquidWave = 0.5 + 0.5 * sin(flamePoint.y * 21.0 - clock * 3.2 + sin(flamePoint.x * 10.0) * 1.35);
     float liquid = smoothstep(0.54, 0.94, liquidWave) * flameBody;
-    liquid += smoothstep(0.67, 0.94, fbmFast(royalPoint * vec2(8.0, 5.6) - vec2(0.0, clock * 0.94))) * flameBody * 0.82;
+    liquid += smoothstep(0.62, 0.92, fbmFast(flamePoint * vec2(8.0, 5.6) - vec2(0.0, clock * 1.62))) * flameBody * 0.86;
 
     float haloRadius = length(royalPoint * vec2(1.0, 1.04));
     float haloAngle = atan(royalPoint.y, royalPoint.x);
@@ -141,6 +151,10 @@ export const crownFragmentShader = /* glsl */ `
 
     float alpha = mask * (0.45 + textureField.x * 0.18 + textureField.z * 0.17);
     alpha += filament * 0.22 + motes * 0.70 + emperorField.z * 0.16;
+    if (golden > 0.5) {
+      float flameAlpha = goldField.x * (0.30 + textureField.x * 0.18 + textureField.z * 0.34);
+      alpha = flameAlpha + goldField.y * 0.32 + filament * 0.28 + motes * 0.58 + goldField.z * 0.10;
+    }
     alpha = saturate(alpha);
     if (alpha < 0.012) discard;
     gl_FragColor = vec4(color, alpha);
