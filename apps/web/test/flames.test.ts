@@ -239,6 +239,18 @@ describe('flame roster', () => {
       })
       expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
     }
+
+    expect(getFlamePreset(flameRosterBySlug.get('golden-emperor')!)).toMatchObject({
+      palette: {
+        core: '#fffef0',
+        inner: '#ffd43b',
+        outer: '#c76a00',
+      },
+      speed: 0.72,
+      scale: 1.04,
+      turbulence: 0.68,
+      intensity: 1.34,
+    })
   })
 
   it('keeps the geofire family dev-only until final visual approval', () => {
