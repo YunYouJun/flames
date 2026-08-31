@@ -1,6 +1,6 @@
 import type { ColorRepresentation } from 'three'
 
-export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid'
+export type FlameKernelId = 'void' | 'lotus' | 'cold' | 'fluid' | 'gale'
 export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
@@ -12,6 +12,10 @@ export interface FluidKernelOptions {
   flowMode: 'tidal' | 'verdant' | 'cloudwater' | 'venom'
 }
 
+export interface GaleKernelOptions {
+  galeMode: 'nether' | 'dragon'
+}
+
 /**
  * Kernel-specific controls are added here as a kernel gains reviewed variants.
  * `never` keeps today's presets unchanged while preserving a typed extension point.
@@ -21,6 +25,7 @@ export interface FlameKernelOptionsMap {
   lotus: LotusKernelOptions
   cold: never
   fluid: FluidKernelOptions
+  gale: GaleKernelOptions
 }
 
 export type FlameKernelOptions = FlameKernelOptionsMap[FlameKernelId]

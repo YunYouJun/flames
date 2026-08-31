@@ -1,10 +1,11 @@
 import type { FlameSculpture } from './objects/flame-sculpture'
-import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, LotusKernelOptions } from './types'
+import type { FlameKernelId, FlamePalette, FlamePreset, FlameQuality, FluidKernelOptions, GaleKernelOptions, LotusKernelOptions } from './types'
 import { LotusBloom } from './objects/lotus-bloom'
 import { TidalBasin } from './objects/tidal-basin'
 import { VoidVortex } from './objects/void-vortex'
 import { coldFragmentShader } from './shaders/cold'
 import { fluidFragmentShader } from './shaders/fluid'
+import { galeFragmentShader } from './shaders/gale'
 import { lotusFragmentShader } from './shaders/lotus'
 import { voidFragmentShader } from './shaders/void'
 
@@ -34,6 +35,10 @@ export const flameKernelRegistry = {
     fragmentShader: fluidFragmentShader,
     createSculpture: (palette, quality) => new TidalBasin(palette, quality),
   },
+  gale: {
+    id: 'gale',
+    fragmentShader: galeFragmentShader,
+  },
 } satisfies Record<FlameKernelId, FlameKernelDefinition>
 
 export const flameKernelIds = Object.keys(flameKernelRegistry) as FlameKernelId[]
@@ -58,6 +63,11 @@ export function getFlameKernelVariant(preset: FlamePreset): number {
       return 2
     if (options?.flowMode === 'venom')
       return 3
+  }
+  if (preset.kernel === 'gale') {
+    const options = preset.kernelOptions as GaleKernelOptions | undefined
+    if (options?.galeMode === 'dragon')
+      return 1
   }
   return 0
 }

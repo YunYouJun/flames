@@ -66,9 +66,11 @@ describe('flame roster', () => {
       'purifying-lotus',
       'life-spirit',
       'karmic-lotus',
+      'nether-gale',
       'bone-chilling',
       'sea-heart',
       'fire-cloud-water',
+      'wind-fury-dragon',
       'green-lotus',
       'nether-poison',
     ])
@@ -142,6 +144,25 @@ describe('flame roster', () => {
         rank,
         kernel: 'fluid',
         kernelOptions: { flowMode },
+      })
+      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+    }
+  })
+
+  it('keeps the gale family dev-only until final visual approval', () => {
+    const prototypes = [
+      ['nether-gale', 10, 'nether'],
+      ['wind-fury-dragon', 18, 'dragon'],
+    ] as const
+
+    for (const [id, rank, galeMode] of prototypes) {
+      const flame = flameRosterBySlug.get(id)
+      expect(flame?.visual.state).toBe('prototype')
+      expect(getFlamePreset(flame!)).toMatchObject({
+        id,
+        rank,
+        kernel: 'gale',
+        kernelOptions: { galeMode },
       })
       expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
     }

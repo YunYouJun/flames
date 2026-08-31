@@ -18,5 +18,6 @@ export type {
   FlameRuntimeOptions,
   FlameRuntimeStatus,
   FluidKernelOptions,
+  GaleKernelOptions,
   LotusKernelOptions,
 } from './types'

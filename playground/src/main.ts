@@ -15,6 +15,7 @@ const palettes: Record<FlameKernelId, FlamePreset['palette']> = {
   void: { core: '#d8a8ff', inner: '#6e3d92', outer: '#110917' },
   cold: { core: '#ffffff', inner: '#c9f9ff', outer: '#498f9d' },
   fluid: { core: '#d9ffff', inner: '#25b9ef', outer: '#08245f' },
+  gale: { core: '#dce9e6', inner: '#718487', outer: '#101619' },
 }
 
 function readPreset(): FlamePreset {

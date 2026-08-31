@@ -62,6 +62,23 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/flowMode/)
   })
 
+  it('accepts reviewed gale modes and rejects unknown variants', () => {
+    for (const galeMode of ['nether', 'dragon'] as const) {
+      const galePreset = {
+        ...preset,
+        kernel: 'gale',
+        kernelOptions: { galeMode },
+      } as unknown as FlamePreset
+      expect(validateFlamePreset(galePreset)).toBe(galePreset)
+    }
+
+    expect(() => validateFlamePreset({
+      ...preset,
+      kernel: 'gale',
+      kernelOptions: { galeMode: 'unknown' },
+    } as unknown as FlamePreset)).toThrow(/galeMode/)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,
