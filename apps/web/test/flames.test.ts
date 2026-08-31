@@ -74,6 +74,7 @@ describe('flame roster', () => {
       'purifying-lotus',
       'karmic-lotus',
       'bone-chilling',
+      'sea-heart',
       'green-lotus',
     ])
   })
@@ -108,10 +109,10 @@ describe('flame roster', () => {
     expect(flameCatalog.map(flame => flame.id)).toContain('green-lotus')
   })
 
-  it('keeps the sea heart implementation dev-only until visual approval', () => {
+  it('publishes the sea heart implementation after visual approval', () => {
     const seaHeart = flameRosterBySlug.get('sea-heart')
 
-    expect(seaHeart?.visual.state).toBe('prototype')
+    expect(seaHeart?.visual.state).toBe('approved')
     expect(getFlamePreset(seaHeart!)).toMatchObject({
       id: 'sea-heart',
       rank: 15,
@@ -120,7 +121,7 @@ describe('flame roster', () => {
         flowMode: 'tidal',
       },
     })
-    expect(flameCatalog.map(flame => flame.id)).not.toContain('sea-heart')
+    expect(flameCatalog.map(flame => flame.id)).toContain('sea-heart')
   })
 
   it('assigns one representative to every visual family', () => {

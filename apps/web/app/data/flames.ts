@@ -147,14 +147,6 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
-function prototypeVisual(
-  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
-  brief: FlameVisualBrief,
-  preset: FlameRenderPreset,
-): FlameVisual {
-  return { state: 'prototype', plannedFamily, brief, preset }
-}
-
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -462,7 +454,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('深蓝色、液态感与高温表现的相关描写。')],
-    visual: prototypeVisual('fluid', visualBriefs.seaHeart, {
+    visual: approvedVisual('fluid', visualBriefs.seaHeart, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'tidal' },
       palette: { core: '#d9ffff', inner: '#25b9ef', outer: '#08245f' },
@@ -582,7 +574,7 @@ export const visualFamilyCatalog: Record<VisualFamilyId, VisualFamilyDefinition>
   void: { id: 'void', label: '虚无', representativeFlameId: 'nihility', status: 'ready' },
   lotus: { id: 'lotus', label: '莲相', representativeFlameId: 'purifying-lotus', status: 'ready' },
   crown: { id: 'crown', label: '冠焰', representativeFlameId: 'golden-emperor', status: 'planned' },
-  fluid: { id: 'fluid', label: '流火', representativeFlameId: 'sea-heart', status: 'planned' },
+  fluid: { id: 'fluid', label: '流火', representativeFlameId: 'sea-heart', status: 'ready' },
   spirit: { id: 'spirit', label: '灵形', representativeFlameId: 'nine-dragon-thunder', status: 'planned' },
   gale: { id: 'gale', label: '风焰', representativeFlameId: 'nether-gale', status: 'planned' },
   cold: { id: 'cold', label: '冷焰', representativeFlameId: 'bone-chilling', status: 'ready' },
