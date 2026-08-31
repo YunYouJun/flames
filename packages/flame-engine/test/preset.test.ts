@@ -33,6 +33,15 @@ describe('flame preset validation', () => {
     } as unknown as FlamePreset)).toThrow(/bloomMode/)
   })
 
+  it('accepts the earthcore lotus bloom mode', () => {
+    const earthcorePreset = {
+      ...preset,
+      kernelOptions: { bloomMode: 'earthcore' },
+    } as unknown as FlamePreset
+
+    expect(validateFlamePreset(earthcorePreset)).toBe(earthcorePreset)
+  })
+
   it('rejects duplicate catalog ranks', () => {
     expect(() => validateFlameCatalog([
       preset,

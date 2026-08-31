@@ -147,6 +147,14 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
+function prototypeVisual(
+  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
+  brief: FlameVisualBrief,
+  preset: FlameRenderPreset,
+): FlameVisual {
+  return { state: 'prototype', plannedFamily, brief, preset }
+}
+
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -193,6 +201,22 @@ const visualBriefs = {
     },
     fallback: '以八瓣深红莲轮、金白焰心与焦黑火茧保留业火识别。',
     differentiation: '低伏旋转的业火轮与闭合火茧，区别于净莲妖火开放平稳的乳白花冠。',
+    specialPasses: ['lotus-petals'],
+    reviewScenes,
+  },
+  greenLotus: {
+    facts: ['青色莲形异火，孕生于大地深处，历经漫长岁月才逐渐成形。'],
+    interpretation: '以低伏厚重的青莲扎入地心熔隙；长按时岩缝与莲脉同时亮起，拖拽时根焰沿熔脉横向游走。',
+    silhouette: '低矮、饱满的青色莲盏包裹黄绿焰心，下方延伸不规则地脉裂隙。',
+    palette: '淡金莲心、青绿内焰、深青外瓣与少量熔金地脉。',
+    motion: '莲瓣缓慢起伏，根焰从下方断续涌入；整体沉稳，偶尔出现地心式能量脉冲。',
+    interactions: {
+      pointer: '莲盏与根焰朝指针方向倾斜。',
+      hold: '地心裂隙亮起，青莲二次绽放。',
+      drag: '根焰沿熔脉错位流动。',
+    },
+    fallback: '以低伏青莲、淡金焰心与三道熔隙根焰保持识别。',
+    differentiation: '低矮厚重且扎根地脉，区别于净莲的开放白冠与红莲的高耸火茧。',
     specialPasses: ['lotus-petals'],
     reviewScenes,
   },
@@ -470,7 +494,15 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('青色莲形、地心来源、成形周期与引发火山活动的相关描写。')],
-    visual: reservedVisual('lotus'),
+    visual: prototypeVisual('lotus', visualBriefs.greenLotus, {
+      kernel: 'lotus',
+      kernelOptions: { bloomMode: 'earthcore' },
+      palette: { core: '#fff2a8', inner: '#34dc96', outer: '#006149' },
+      speed: 0.78,
+      scale: 0.74,
+      turbulence: 0.92,
+      intensity: 1.04,
+    }),
   },
   {
     id: 'nether-poison',

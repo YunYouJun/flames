@@ -36,7 +36,11 @@ export function getFlameKernelDefinition(kernel: FlameKernelId): FlameKernelDefi
 }
 
 export function getFlameKernelVariant(preset: FlamePreset): number {
-  if (preset.kernel === 'lotus' && preset.kernelOptions?.bloomMode === 'karmic')
-    return 1
+  if (preset.kernel === 'lotus') {
+    if (preset.kernelOptions?.bloomMode === 'karmic')
+      return 1
+    if (preset.kernelOptions?.bloomMode === 'earthcore')
+      return 2
+  }
   return 0
 }

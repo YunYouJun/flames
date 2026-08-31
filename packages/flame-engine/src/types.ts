@@ -5,7 +5,7 @@ export type FlameQuality = 'high' | 'balanced' | 'lite'
 export type FlameRuntimeStatus = 'idle' | 'ready' | 'context-lost' | 'disposed' | 'error'
 
 export interface LotusKernelOptions {
-  bloomMode: 'purifying' | 'karmic'
+  bloomMode: 'purifying' | 'karmic' | 'earthcore'
 }
 
 /**

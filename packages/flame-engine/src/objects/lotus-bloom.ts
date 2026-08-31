@@ -207,7 +207,7 @@ export class LotusBloom implements FlameSculpture {
   setAppearance(palette: FlamePalette, speed: number, intensity: number, options?: FlameKernelOptions): void {
     this.speed = speed
     this.intensity = intensity
-    this.variant = options?.bloomMode === 'karmic' ? 1 : 0
+    this.variant = options?.bloomMode === 'karmic' ? 1 : options?.bloomMode === 'earthcore' ? 2 : 0
     this.uniform<Color>('uCore').value.set(palette.core)
     this.uniform<Color>('uInner').value.set(palette.inner)
     this.uniform<Color>('uOuter').value.set(palette.outer)
@@ -241,10 +241,12 @@ export class LotusBloom implements FlameSculpture {
     this.uniform<number>('uIntensity').value = this.intensity
     this.uniform<number>('uPressed').value = pressed
 
-    const scale = this.viewportScale * mix(1, 0.90, this.variant) * (1 + pressed * mix(0.055, 0.075, this.variant))
-    this.group.scale.setScalar(scale)
-    this.group.position.y = mix(-0.26, -0.24, this.variant)
-    this.group.rotation.x = mix(-0.04, -0.025, this.variant) - pointer.y * 0.075
+    const karmic = this.variant === 1 ? 1 : 0
+    const earthcore = this.variant === 2 ? 1 : 0
+    const scale = this.viewportScale * (1 - karmic * 0.10 - earthcore * 0.035) * (1 + pressed * (0.055 + karmic * 0.020 + earthcore * 0.035))
+    this.group.scale.set(scale, scale * (1 - earthcore * 0.20), scale)
+    this.group.position.y = -0.26 + karmic * 0.02 - earthcore * 0.055
+    this.group.rotation.x = -0.04 + karmic * 0.015 - earthcore * 0.035 - pointer.y * 0.075
     this.group.rotation.z = -pointer.x * 0.035
 
     for (const [index, layer] of this.layerGroups.entries()) {
@@ -252,11 +254,13 @@ export class LotusBloom implements FlameSculpture {
       if (!spec)
         continue
       const pointerTurn = pointer.x * (0.11 + index * 0.025)
-      const karmicOffset = this.variant * (index - 1) * 0.22
-      const karmicPulse = this.variant * Math.sin(time * this.speed * 1.8 + index * 1.7) * 0.025
+      const karmicOffset = karmic * (index - 1) * 0.22
+      const karmicPulse = karmic * Math.sin(time * this.speed * 1.8 + index * 1.7) * 0.025
       const karmicDragTurn = ((index % 2 === 0 ? -1 : 1) * (0.16 + index * 0.045)) * drag
-      layer.rotation.y = time * this.speed * spec.spin + pointerTurn + drag * spec.spin * 0.72 + this.variant * karmicDragTurn + karmicOffset + karmicPulse
-      const layerScale = 1 - this.variant * index * 0.055 + pressed * this.variant * (0.012 + index * 0.009)
+      const earthcoreDrift = earthcore * Math.sin(time * this.speed * 0.72 + index * 2.1) * 0.018
+      const earthcoreDragTurn = earthcore * (index % 2 === 0 ? 1 : -1) * drag * (0.075 + index * 0.025)
+      layer.rotation.y = time * this.speed * spec.spin * (1 - earthcore * 0.42) + pointerTurn + drag * spec.spin * 0.72 + karmic * karmicDragTurn + karmicOffset + karmicPulse + earthcoreDrift + earthcoreDragTurn
+      const layerScale = 1 - karmic * index * 0.055 + pressed * karmic * (0.012 + index * 0.009) + earthcore * (0.055 - index * 0.018) + pressed * earthcore * (0.022 + index * 0.006)
       layer.scale.setScalar(layerScale)
     }
   }
@@ -267,8 +271,4 @@ export class LotusBloom implements FlameSculpture {
       throw new Error(`Missing lotus bloom uniform: ${name}`)
     return uniform
   }
-}
-
-function mix(from: number, to: number, amount: number): number {
-  return from + (to - from) * amount
 }

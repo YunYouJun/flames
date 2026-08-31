@@ -22,7 +22,7 @@ export function validateFlamePreset(preset: FlamePreset): FlamePreset {
     new Color(color).getHex()
 
   if (preset.kernel === 'lotus' && preset.kernelOptions) {
-    if (preset.kernelOptions.bloomMode !== 'purifying' && preset.kernelOptions.bloomMode !== 'karmic')
+    if (preset.kernelOptions.bloomMode !== 'purifying' && preset.kernelOptions.bloomMode !== 'karmic' && preset.kernelOptions.bloomMode !== 'earthcore')
       throw new Error(`Flame preset "${preset.id}" has an unsupported lotus bloomMode.`)
   }
   else if (preset.kernel !== 'lotus' && preset.kernelOptions !== undefined) {

@@ -66,6 +66,7 @@ describe('flame roster', () => {
       'purifying-lotus',
       'karmic-lotus',
       'bone-chilling',
+      'green-lotus',
     ])
     expect(flameCatalog.map(flame => flame.id)).toEqual([
       'nihility',
@@ -88,6 +89,21 @@ describe('flame roster', () => {
       },
     })
     expect(flameCatalog.map(flame => flame.id)).toContain('karmic-lotus')
+  })
+
+  it('keeps the green lotus implementation dev-only until visual approval', () => {
+    const greenLotus = flameRosterBySlug.get('green-lotus')
+
+    expect(greenLotus?.visual.state).toBe('prototype')
+    expect(getFlamePreset(greenLotus!)).toMatchObject({
+      id: 'green-lotus',
+      rank: 19,
+      kernel: 'lotus',
+      kernelOptions: {
+        bloomMode: 'earthcore',
+      },
+    })
+    expect(flameCatalog.map(flame => flame.id)).not.toContain('green-lotus')
   })
 
   it('assigns one representative to every visual family', () => {

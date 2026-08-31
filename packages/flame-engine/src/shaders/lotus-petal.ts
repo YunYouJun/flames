@@ -16,7 +16,8 @@ export const lotusPetalVertexShader = /* glsl */ `
     float tip = pow(uv.y, 1.65);
     float flutter = sin(uTime * uSpeed * 2.1 + phase + uv.x * 2.8);
     float breathing = sin(uTime * uSpeed * 1.15 + phase * 0.72);
-    float karmic = step(0.5, uVariant);
+    float karmic = 1.0 - step(0.5, abs(uVariant - 1.0));
+    float earthcore = step(1.5, uVariant);
 
     vec3 animated = position;
     animated.y += flutter * tip * (0.012 + uQuality * 0.014);
@@ -25,6 +26,11 @@ export const lotusPetalVertexShader = /* glsl */ `
     animated.z *= mix(1.0, 0.48 + tip * 0.06, karmic);
     animated.y += karmic * tip * (0.30 + breathing * 0.030);
     animated.z *= 1.0 + uPressed * tip * mix(0.075, 0.10, karmic);
+    animated.x *= mix(1.0, 1.08, earthcore);
+    animated.z *= mix(1.0, 0.72 + tip * 0.08, earthcore);
+    animated.y *= mix(1.0, 0.82, earthcore);
+    animated.y += earthcore * tip * (0.10 + breathing * 0.014);
+    animated.z *= 1.0 + uPressed * tip * earthcore * 0.11;
 
     vec4 worldPosition = modelMatrix * vec4(animated, 1.0);
     vWorldPosition = worldPosition.xyz;
@@ -85,7 +91,8 @@ export const lotusPetalFragmentShader = /* glsl */ `
 
   void main() {
     float clock = uTime * uSpeed;
-    float karmic = step(0.5, uVariant);
+    float karmic = 1.0 - step(0.5, abs(uVariant - 1.0));
+    float earthcore = step(1.5, uVariant);
     float side = abs(vUv.x * 2.0 - 1.0);
     float edge = smoothstep(0.0, 0.13, min(vUv.x, 1.0 - vUv.x));
     float root = smoothstep(0.0, 0.09, vUv.y);
@@ -114,12 +121,18 @@ export const lotusPetalFragmentShader = /* glsl */ `
     float heat = saturate(centerHeat * 0.34 + rootHeat * 0.30 + billow * 0.38 + filament * 0.24);
     float karmicVein = smoothstep(0.54, 0.78, noise21(vec2(vUv.x * 16.0 + clock * 0.18, vUv.y * 5.2 - clock * 0.52)));
     karmicVein *= centerHeat * smoothstep(0.12, 0.92, vUv.y) * karmic;
+    float earthVein = smoothstep(0.58, 0.76, noise21(vec2(vUv.x * 10.0 - clock * 0.08, vUv.y * 4.2 - clock * 0.24)));
+    earthVein *= centerHeat * (1.0 - smoothstep(0.46, 0.96, vUv.y)) * earthcore;
 
     vec3 color = mix(uOuter, uInner, smoothstep(0.16, 0.62, heat));
     color = mix(color, uCore, smoothstep(0.70, 1.0, heat));
     color += uInner * filament * centerHeat * 0.30;
     color += uOuter * (side * 0.18 + edgeBand * 0.32);
     color += mix(uInner, uCore, 0.68) * karmicVein * (0.24 + uPressed * 0.34);
+    color += mix(uInner, uCore, 0.54) * earthVein * (0.64 + uPressed * 0.58);
+    float earthCrust = earthcore * smoothstep(0.38, 0.94, side) * (0.34 + billow * 0.36);
+    color = mix(color, uOuter * 0.48, earthCrust * 0.62);
+    color += uInner * earthcore * centerHeat * rootHeat * 0.14;
     float charEdge = karmic * smoothstep(0.58, 0.96, max(side, vUv.y)) * (0.30 + breakupNoise * 0.52);
     color = mix(color, uOuter * 0.22, charEdge * 0.48);
 
@@ -132,7 +145,7 @@ export const lotusPetalFragmentShader = /* glsl */ `
     alpha *= 1.0 - charEdge * 0.34;
     alpha *= mix(0.58, 0.92, side);
     alpha += edgeBand * root * tip * 0.10;
-    alpha *= 0.66;
+    alpha *= mix(0.66, 0.74, earthcore);
 
     if (alpha < 0.025) discard;
     gl_FragColor = vec4(color, alpha);
