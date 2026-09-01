@@ -57,25 +57,21 @@ export const crownFragmentShader = /* glsl */ `
   vec3 desolationWings(vec2 q, float t) {
     vec2 p = q - vec2(uPointer.x * 0.018, -0.04 + uPointer.y * 0.012);
     float x = abs(p.x);
-    float e = 0.84 + uPressed * 0.12;
+    float b = pow(0.5 + 0.5 * sin(t * 0.86), 3.0);
+    float e = 0.92 + uPressed * 0.15 + b * 0.10;
     float a = x / e;
-    float h = 0.22 - a * 0.32 + sin(t * 0.92 + x * 5.0) * 0.028;
+    float h = 0.28 - a * 0.40 - b * 0.035 + sin(t * 0.94 + x * 5.0) * 0.035;
     h += sign(p.x) * (uPointer.x * x + uDrag * sin(a * PI)) * 0.05;
-    float w = 0.025 + sin(saturate(a) * PI) * (0.18 + uPressed * 0.025);
-    w = max(w + (sin(x * 33.0 - t * 2.1) + sin(x * 51.0 + t * 1.6)) * 0.010 * a, 0.015);
-    float d = max((p.y - h) / (w * 0.72), (h - p.y) / (w * 1.28));
+    float w = 0.035 + sin(saturate(a) * PI) * (0.22 + uPressed * 0.030);
+    w = max(w + (sin(x * 33.0 - t * 2.1) + sin(x * 51.0 + t * 1.6)) * 0.012 * a, 0.018);
+    float d = max((p.y - h) / (w * 0.62), (h - p.y) / (w * 1.38));
     float v = (1.0 - smoothstep(0.84, 1.03, d)) * smoothstep(0.04, 0.13, x);
-    v *= (1.0 - smoothstep(e - 0.10, e, x)) * (0.76 + 0.24 * smoothstep(-0.5, 0.72, sin(x * 35.0 - (p.y - h) * 17.0 - t * 1.2)));
-    float c = flameTongue(q, t * 1.18, 0.0, 1.9, 0.94 + uPressed * 0.12, 0.105);
-    float s = 0.0;
-    for (int n = 0; n < 5; n += 1) {
-      float i = float(n);
-      float r = 1.0 - smoothstep(0.008, 0.027, abs(q.y + 0.38 - i * 0.055 - sin(q.x * (8.0 + i * 0.8) + i * 1.7 - t * (2.1 + i * 0.19)) * 0.028));
-      r *= (1.0 - smoothstep(0.64, 0.88, abs(q.x))) * smoothstep(0.12, 0.22, abs(q.x));
-      r *= 0.45 + 0.55 * smoothstep(-0.25, 0.65, sin(q.x * 19.0 - t * 3.1 + i));
-      s = max(s, r);
-    }
-    return vec3(v, max(c, v * smoothstep(0.66, 0.94, d) * 0.56), s);
+    v *= (1.0 - smoothstep(e - 0.12, e, x)) * (0.82 + 0.18 * smoothstep(-0.5, 0.72, sin(x * 35.0 - (p.y - h) * 17.0 - t * 1.2)));
+    float c = flameTongue(q, t * 1.32, 0.0, 1.9, 0.82 + uPressed * 0.12, 0.145);
+    float f = fract(t * 0.34);
+    float r = 1.0 - smoothstep(0.012, 0.055, abs(q.y + 0.16 + f * 0.42 + x * 0.10 - sin(x * 8.0 - t * 2.0) * 0.025));
+    r *= (1.0 - f) * (1.0 - smoothstep(0.28, e, x)) * smoothstep(0.10, 0.20, x);
+    return vec3(v, v * smoothstep(0.62, 0.93, d), max(c, r));
   }
 
   vec3 ancestralSeal(vec2 point, float clock) {
