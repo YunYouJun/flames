@@ -11,47 +11,47 @@ export const crownFragmentShader = /* glsl */ `
   vec3 goldCrown(vec2 p, float t) {
     vec2 q = p - vec2(uPointer.x * 0.028, uPointer.y * 0.012);
     vec2 f = advectFlame(q, t * 1.34);
-    vec2 eddy = q * 1.72 + vec2(6.4, -3.1);
-    f += (advectFlame(eddy, t * 2.18) - eddy) * (0.18 + smoothstep(-0.52, 0.86, q.y) * 0.56);
+    vec2 d = q * 1.72 + vec2(6.4, -3.1);
+    f += (advectFlame(d, t * 2.18) - d) * (0.18 + smoothstep(-0.52, 0.86, q.y) * 0.56);
     vec2 e = vec2(-0.17 + sin(t * 0.73) * 0.07, -0.02 + sin(t * 0.43) * 0.13);
     vec2 v = f - e;
     f = e + rotate2d(sin(t * 1.62) * 0.92 * (1.0 - smoothstep(0.06, 0.48, length(v)))) * v;
     e = vec2(0.16 + sin(t * 0.58 + 2.0) * 0.07, 0.24 + sin(t * 0.51 + 1.3) * 0.12);
     v = f - e;
     f = e + rotate2d(-sin(t * 1.37 + 1.7) * 0.84 * (1.0 - smoothstep(0.05, 0.44, length(v)))) * v;
-    float coil = (1.0 - smoothstep(0.04, 0.17, abs(sin(atan(v.y, v.x) + length(v) * 13.0 + t * 2.7)))) * (1.0 - smoothstep(0.08, 0.43, length(v)));
+    float c = (1.0 - smoothstep(0.04, 0.17, abs(sin(atan(v.y, v.x) + length(v) * 13.0 + t * 2.7)))) * (1.0 - smoothstep(0.08, 0.43, length(v)));
 
-    vec3 plume = plumeLayers(f * vec2(0.86, 0.82), t * 1.28, 1.06, 0.028);
+    vec3 pm = plumeLayers(f * vec2(0.86, 0.82), t * 1.28, 1.06, 0.028);
     float tg = 0.0;
     float cs = 0.0;
     for (int i = 0; i < 7; i += 1) {
       float u = float(i) - 3.0;
       float ph = float(i) * 1.37 + 0.6;
       float ps = noise21(vec2(t * 0.72 + ph, ph * 2.71));
-      float drift = noise21(vec2(t * 0.41 + ph * 1.9, ph * 0.83));
-      float life = smoothstep(0.12, 0.64, ps);
-      float cx = u * 0.105 + (drift - 0.5) * 0.18;
-      float height = (0.76 + (1.0 - abs(u) * 0.095) * 0.42 + uPressed * 0.12) * (0.58 + ps * 0.62);
-      float tongue = flameTongue(f, t * 1.72, cx, ph, height, (0.14 - abs(u) * 0.008) * (0.72 + drift * 0.46)) * life;
-      tg = max(tg, tongue);
-      cs = max(cs, pow(tongue, 2.2));
+      float dr = noise21(vec2(t * 0.41 + ph * 1.9, ph * 0.83));
+      float lf = smoothstep(0.12, 0.64, ps);
+      float cx = u * 0.105 + (dr - 0.5) * 0.18;
+      float ht = (0.76 + (1.0 - abs(u) * 0.095) * 0.42 + uPressed * 0.12) * (0.58 + ps * 0.62);
+      float tn = flameTongue(f, t * 1.72, cx, ph, ht, (0.14 - abs(u) * 0.008) * (0.72 + dr * 0.46)) * lf;
+      tg = max(tg, tn);
+      cs = max(cs, pow(tn, 2.2));
     }
 
-    float base = ellipseMask(f, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
-    float support = plume.x * (1.0 - smoothstep(0.04, 0.72, f.y));
-    float body = max(max(support, tg), base);
-    float erosion = fbmFast(f * vec2(5.8, 3.7) + vec2(-t * 0.44, -t * 2.36));
-    float breakup = smoothstep(0.60, 0.84, erosion) * smoothstep(-0.22, 0.86, f.y);
-    body *= 1.0 - breakup * 0.76;
-    float glow = fbmFast(f * vec2(7.4, 4.6) + vec2(t * 0.32, -t * 2.08));
-    float heat = max(cs, pow(support, 1.65));
-    heat = max(heat, ellipseMask(f, vec2(0.0, -0.49), vec2(0.33, 0.065), 0.42));
-    heat *= 0.42 + smoothstep(0.32, 0.78, glow) * 0.78;
-    heat = max(heat, coil * body * 0.68);
+    float ba = ellipseMask(f, vec2(0.0, -0.49), vec2(0.52 + uPressed * 0.06, 0.115), 0.32);
+    float sp = pm.x * (1.0 - smoothstep(0.04, 0.72, f.y));
+    float bd = max(max(sp, tg), ba);
+    float er = fbmFast(f * vec2(5.8, 3.7) + vec2(-t * 0.44, -t * 2.36));
+    float br = smoothstep(0.60, 0.84, er) * smoothstep(-0.22, 0.86, f.y);
+    bd *= 1.0 - br * 0.76;
+    float g = fbmFast(f * vec2(7.4, 4.6) + vec2(t * 0.32, -t * 2.08));
+    float hh = max(cs, pow(sp, 1.65));
+    hh = max(hh, ellipseMask(f, vec2(0.0, -0.49), vec2(0.33, 0.065), 0.42));
+    hh *= 0.42 + smoothstep(0.32, 0.78, g) * 0.78;
+    hh = max(hh, c * bd * 0.68);
 
     float hr = length(q * vec2(1.0, 1.04));
-    float halo = 1.0 - smoothstep(0.016, 0.052, abs(hr - (0.51 + uPressed * 0.04)));
-    return vec3(body, heat, halo);
+    float ha = 1.0 - smoothstep(0.016, 0.052, abs(hr - (0.51 + uPressed * 0.04)));
+    return vec3(bd, hh, ha);
   }
 
   vec3 desolationWings(vec2 q, float t) {
@@ -90,37 +90,40 @@ export const crownFragmentShader = /* glsl */ `
 
   vec3 oldSeal(vec2 p, float t) {
     vec2 q = p - vec2(uPointer.x * 0.018, -0.10 + uPointer.y * 0.01);
-    float tower = 1.0 - smoothstep(0.12, 0.16, abs(q.x));
-    tower *= smoothstep(-0.58, -0.46, q.y) * (1.0 - smoothstep(0.42, 0.58, q.y));
-    float shoulders = 1.0 - smoothstep(0.17, 0.22, abs(q.x));
-    shoulders *= smoothstep(-0.30, -0.20, q.y) * (1.0 - smoothstep(0.22, 0.34, q.y));
-    float crown = 1.0 - smoothstep(0.014, 0.040, abs(abs(q.x) * 0.72 + q.y - (0.46 + uPressed * 0.04)));
-    crown *= 1.0 - smoothstep(0.18, 0.27, abs(q.x));
-    float glyph = 1.0 - smoothstep(0.012, 0.036, abs(sin(q.y * 21.0 + t * 0.28) * 0.12 + q.x));
-    glyph *= tower;
+    vec2 f = advectFlame(q, t * 0.72);
+    vec3 pm = plumeLayers(f * vec2(1.28, 0.92), t * 0.82, 0.68, 0.026);
+    float b = (1.0 - smoothstep(0.11, 0.16, abs(q.x))) * smoothstep(-0.58, -0.46, q.y) * (1.0 - smoothstep(0.38, 0.55, q.y));
+    float sh = (1.0 - smoothstep(0.17, 0.22, abs(q.x))) * smoothstep(-0.30, -0.20, q.y) * (1.0 - smoothstep(0.18, 0.31, q.y));
+    float n = fbmFast(q * vec2(5.2, 3.8) + vec2(t * 0.18, -t * 0.72));
+    float a = flameTongue(f, t * 1.18, 0.0, 5.7, 0.96 + uPressed * 0.12, 0.15);
+    float d = max(max(b, sh) * (0.52 + n * 0.28), max(pm.x * 0.78, a));
+    d *= 1.0 - smoothstep(0.70, 0.86, n) * smoothstep(-0.12, 0.78, q.y) * 0.58;
+    d *= smoothstep(-0.60, -0.43, q.y);
+    float g = (1.0 - smoothstep(0.012, 0.036, abs(sin(q.y * 21.0 - t * 0.86) * 0.12 + q.x))) * max(b, pm.x * 0.62);
+    g *= smoothstep(0.30, 0.68, n);
     float hr = length(q * vec2(1.0, 0.94));
-    float halo = 1.0 - smoothstep(0.014, 0.040, abs(hr - (0.39 + uPressed * 0.045)));
-    halo *= 0.56 + 0.44 * smoothstep(0.35, 0.88, 0.5 + 0.5 * sin(atan(q.y, q.x) * 8.0 + t * 0.7));
-    return vec3(max(max(tower, shoulders), crown), glyph, halo);
+    float h = 1.0 - smoothstep(0.014, 0.040, abs(hr - (0.39 + uPressed * 0.045)));
+    h *= 0.56 + 0.44 * smoothstep(0.35, 0.88, 0.5 + 0.5 * sin(atan(q.y, q.x) * 8.0 + t * 0.7));
+    return vec3(d, max(max(g, a * 0.58), pm.x * pm.x * 0.34), h);
   }
 
   vec3 empRings(vec2 p, float t) {
     vec2 q = p - vec2(uPointer.x * 0.028, -0.04 + uPointer.y * 0.018);
-    float radius = length(q * vec2(1.0, 1.06));
-    float angle = atan(q.y, q.x);
-    float rings = 0.0;
+    float r = length(q * vec2(1.0, 1.06));
+    float a = atan(q.y, q.x);
+    float rs = 0.0;
     for (int i = 0; i < 4; i += 1) {
       float u = float(i) / 3.0;
-      float ringRadius = 0.16 + u * 0.12 + uPressed * u * 0.045;
-      float ripple = sin(angle * (5.0 + float(i) * 2.0) + t * (0.38 + u * 0.24)) * 0.016;
-      float ring = 1.0 - smoothstep(0.012, 0.038, abs(radius - ringRadius - ripple));
-      rings = max(rings, ring);
+      float rr = 0.16 + u * 0.12 + uPressed * u * 0.045;
+      float w = sin(a * (5.0 + float(i) * 2.0) + t * (0.38 + u * 0.24)) * 0.016;
+      float g = 1.0 - smoothstep(0.012, 0.038, abs(r - rr - w));
+      rs = max(rs, g);
     }
-    float spokes = 1.0 - smoothstep(0.018, 0.070, abs(sin(angle * 11.0 - t * 0.46)));
-    spokes *= smoothstep(0.11, 0.20, radius) * (1.0 - smoothstep(0.48, 0.61, radius));
-    vec3 plume = plumeLayers(p * vec2(0.98, 0.86), t * 0.66, 0.84, 0.028);
-    float core = softGlow(p, vec2(0.0, -0.06), vec2(4.2, 3.1), 1.0);
-    return vec3(max(rings, spokes), plume.x, core);
+    float s = 1.0 - smoothstep(0.018, 0.070, abs(sin(a * 11.0 - t * 0.46)));
+    s *= smoothstep(0.11, 0.20, r) * (1.0 - smoothstep(0.48, 0.61, r));
+    vec3 pm = plumeLayers(p * vec2(0.98, 0.86), t * 0.66, 0.84, 0.028);
+    float c = softGlow(p, vec2(0.0, -0.06), vec2(4.2, 3.1), 1.0);
+    return vec3(max(rs, s), pm.x, c);
   }
 
   void main() {
@@ -154,8 +157,8 @@ export const crownFragmentShader = /* glsl */ `
     if (uQuality > 0.25)
       m = emberField(p * vec2(0.84, 0.68), t * mix(0.68, 0.82, ce), 0.042 + gc * 0.075 + dw * 0.052 + ce * 0.045);
 
-    vec3 col = uOuter * (mask * 0.38 + wing.x * 0.30 + seal.x * 0.30);
-    col += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wing.z * 0.82 + seal.z * 0.52 + emp.x * 0.68);
+    vec3 col = uOuter * (mask * 0.38 + wing.x * 0.30 + seal.x * 0.08);
+    col += uInner * (mask * 0.43 + gold.x * 0.62 + gold.y * 0.74 + wing.z * 0.82 + seal.x * 0.22 + seal.z * 0.52 + emp.x * 0.68);
     col += uCore * (fil * 0.72 + gold.x * 0.24 + gold.y * 1.18 + gold.z * 1.42 + wing.y * 0.95 + seal.y * 1.10 + emp.z * 1.28 + m * 1.32);
     if (gc > 0.5) {
       col = uOuter * (gold.x * 0.88 + gold.z * 0.10);
@@ -171,8 +174,8 @@ export const crownFragmentShader = /* glsl */ `
     float al = mask * (0.45 + tex.x * 0.18 + tex.z * 0.17);
     al += fil * 0.22 + m * 0.70 + emp.z * 0.16 + wing.y * 0.30;
     if (gc > 0.5) {
-      float flameAlpha = gold.x * (0.62 + tex.x * 0.06 + tex.z * 0.12);
-      al = flameAlpha + gold.y * 0.26 + fil * 0.12 + m * 0.54 + gold.z * 0.08;
+      float fa = gold.x * (0.62 + tex.x * 0.06 + tex.z * 0.12);
+      al = fa + gold.y * 0.26 + fil * 0.12 + m * 0.54 + gold.z * 0.08;
     }
     al = saturate(al);
     if (al < 0.012) discard;
