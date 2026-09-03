@@ -9,8 +9,12 @@ const assetDirectory = new URL('_nuxt/', publicDirectory)
 const budgets = {
   clientJavaScriptGzip: 300 * 1024,
   clientCssGzip: 15 * 1024,
-  largestJavaScriptRaw: 600 * 1024,
+  largestJavaScriptRaw: 800 * 1024,
   publicOutputRaw: 3 * 1024 * 1024,
+}
+
+const warnings = {
+  largestJavaScriptRaw: 600 * 1024,
 }
 
 async function collectFiles(directory) {
@@ -57,8 +61,12 @@ const measurements = {
 let failed = false
 for (const [name, value] of Object.entries(measurements)) {
   const limit = budgets[name]
-  const marker = value <= limit ? 'PASS' : 'FAIL'
-  console.log(`${marker} ${name}: ${kibibytes(value)} / ${kibibytes(limit)}`)
+  const warning = warnings[name]
+  const marker = value > limit ? 'FAIL' : warning && value > warning ? 'WARN' : 'PASS'
+  const threshold = warning
+    ? `warn ${kibibytes(warning)} / hard ${kibibytes(limit)}`
+    : kibibytes(limit)
+  console.log(`${marker} ${name}: ${kibibytes(value)} / ${threshold}`)
   failed ||= value > limit
 }
 

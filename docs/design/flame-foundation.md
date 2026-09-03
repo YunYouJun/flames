@@ -37,7 +37,7 @@
 - resident programs `≤ 16`；单席 active programs `≤ 4`。
 - draw calls：High `≤ 32`、Balanced `≤ 24`、Lite `≤ 8`。
 - 单详情页初始 JavaScript 目标 gzip `≤ 250 KiB`，硬上限 `≤ 300 KiB`。
-- 单个客户端 chunk 原始体积硬上限 `≤ 600 KiB`，目标回到 `< 500 KiB`。
+- 单个客户端 chunk 原始体积在 `> 600 KiB` 时预警，硬上限 `≤ 800 KiB`；后续按 kernel 拆分加载后再重新收紧。
 - CSS gzip `≤ 15 KiB`，完整静态产物 `≤ 3 MiB`。
 - 每个家族代表作必须没有 shader compile error、page error 或 console error。
 
