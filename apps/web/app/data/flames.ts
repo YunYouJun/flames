@@ -694,11 +694,11 @@ const roster = [
     visual: prototypeVisual('spirit', visualBriefs.threeThousand, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'starlit' },
-      palette: { core: '#f0dcff', inner: '#7d3bc1', outer: '#160d32' },
+      palette: { core: '#f6e8ff', inner: '#a955ff', outer: '#32105c' },
       speed: 0.82,
-      scale: 0.92,
+      scale: 0.98,
       turbulence: 0.95,
-      intensity: 1.05,
+      intensity: 1.20,
     }),
   },
   {
@@ -753,11 +753,11 @@ const roster = [
     visual: prototypeVisual('spirit', visualBriefs.nineDragonThunder, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'thunder' },
-      palette: { core: '#ffffff', inner: '#b9d9ff', outer: '#3d4668' },
+      palette: { core: '#ffffff', inner: '#d4e9ff', outer: '#58688f' },
       speed: 1.02,
-      scale: 0.92,
+      scale: 0.98,
       turbulence: 1.15,
-      intensity: 1.10,
+      intensity: 1.26,
     }),
   },
   {
@@ -773,11 +773,11 @@ const roster = [
     visual: prototypeVisual('spirit', visualBriefs.turtleSpirit, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'turtle' },
-      palette: { core: '#ffd58a', inner: '#b65c2f', outer: '#2d160e' },
+      palette: { core: '#ffe0a0', inner: '#e77834', outer: '#4b2412' },
       speed: 0.52,
-      scale: 0.86,
+      scale: 0.94,
       turbulence: 0.72,
-      intensity: 0.92,
+      intensity: 1.10,
     }),
   },
   {
@@ -953,11 +953,11 @@ const roster = [
     visual: prototypeVisual('spirit', visualBriefs.myriadBeasts, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'beasts' },
-      palette: { core: '#fff0ba', inner: '#ef442f', outer: '#5b0e16' },
+      palette: { core: '#fff0ba', inner: '#ff563b', outer: '#7a1320' },
       speed: 0.96,
-      scale: 0.94,
+      scale: 1.00,
       turbulence: 1.18,
-      intensity: 1.08,
+      intensity: 1.18,
     }),
   },
   {
