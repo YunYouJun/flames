@@ -714,11 +714,11 @@ const roster = [
     visual: prototypeVisual('gale', visualBriefs.netherGale, {
       kernel: 'gale',
       kernelOptions: { galeMode: 'nether' },
-      palette: { core: '#dce9e6', inner: '#718487', outer: '#101619' },
-      speed: 1.05,
-      scale: 0.92,
+      palette: { core: '#eef8f6', inner: '#93aaad', outer: '#223137' },
+      speed: 1.18,
+      scale: 1.00,
       turbulence: 1.25,
-      intensity: 0.88,
+      intensity: 1.12,
     }),
   },
   {

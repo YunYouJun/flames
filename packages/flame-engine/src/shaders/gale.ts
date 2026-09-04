@@ -21,7 +21,13 @@ export const galeFragmentShader = /* glsl */ `
       float unit = float(index) / 6.0;
       float level = mix(-0.44, 0.54, unit);
       float thickness = 0.055 - abs(unit - 0.5) * 0.018;
-      ribbons = max(ribbons, windRibbon(point, clock, level, unit * 4.3, thickness, 0.76 - abs(unit - 0.5) * 0.18));
+      float direction = mod(float(index), 2.0) * 2.0 - 1.0;
+      float tilt = (unit - 0.5) * 0.16 + direction * 0.025;
+      vec2 ribbonPoint = rotate2d(tilt) * point;
+      float ribbon = windRibbon(ribbonPoint, clock * direction * (0.82 + unit * 0.24), level, unit * 4.3, thickness, 0.76 - abs(unit - 0.5) * 0.18);
+      float tear = noise21(vec2(ribbonPoint.x * 5.4 - clock * direction * 0.72, float(index) * 3.1 + ribbonPoint.y));
+      ribbon *= 0.42 + smoothstep(0.30, 0.72, tear) * 0.58;
+      ribbons = max(ribbons, ribbon);
     }
 
     vec2 ringPoint = point - vec2(uPointer.x * 0.035, -0.02 + uPointer.y * 0.02);
@@ -29,8 +35,10 @@ export const galeFragmentShader = /* glsl */ `
     float radius = length(ringPoint);
     float angle = atan(ringPoint.y, ringPoint.x);
     float warpedRadius = radius + sin(angle * 5.0 - clock * 0.66) * 0.018;
-    float soundRadius = 0.20 + uPressed * 0.22;
+    float pulseProgress = fract(clock * 0.16);
+    float soundRadius = 0.16 + pulseProgress * 0.15 + uPressed * 0.22;
     float soundRing = 1.0 - smoothstep(0.012, 0.040, abs(warpedRadius - soundRadius));
+    soundRing *= (1.0 - pulseProgress) * (0.46 + uPressed * 0.54);
     float innerVoid = 1.0 - smoothstep(0.10, 0.24, radius);
     return vec3(ribbons, soundRing, innerVoid);
   }
