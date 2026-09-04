@@ -132,8 +132,11 @@ watch(() => activeFlame.value?.slug, (slug) => {
         </div>
 
         <FlameAltar
+          :family="activeFamily"
+          :flame-id="flame.id"
           :palette="activeFlame?.palette"
           :paused="paused || benchmarkTime !== undefined"
+          :rank="flame.rank"
         />
 
         <p v-if="activeFlame && runtimeStatus === 'context-lost'" class="runtime-notice">

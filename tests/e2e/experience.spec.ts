@@ -33,6 +33,55 @@ test('keeps development prototypes sealed from search indexing', async ({ page }
   await expect(page.getByText('帝炎未启')).toBeVisible()
 })
 
+test('keeps family altars centered on the shared flame source seam', async ({ page }) => {
+  const representatives = [
+    ['nihility', 'void', '虚'],
+    ['purifying-lotus', 'lotus', '净'],
+    ['golden-emperor', 'crown', '金'],
+    ['life-spirit', 'fluid', '生'],
+    ['three-thousand', 'spirit', '星'],
+    ['wind-fury-dragon', 'gale', '风'],
+    ['bone-chilling', 'cold', '骨'],
+    ['yin-yang', 'soul', '衡'],
+    ['volcanic-stone', 'geofire', '山'],
+  ] as const
+
+  for (const [slug, family, mark] of representatives) {
+    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+
+    const altar = page.locator(`.flame-altar[data-family="${family}"][data-flame="${slug}"]`)
+    await expect(altar).toBeVisible()
+    await expect(altar.locator('.flame-altar__crest')).toHaveText(mark)
+
+    const alignment = await altar.evaluate((element) => {
+      const canvas = element.parentElement?.querySelector('.flame-canvas')
+      const surface = element.querySelector('.flame-altar__top')
+      const body = element.querySelector('.flame-altar__body')
+      if (!canvas || !surface || !body)
+        return undefined
+
+      const altarRect = element.getBoundingClientRect()
+      const canvasRect = canvas.getBoundingClientRect()
+      const surfaceRect = surface.getBoundingClientRect()
+      const bodyRect = body.getBoundingClientRect()
+      return {
+        centerDelta: Math.abs((altarRect.left + altarRect.width / 2) - (canvasRect.left + canvasRect.width / 2)),
+        seamDelta: Math.abs((surfaceRect.top + surfaceRect.height / 2) - bodyRect.top),
+        surfaceLayer: Number.parseInt(getComputedStyle(surface).zIndex),
+        canvasLayer: Number.parseInt(getComputedStyle(canvas).zIndex),
+        bodyLayer: Number.parseInt(getComputedStyle(body).zIndex),
+      }
+    })
+
+    expect(alignment).toBeDefined()
+    expect(alignment!.centerDelta).toBeLessThanOrEqual(1)
+    expect(alignment!.seamDelta).toBeLessThanOrEqual(1)
+    expect(alignment!.surfaceLayer).toBeLessThan(alignment!.canvasLayer)
+    expect(alignment!.bodyLayer).toBeGreaterThan(alignment!.canvasLayer)
+  }
+})
+
 test('opens the independently written setting summary and source tier', async ({ page }) => {
   await page.getByRole('button', { name: /阅览设定/ }).click()
   const details = page.getByRole('dialog', { name: '净莲妖火' })
