@@ -163,7 +163,7 @@ test('renders distinct gale family prototypes inside renderer budgets', async ({
 
   const prototypes = [
     ['nether-gale', '九幽风炎', '横向淡黑风带穿过中央暗眼'],
-    ['wind-fury-dragon', '风怒龙炎', '青灰风龙沿螺旋上升'],
+    ['wind-fury-dragon', '风怒龙炎', '两股青灰风焰彼此缠绕成上升龙卷'],
   ] as const
 
   for (const [slug, name, interpretation] of prototypes) {
