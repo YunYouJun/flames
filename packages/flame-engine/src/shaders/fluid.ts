@@ -113,7 +113,25 @@ export const fluidFragmentShader = /* glsl */ `
     lowerBand *= 1.0 - smoothstep(0.40, 0.72, abs(point.x));
     float upperBand = exp(-pow((point.y + 0.02 - drift) * 9.6, 2.0));
     upperBand *= 1.0 - smoothstep(0.24, 0.56, abs(point.x));
-    float banks = max(lowerBand * (0.54 + tex * 0.46), upperBand * (0.48 + tex * 0.52));
+    float lowerBillow = smoothstep(0.24, 0.74, tex + lowerBand * 0.66);
+    float upperBillow = smoothstep(0.30, 0.78, (1.0 - tex) * 0.62 + upperBand * 0.72);
+    float lowerPuffs = 0.0;
+    for (int index = 0; index < 5; index += 1) {
+      float unit = float(index) / 4.0;
+      vec2 center = vec2(mix(-0.43, 0.43, unit) + sin(clock * 0.22 + unit * 9.0) * 0.018, -0.28 + sin(unit * 7.0 + clock * 0.18) * 0.025);
+      vec2 local = (point - center) / vec2(0.19, 0.095 + mod(float(index), 2.0) * 0.022);
+      float puff = 1.0 - smoothstep(0.74, 1.06, length(local) + (tex - 0.5) * 0.22);
+      lowerPuffs = max(lowerPuffs, puff);
+    }
+    float upperPuffs = 0.0;
+    for (int index = 0; index < 4; index += 1) {
+      float unit = float(index) / 3.0;
+      vec2 center = vec2(mix(-0.29, 0.29, unit) - sin(clock * 0.19 + unit * 8.0) * 0.016, -0.02 + sin(unit * 6.0 - clock * 0.16) * 0.020);
+      vec2 local = (point - center) / vec2(0.17, 0.085 + mod(float(index), 2.0) * 0.018);
+      float puff = 1.0 - smoothstep(0.72, 1.05, length(local) + (0.5 - tex) * 0.20);
+      upperPuffs = max(upperPuffs, puff);
+    }
+    float banks = max(max(lowerBand * 0.36, lowerPuffs) * (0.42 + lowerBillow * 0.58), max(upperBand * 0.34, upperPuffs) * (0.40 + upperBillow * 0.60));
 
     float rain = 0.0;
     for (int index = 0; index < 5; index += 1) {
@@ -134,18 +152,23 @@ export const fluidFragmentShader = /* glsl */ `
     float cores = 0.0;
     for (int index = 0; index < 6; index += 1) {
       float seed = float(index) * 3.17 + 1.2;
+      float life = fract(clock * (0.10 + mod(float(index), 3.0) * 0.018) + seed * 0.13);
+      float visibility = smoothstep(0.04, 0.20, life) * (1.0 - smoothstep(0.76, 0.98, life));
       vec2 center = vec2(
         sin(seed * 2.4 + clock * 0.22) * (0.12 + 0.055 * float(index)),
-        cos(seed * 1.7 + clock * 0.31) * 0.11
+        cos(seed * 1.7 + clock * 0.31) * 0.08 + mix(-0.10, 0.14, life)
       );
-      float radius = 0.026 + 0.012 * mod(float(index), 3.0) + uPressed * 0.010;
+      float radius = (0.020 + 0.014 * mod(float(index), 3.0)) * (0.52 + life * 0.80) + uPressed * 0.010;
       float distanceToBubble = length(poolPoint - center);
       float ring = 1.0 - smoothstep(0.008, 0.024, abs(distanceToBubble - radius));
-      bubbles = max(bubbles, ring);
-      cores = max(cores, 1.0 - smoothstep(radius * 0.22, radius * 0.86, distanceToBubble));
+      float burst = 1.0 - smoothstep(0.010, 0.034, abs(distanceToBubble - radius * (1.0 + (life - 0.72) * 2.6)));
+      burst *= smoothstep(0.72, 0.84, life) * (1.0 - smoothstep(0.88, 0.98, life));
+      bubbles = max(bubbles, max(ring * visibility, burst));
+      cores = max(cores, (1.0 - smoothstep(radius * 0.22, radius * 0.86, distanceToBubble)) * visibility * (1.0 - life));
     }
     float tendrils = liquidTongue(point, clock * 0.78, -0.26, 2.4, 0.62 + uPressed * 0.07, 0.075);
     tendrils = max(tendrils, liquidTongue(point, clock * 0.86, 0.30, 6.1, 0.55 + uPressed * 0.08, 0.082));
+    tendrils = max(tendrils, liquidTongue(point, clock * 0.72, 0.02, 4.8, 0.72 + uPressed * 0.06, 0.060));
     return vec3(bubbles, cores, tendrils);
   }
 
@@ -175,8 +198,12 @@ export const fluidFragmentShader = /* glsl */ `
     float folds = max(sheet.z, body * smoothstep(0.60, 0.88, tex.x));
 
     vec3 basin = tidalBasin(point, clock);
-    float surface = max(basin.x * 0.48, basin.y);
-    surface = max(surface, basin.z * 0.82);
+    float basinFill = basin.x * mix(0.48, 0.12, cloudy);
+    basinFill = mix(basinFill, basin.x * 0.54, venom);
+    float basinEdge = basin.y * (1.0 - cloudy * 0.84 - venom * 0.58);
+    float basinRipple = basin.z * (1.0 - cloudy * 0.92 - venom * 0.76);
+    float surface = max(basinFill, basinEdge);
+    surface = max(surface, basinRipple * 0.82);
     float mask = max(body, surface);
 
     vec3 growth = vec3(0.0);
@@ -205,8 +232,8 @@ export const fluidFragmentShader = /* glsl */ `
       spray = emberField(point * vec2(0.92, 0.84), clock * mix(0.56, 0.38, verdant), 0.035 + uPressed * 0.028 + verdant * 0.025 + venom * 0.018);
 
     float pulse = 0.90 + 0.08 * sin(clock * 1.06) + uPressed * 0.08;
-    vec3 color = uOuter * (body * 0.48 + basin.x * 0.20);
-    color += uInner * (body * 0.38 + edge * 0.96 + basin.y * 1.12 + basin.z * 0.72);
+    vec3 color = uOuter * (body * 0.48 + basinFill * 0.42);
+    color += uInner * (body * 0.38 + edge * 0.96 + basinEdge * 1.12 + basinRipple * 0.72);
     color += uCore * (folds * 0.70 + caustic * 0.54 + core * 0.48 + spray * 1.26);
     color += mix(uOuter, uInner, 0.68) * growth.x * 1.28 + mix(uInner, uCore, 0.18) * growth.y * 1.18 + uInner * growth.z * verdant * 0.42;
     color += uOuter * clouds.x * 0.54 + uInner * clouds.y * 1.08 + uCore * clouds.z * 1.22;
@@ -215,7 +242,7 @@ export const fluidFragmentShader = /* glsl */ `
 
     float alpha = body * (0.55 + tex.z * 0.25);
     alpha += edge * 0.28 + folds * 0.18;
-    alpha += basin.x * 0.13 + basin.y * 0.62 + basin.z * 0.42 + spray * 0.78;
+    alpha += basinFill * 0.26 + basinEdge * 0.62 + basinRipple * 0.42 + spray * 0.78;
     alpha = max(alpha, gMask * verdant * 0.92);
     alpha = max(alpha, cMask * cloudy * 0.88);
     alpha = max(alpha, pMask * venom * 0.94);

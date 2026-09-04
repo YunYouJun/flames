@@ -261,7 +261,7 @@ const visualBriefs = {
     },
     fallback: '以橙蓝双层焰云和五道垂落火丝保持项目演绎轮廓。',
     differentiation: '唯一采用上下分层、向下垂落的流火构图；其形态明确标注为项目演绎而非原著事实。',
-    specialPasses: ['tidal-rings'],
+    specialPasses: [],
     reviewScenes,
   },
   netherPoison: {
@@ -833,11 +833,11 @@ const roster = [
     visual: prototypeVisual('fluid', visualBriefs.fireCloudWater, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'cloudwater' },
-      palette: { core: '#fff0c4', inner: '#ff795f', outer: '#286a9b' },
+      palette: { core: '#fff4d4', inner: '#ff6c5a', outer: '#276da8' },
       speed: 0.74,
-      scale: 0.90,
+      scale: 0.96,
       turbulence: 0.78,
-      intensity: 1.00,
+      intensity: 1.10,
     }),
   },
   {
@@ -913,11 +913,11 @@ const roster = [
     visual: prototypeVisual('fluid', visualBriefs.netherPoison, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'venom' },
-      palette: { core: '#eaff92', inner: '#9b3bd1', outer: '#082f25' },
+      palette: { core: '#efff78', inner: '#b543e6', outer: '#093f31' },
       speed: 0.64,
-      scale: 0.82,
+      scale: 0.90,
       turbulence: 1.05,
-      intensity: 1.02,
+      intensity: 1.12,
     }),
   },
   {
