@@ -793,11 +793,11 @@ const roster = [
     visual: prototypeVisual('soul', visualBriefs.fallenHeart, {
       kernel: 'soul',
       kernelOptions: { soulMode: 'heart' },
-      palette: { core: '#fffef5', inner: '#ffd18a', outer: '#4c2030' },
+      palette: { core: '#fffef5', inner: '#ffdda5', outer: '#713548' },
       speed: 0.76,
-      scale: 0.90,
+      scale: 0.96,
       turbulence: 0.84,
-      intensity: 0.82,
+      intensity: 0.98,
     }),
   },
   {
@@ -933,11 +933,11 @@ const roster = [
     visual: prototypeVisual('soul', visualBriefs.yinYang, {
       kernel: 'soul',
       kernelOptions: { soulMode: 'duality' },
-      palette: { core: '#ffffff', inner: '#d8d6ce', outer: '#090a0c' },
+      palette: { core: '#ffffff', inner: '#e5e1d7', outer: '#14161b' },
       speed: 0.70,
-      scale: 0.86,
+      scale: 0.94,
       turbulence: 0.58,
-      intensity: 0.96,
+      intensity: 1.10,
     }),
   },
   {
