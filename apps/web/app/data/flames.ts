@@ -853,11 +853,11 @@ const roster = [
     visual: prototypeVisual('geofire', visualBriefs.volcanicStone, {
       kernel: 'geofire',
       kernelOptions: { earthMode: 'volcanic' },
-      palette: { core: '#fff2ad', inner: '#ef6725', outer: '#24140e' },
+      palette: { core: '#fff1a8', inner: '#ff6a1f', outer: '#40150b' },
       speed: 0.76,
-      scale: 0.92,
+      scale: 1.00,
       turbulence: 0.88,
-      intensity: 1.04,
+      intensity: 1.18,
     }),
   },
   {
@@ -973,11 +973,11 @@ const roster = [
     visual: prototypeVisual('geofire', visualBriefs.darkYellow, {
       kernel: 'geofire',
       kernelOptions: { earthMode: 'seed' },
-      palette: { core: '#fff0a0', inner: '#c49a28', outer: '#39280d' },
+      palette: { core: '#fff2a0', inner: '#dfa72b', outer: '#4a310d' },
       speed: 0.46,
-      scale: 0.76,
+      scale: 0.80,
       turbulence: 0.48,
-      intensity: 0.76,
+      intensity: 0.90,
     }),
   },
 ] satisfies FlameSeat[]
