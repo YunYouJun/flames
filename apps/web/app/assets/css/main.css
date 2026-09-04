@@ -250,40 +250,6 @@ select:focus-visible {
   cursor: grabbing;
 }
 
-.altar {
-  position: absolute;
-  z-index: 1;
-  right: 17%;
-  bottom: 0;
-  left: 17%;
-  height: 8.8rem;
-  filter: drop-shadow(0 2rem 2.8rem rgba(0, 0, 0, 0.92));
-}
-
-.altar-surface {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  right: 4%;
-  left: 4%;
-  height: 3.6rem;
-  border: 1px solid rgba(194, 207, 202, 0.11);
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse, rgba(111, 143, 140, 0.13), #111719 45%, #050708 73%);
-  box-shadow: inset 0 0.5rem 1.6rem #000;
-}
-
-.altar-body {
-  position: absolute;
-  inset: 1.8rem 13% 0;
-  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
-  background:
-    linear-gradient(110deg, transparent 48%, rgba(255, 255, 255, 0.04) 49%, transparent 50%),
-    linear-gradient(90deg, #080b0c, #182023 48%, #090c0d);
-  box-shadow: inset 0 0 2rem #000;
-}
-
 .flame-fallback {
   position: absolute;
   z-index: 2;
@@ -654,12 +620,6 @@ select:focus-visible {
   .stage-wrap {
     height: 49svh;
     min-height: 22rem;
-  }
-
-  .altar {
-    right: 12%;
-    left: 12%;
-    height: 6.7rem;
   }
 
   .flame-canvas {

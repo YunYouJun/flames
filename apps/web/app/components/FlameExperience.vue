@@ -131,10 +131,10 @@ watch(() => activeFlame.value?.slug, (slug) => {
           <span />
         </div>
 
-        <div class="altar" aria-hidden="true">
-          <i class="altar-surface" />
-          <i class="altar-body" />
-        </div>
+        <FlameAltar
+          :palette="activeFlame?.palette"
+          :paused="paused || benchmarkTime !== undefined"
+        />
 
         <p v-if="activeFlame && runtimeStatus === 'context-lost'" class="runtime-notice">
           灵力波动中断，正在重新凝聚异火……
