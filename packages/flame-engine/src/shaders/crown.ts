@@ -114,16 +114,26 @@ export const crownFragmentShader = /* glsl */ `
     float rs = 0.0;
     for (int i = 0; i < 4; i += 1) {
       float u = float(i) / 3.0;
-      float rr = 0.16 + u * 0.12 + uPressed * u * 0.045;
-      float w = sin(a * (5.0 + float(i) * 2.0) + t * (0.38 + u * 0.24)) * 0.016;
-      float g = 1.0 - smoothstep(0.012, 0.038, abs(r - rr - w));
-      rs = max(rs, g);
+      float direction = mod(float(i), 2.0) * 2.0 - 1.0;
+      float rr = 0.17 + u * 0.145 + uPressed * u * 0.060;
+      float w = sin(a * (5.0 + float(i) * 2.0) + t * direction * (0.42 + u * 0.28)) * 0.014;
+      float g = 1.0 - smoothstep(0.009, 0.029, abs(r - rr - w));
+      float segment = 0.5 + 0.5 * sin(a * (7.0 + float(i) * 2.0) - t * direction * (0.54 + u * 0.24) + float(i));
+      g *= 0.32 + smoothstep(0.28, 0.72, segment) * 0.68;
+      rs = max(rs, g * (0.78 + u * 0.22));
     }
-    float s = 1.0 - smoothstep(0.018, 0.070, abs(sin(a * 11.0 - t * 0.46)));
-    s *= smoothstep(0.11, 0.20, r) * (1.0 - smoothstep(0.48, 0.61, r));
-    vec3 pm = plumeLayers(p * vec2(0.98, 0.86), t * 0.66, 0.84, 0.028);
-    float c = softGlow(p, vec2(0.0, -0.06), vec2(4.2, 3.1), 1.0);
-    return vec3(max(rs, s), pm.x, c);
+    float s = 1.0 - smoothstep(0.014, 0.052, abs(sin(a * 11.0 - t * 0.46)));
+    float inward = 1.0 - smoothstep(0.045, 0.16, abs(fract(r * 4.2 + t * 0.34) - 0.5));
+    s *= smoothstep(0.11, 0.20, r) * (1.0 - smoothstep(0.54, 0.66, r)) * (0.34 + inward * 0.66);
+
+    vec3 pm = plumeLayers(p * vec2(1.18, 0.88), t * 0.72, 0.76, 0.026);
+    float tongues = flameTongue(p, t * 0.92, -0.10, 1.4, 0.88 + uPressed * 0.10, 0.105);
+    tongues = max(tongues, flameTongue(p, t * 0.84, 0.08, 4.8, 1.00 + uPressed * 0.12, 0.115));
+    tongues = max(tongues, flameTongue(p, t * 0.96, 0.0, 7.2, 1.14 + uPressed * 0.14, 0.095));
+    float flame = max(pm.x * 0.62, tongues);
+    float kernel = ellipseMask(q, vec2(0.0, -0.02), vec2(0.105 + uPressed * 0.015, 0.145 + uPressed * 0.022), 0.38);
+    float halo = softGlow(q, vec2(0.0, -0.02), vec2(5.2, 4.2), 1.5) * 0.24;
+    return vec3(max(rs, s), flame, max(kernel, halo));
   }
 
   void main() {
@@ -166,8 +176,15 @@ export const crownFragmentShader = /* glsl */ `
       col += uCore * (fil * 0.12 + gold.y * 0.20 + m * 1.18);
     }
     if (ce > 0.5) {
-      float spectrum = 0.5 + 0.5 * sin(atan(p.y, p.x) * 3.0 + t * 0.48);
-      col += mix(vec3(0.18, 0.52, 1.0), vec3(1.0, 0.18, 0.36), spectrum) * emp.x * 0.72;
+      float angle = atan(p.y + 0.04, p.x);
+      float spectrum = 0.5 + 0.5 * sin(angle * 3.0 + t * 0.58);
+      float goldBand = 0.5 + 0.5 * sin(angle * 5.0 - t * 0.42 + 1.4);
+      vec3 spectrumColor = mix(vec3(0.14, 0.54, 1.0), vec3(1.0, 0.16, 0.38), spectrum);
+      spectrumColor = mix(spectrumColor, vec3(1.0, 0.66, 0.12), goldBand * 0.48);
+      col = uOuter * (emp.y * 0.10 + emp.x * 0.12);
+      col += spectrumColor * emp.x * 1.45;
+      col += uInner * (emp.y * 0.82 + emp.x * 0.18);
+      col += uCore * (emp.z * 0.88 + fil * 0.46 + m * 1.18);
     }
     col *= uIntensity * (0.88 + 0.12 * sin(t * mix(1.7, 1.1, anc)));
 

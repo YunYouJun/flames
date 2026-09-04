@@ -536,11 +536,11 @@ const roster = [
     visual: prototypeVisual('crown', visualBriefs.emperor, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'emperor' },
-      palette: { core: '#ffffff', inner: '#f7c65b', outer: '#38245c' },
+      palette: { core: '#ffffff', inner: '#ffd45a', outer: '#5b2b8c' },
       speed: 0.66,
-      scale: 0.94,
+      scale: 1.03,
       turbulence: 0.82,
-      intensity: 1.14,
+      intensity: 1.32,
     }),
   },
   {
