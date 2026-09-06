@@ -39,7 +39,9 @@ const { phase, cancel: cancelGesture, onPointerDown, onPointerMove, onPointerUp,
   interact: () => emit('interact'),
 })
 
-onMounted(async () => {
+onNuxtReady(async () => {
+  // Let the experience apply URL/reduced-motion preferences before allocating GL.
+  await nextTick()
   const mountedCanvas = canvas.value
   if (!mountedCanvas) {
     emit('statusChange', 'error')

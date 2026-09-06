@@ -46,7 +46,11 @@ docs/                     VitePress 文档与设计规范
 
 ## 部署
 
-仓库内的 `edgeone.json` 已将 EdgeOne Pages 构建命令设为 `pnpm generate`，静态输出目录为 `apps/web/.output/public`。当前阶段仅准备部署配置，不会自动创建远程项目或发布站点。
+仓库内的 `edgeone.json` 将 EdgeOne Pages 构建命令设为 `pnpm generate`，静态输出目录为 `apps/web/.output/public`。已连接的项目会在推送 `main` 后自动部署，线上地址为 [flames.yunyoujun.cn](https://flames.yunyoujun.cn)。
+
+发布前运行 `pnpm generate`，然后用 `pnpm preview:web` 在 `http://127.0.0.1:3100` 检查正式产物。静态托管应优先匹配生成的页面，未知路径返回 `404.html` 和 HTTP 404，不应重写到首页。
+
+CI 将桌面与移动端的浏览器验收分片运行在静态产物上。可用 `FLAMES_E2E_STATIC=1 pnpm e2e --workers=1` 本地复测；设置 `FLAMES_E2E_SOFTWARE=1` 可显式使用软件 WebGL。软件渲染结果用于功能与像素回归，不代表真机帧率验收。
 
 ## License
 

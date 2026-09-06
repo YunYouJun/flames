@@ -2,6 +2,8 @@ import type { CDPSession, Page } from '@playwright/test'
 import { Buffer } from 'node:buffer'
 import { expect, test } from '@playwright/test'
 import { flameRoster } from '../../apps/web/app/data/flames'
+import { FireFrame } from './helpers/fire-frame'
+import { advanceFlame, openFlame } from './helpers/scene'
 
 async function flameCrop(page: Page) {
   const rect = (await page.locator('canvas').boundingBox())!
@@ -20,7 +22,7 @@ async function fireSnapshot(page: Page, clip: Awaited<ReturnType<typeof flameCro
   // Capture the next compositor frame directly. Playwright's screenshot preparation
   // can outlast a one-second pulse on software WebGL, hiding a real transient response.
   const result = await session.send('Page.captureScreenshot', { format: 'png', clip: { ...clip, scale: 1 } })
-  return Buffer.from(result.data, 'base64')
+  return new FireFrame(Buffer.from(result.data, 'base64'))
 }
 
 for (const flame of flameRoster) {
@@ -37,8 +39,9 @@ for (const flame of flameRoster) {
     })
     // Explicit user input is still available with reduced motion; its frozen scene
     // also lets us compare real pixels while exercising the actual quality control.
+    await page.clock.install()
     await page.emulateMedia({ reducedMotion: 'reduce' })
-    await page.goto(`/flames/${flame.slug}?quality=balanced`)
+    await openFlame(page, `/flames/${flame.slug}?quality=balanced`)
     await expect(page).toHaveTitle(new RegExp(flame.name))
     await expect(page.getByRole('heading', { name: flame.name, exact: true })).toBeVisible()
     await expect(page.locator('main')).toHaveAttribute('data-visual-state', 'approved')
@@ -58,6 +61,9 @@ for (const flame of flameRoster) {
     const angle = page.getByRole('slider', { name: '左右环绕角度' })
     await expect(page.getByRole('button', { name: '拖拽旋转' })).toHaveAttribute('aria-pressed', 'true')
     const clip = await flameCrop(page)
+    // Control the interaction clock too: GPU/IPC latency must not consume the
+    // entire transient pulse before the screenshot reaches the compositor.
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 60_000))
     const resting = await fireSnapshot(page, clip)
     // Prove the baseline is stable before treating a pixel difference as input feedback.
     expect((await fireSnapshot(page, clip)).equals(resting)).toBe(true)
@@ -67,27 +73,33 @@ for (const flame of flameRoster) {
       await page.touchscreen.tap(point.x, point.y)
     else
       await page.mouse.click(point.x, point.y)
+    await advanceFlame(page, 100)
     await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Quick tap must change the fire, not just its altar', intervals: [50] }).toBe(false)
     await expect(angle).toHaveValue('0')
+    await advanceFlame(page, 2000)
     await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { timeout: 10_000 }).toBe(true)
     const settled = await fireSnapshot(page, clip)
     expect(settled.equals(resting), 'Tap must decay back to the fixed-time baseline').toBe(true)
     await page.mouse.move(point.x, point.y)
     await page.mouse.down()
+    await advanceFlame(page, 800)
     await expect.poll(async () => (await fireSnapshot(page, clip)).equals(settled)).toBe(false)
-    await page.waitForTimeout(500)
     await page.screenshot({ path: testInfo.outputPath('hold.png') })
     await page.mouse.up()
+    await advanceFlame(page, 2000)
     await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Released hold returns to baseline', timeout: 10_000 }).toBe(true)
     await page.screenshot({ path: testInfo.outputPath('front.png') })
     await angle.fill('90')
+    await advanceFlame(page, 100)
     await page.screenshot({ path: testInfo.outputPath('side.png') })
     expect((await fireSnapshot(page, clip)).equals(resting), 'Volume must have a distinct side view').toBe(false)
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width)
 
     await page.getByRole('button', { name: '复位' }).click()
+    await advanceFlame(page, 100)
     for (const quality of ['high', 'lite'] as const) {
       await page.getByLabel('画质').selectOption(quality)
+      await advanceFlame(page, 100)
       await expect(canvas).toBeVisible()
       await expect(canvas).toHaveAttribute('data-render-mode', quality === 'lite' ? 'planar' : 'volume')
       expect(Number(await canvas.getAttribute('data-programs'))).toBeLessThanOrEqual(17)
@@ -96,8 +108,9 @@ for (const flame of flameRoster) {
       const tierResting = await fireSnapshot(page, tierClip)
       const tierRect = (await canvas.boundingBox())!
       await page.mouse.click(tierRect.x + tierRect.width * 0.5, tierRect.y + tierRect.height * 0.5)
+      await advanceFlame(page, 100)
       await expect.poll(async () => (await fireSnapshot(page, tierClip)).equals(tierResting), { message: `${quality} tap feedback`, intervals: [50] }).toBe(false)
-      await page.waitForTimeout(1200)
+      await advanceFlame(page, 2000)
       await page.screenshot({ path: testInfo.outputPath(`${quality}.png`) })
     }
     expect(errors).toEqual([])
@@ -108,28 +121,37 @@ for (const flame of flameRoster) {
 }
 
 test('supports paused keyboard ignition, gesture cancellation and quality changes', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.clock.install()
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/flames/myriad-beasts')
+  await openFlame(page, '/flames/myriad-beasts')
   const canvas = page.locator('canvas[data-render-mode="volume"]')
   await expect(canvas).toBeVisible()
   await expect(page.getByRole('button', { name: '唤醒' })).toHaveAttribute('aria-pressed', 'true')
   const clip = await flameCrop(page)
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 60_000))
   const resting = await fireSnapshot(page, clip)
   await canvas.focus()
   await page.keyboard.press('Enter')
+  await advanceFlame(page, 100)
   await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
+  await advanceFlame(page, 2000)
   await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { timeout: 10_000 }).toBe(true)
   await page.keyboard.press('Space')
+  await advanceFlame(page, 100)
   await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
   const rect = (await canvas.boundingBox())!
   await page.mouse.move(rect.x + rect.width * 0.5, rect.y + rect.height * 0.5)
   await page.mouse.down()
   await canvas.dispatchEvent('pointercancel', { pointerId: 1, pointerType: 'mouse', isPrimary: true })
   await page.mouse.up()
+  await advanceFlame(page, 2000)
   await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(true)
   await page.getByLabel('画质').selectOption('lite')
+  await advanceFlame(page, 100)
   await expect(page.locator('canvas')).toHaveAttribute('data-render-mode', 'planar')
   await page.getByLabel('画质').selectOption('balanced')
+  await advanceFlame(page, 100)
   await expect(canvas).toBeVisible()
   await expect(page.getByRole('slider', { name: '左右环绕角度' })).toHaveValue('0')
 })

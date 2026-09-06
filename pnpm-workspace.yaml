@@ -29,6 +29,7 @@ catalog:
   '@playwright/test': ^1.55.0
   '@shikijs/vitepress-twoslash': ^4.4.3
   '@types/node': ^26.2.0
+  '@types/pngjs': ^6.0.5
   '@types/three': ^0.185.0
   '@unocss/reset': ^66.7.5
   '@vueuse/core': ^14.4.0
@@ -40,6 +41,7 @@ catalog:
   lint-staged: ^17.3.0
   nuxt: ^4.5.2
   pinia: ^4.0.2
+  pngjs: ^7.0.0
   publint: ^0.3.23
   reka-ui: ^2.10.4
   simple-git-hooks: ^2.13.1

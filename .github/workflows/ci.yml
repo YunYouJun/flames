@@ -115,6 +115,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm generate
       # Balance individual cases across runners, keeping software WebGL single-worker.
       - run: pnpm e2e --project=${{ matrix.project }} --shard=${{ matrix.shard }}/2 --fully-parallel --workers=1 --reporter=line
       - uses: actions/upload-artifact@v7

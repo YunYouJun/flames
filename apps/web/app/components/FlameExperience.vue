@@ -62,7 +62,9 @@ async function toggleSound() {
   await sound.setMuted(muted.value)
 }
 
-onMounted(() => {
+// SSG hydration restores URL query parameters after component mount. Read the
+// requested quality only once Nuxt has restored that route, before starting GL.
+onNuxtReady(() => {
   hydrated.value = true
   if (activeFlame.value)
     markSeen(activeFlame.value.slug)

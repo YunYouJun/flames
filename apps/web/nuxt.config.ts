@@ -37,6 +37,14 @@ export default defineNuxtConfig({
     '/flames/**': { prerender: true },
   },
   nitro: {
+    hooks: {
+      'prerender:generate': (route) => {
+        // All public flame routes are prerendered. Do not advertise an SPA
+        // success fallback for unknown URLs; static hosts should use 404.html.
+        if (route.route === '/200.html')
+          route.skip = true
+      },
+    },
     prerender: {
       routes: [
         '/',

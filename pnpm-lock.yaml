@@ -30,6 +30,9 @@ catalogs:
     '@types/node':
       specifier: ^26.2.0
       version: 26.2.0
+    '@types/pngjs':
+      specifier: ^6.0.5
+      version: 6.0.5
     '@types/three':
       specifier: ^0.185.0
       version: 0.185.4
@@ -63,6 +66,9 @@ catalogs:
     pinia:
       specifier: ^4.0.2
       version: 4.0.2
+    pngjs:
+      specifier: ^7.0.0
+      version: 7.0.0
     publint:
       specifier: ^0.3.23
       version: 0.3.23
@@ -143,6 +149,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
+      '@types/pngjs':
+        specifier: 'catalog:'
+        version: 6.0.5
       bumpp:
         specifier: 'catalog:'
         version: 12.2.0
@@ -152,6 +161,9 @@ importers:
       lint-staged:
         specifier: 'catalog:'
         version: 17.3.0
+      pngjs:
+        specifier: 'catalog:'
+        version: 7.0.0
       publint:
         specifier: 'catalog:'
         version: 0.3.23
@@ -1840,6 +1852,9 @@ packages:
   '@types/parse-path@7.1.0':
     resolution: {integrity: sha512-EULJ8LApcVEPbrfND0cRQqutIOdiIgJ1Mgrhpy755r14xMohPTEpkV/k28SJvuOs9bHRFW8x+KeDAEPiGQPB9Q==}
     deprecated: This is a stub types definition. parse-path provides its own type definitions, so you do not need this installed.
+
+  '@types/pngjs@6.0.5':
+    resolution: {integrity: sha512-0k5eKfrA83JOZPppLtS2C7OUtyNAl2wKNxfyYl9Q5g9lPkgBl/9hNyAu6HuEH2J4XmIv2znEpkDd0SaZVxW6iQ==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -4706,6 +4721,10 @@ packages:
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
+
+  pngjs@7.0.0:
+    resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
+    engines: {node: '>=14.19.0'}
 
   pnpm-workspace-yaml@1.7.0:
     resolution: {integrity: sha512-cgjaozHkjWL4H8oKZydEWE4mg31XydK3/1cLKjHvwnFAXutp45yAlMKljpOdZEq4TtLuzYAMvy9j05wRm3aoPw==}
@@ -8057,6 +8076,10 @@ snapshots:
   '@types/parse-path@7.1.0':
     dependencies:
       parse-path: 7.1.0
+
+  '@types/pngjs@6.0.5':
+    dependencies:
+      '@types/node': 26.2.0
 
   '@types/resolve@1.20.2': {}
 
@@ -11528,6 +11551,8 @@ snapshots:
       fsevents: 2.3.2
 
   pluralize@8.0.0: {}
+
+  pngjs@7.0.0: {}
 
   pnpm-workspace-yaml@1.7.0:
     dependencies:

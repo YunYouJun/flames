@@ -1,10 +1,12 @@
 import type { Page } from '@playwright/test'
 import { Buffer } from 'node:buffer'
 import { expect, test } from '@playwright/test'
+import { FireFrame } from './helpers/fire-frame'
+import { openFlame } from './helpers/scene'
 
 async function gestureScene(page: Page, mobile: boolean) {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/flames/myriad-beasts?quality=balanced')
+  await openFlame(page, '/flames/myriad-beasts?quality=balanced')
   const canvas = page.locator('canvas[data-programs]')
   await expect(canvas).toBeVisible()
   const rect = (await canvas.boundingBox())!
@@ -29,10 +31,10 @@ async function gestureScene(page: Page, mobile: boolean) {
       await page.mouse.up()
     }
   }
-  const frame = async () => Buffer.from((await session.send('Page.captureScreenshot', {
+  const frame = async () => new FireFrame(Buffer.from((await session.send('Page.captureScreenshot', {
     format: 'png',
     clip: { x: rect.x + rect.width * 0.22, y: rect.y + rect.height * 0.08, width: rect.width * 0.56, height: rect.height * 0.57, scale: 1 },
-  })).data, 'base64')
+  })).data, 'base64'))
   return { canvas, pointer, frame }
 }
 

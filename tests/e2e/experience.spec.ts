@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test'
+import { openFlame } from './helpers/scene'
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(() => {
   // Family regressions compile several routes on software WebGL; this is not an FPS gate.
   test.setTimeout(90_000)
-  await page.goto('/')
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 })
 
 test('navigates between approved flames from the short roster', async ({ page }) => {
+  await openFlame(page, '/')
   await expect(page.getByRole('heading', { name: '净莲妖火' })).toBeVisible()
 
   await page.getByRole('link', { name: /02.*虚无吞炎/ }).click()
@@ -26,7 +26,7 @@ test('navigates between approved flames from the short roster', async ({ page })
 })
 
 test('publishes reviewed flames for search indexing', async ({ page }) => {
-  await page.goto('/flames/golden-emperor?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/golden-emperor?benchmark=1&quality=balanced')
 
   await expect(page.locator('main[data-visual-state="approved"][data-kernel="crown"]')).toBeVisible()
   await expect(page.locator('canvas[data-benchmark-ready="true"]')).toBeVisible()
@@ -50,7 +50,7 @@ test('renders lit altars across families and resets the inspection view', async 
   ] as const
 
   for (const [slug] of representatives) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
@@ -69,6 +69,7 @@ test('renders lit altars across families and resets the inspection view', async 
 })
 
 test('opens the independently written setting summary and source tier', async ({ page }) => {
+  await openFlame(page, '/')
   await page.getByRole('button', { name: /阅览设定/ }).click()
   const details = page.getByRole('dialog', { name: '净莲妖火' })
 
@@ -78,7 +79,7 @@ test('opens the independently written setting summary and source tier', async ({
 })
 
 test('keeps orbit controls clear of the flame viewing area', async ({ page }) => {
-  await page.goto('/flames/wind-fury-dragon?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/wind-fury-dragon?benchmark=1&quality=balanced')
   const canvas = page.locator('canvas[data-benchmark-ready="true"]')
   await expect(canvas).toBeVisible()
   const controls = (await page.getByRole('group', { name: '环绕查看' }).boundingBox())!
@@ -91,7 +92,7 @@ test('keeps orbit controls clear of the flame viewing area', async ({ page }) =>
 })
 
 test('labels extension-only identities and derived alternatives', async ({ page }) => {
-  await page.goto('/flames/wind-fury-dragon')
+  await openFlame(page, '/flames/wind-fury-dragon')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
   await page.getByRole('button', { name: /阅览设定/ }).click()
   const details = page.getByRole('dialog', { name: '风怒龙炎' })
@@ -109,7 +110,7 @@ test('renders the approved red lotus with its karmic interaction contract', asyn
   })
   page.on('pageerror', error => consoleErrors.push(error.message))
 
-  await page.goto('/flames/karmic-lotus?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/karmic-lotus?benchmark=1&quality=balanced')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 
   const experience = page.locator('main[data-visual-state="approved"]')
@@ -132,7 +133,7 @@ test('renders the approved green lotus with its earthcore interaction contract',
   })
   page.on('pageerror', error => consoleErrors.push(error.message))
 
-  await page.goto('/flames/green-lotus?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/green-lotus?benchmark=1&quality=balanced')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 
   const experience = page.locator('main[data-visual-state="approved"]')
@@ -155,7 +156,7 @@ test('renders the approved sea heart with its tidal interaction contract', async
   })
   page.on('pageerror', error => consoleErrors.push(error.message))
 
-  await page.goto('/flames/sea-heart?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/sea-heart?benchmark=1&quality=balanced')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
 
   const experience = page.locator('main[data-visual-state="approved"][data-kernel="fluid"]')
@@ -185,7 +186,7 @@ test('renders distinct fluid sibling variants inside renderer budgets', async ({
   ] as const
 
   for (const [slug, flowMode, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
     const experience = page.locator('main[data-visual-state="approved"][data-kernel="fluid"]')
     await expect(experience).toHaveAttribute('data-flow-mode', flowMode)
@@ -203,7 +204,7 @@ test('renders distinct fluid sibling variants inside renderer budgets', async ({
 
 for (const slug of ['life-spirit', 'fire-cloud-water', 'wind-fury-dragon', 'three-thousand', 'nine-dragon-thunder']) {
   test(`changes the ${slug} volume on hold at a fixed animation time`, async ({ page }) => {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
     const angle = page.getByRole('slider', { name: '左右环绕角度' })
@@ -237,7 +238,7 @@ test('renders distinct gale family variants inside renderer budgets', async ({ p
   ] as const
 
   for (const [slug, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="approved"][data-kernel="gale"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
@@ -267,7 +268,7 @@ test('renders distinct spirit family variants inside renderer budgets', async ({
   ] as const
 
   for (const [slug, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="approved"][data-kernel="spirit"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
@@ -295,7 +296,7 @@ test('renders distinct soul family variants inside renderer budgets', async ({ p
   ] as const
 
   for (const [slug, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="approved"][data-kernel="soul"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
@@ -325,7 +326,7 @@ test('renders distinct crown family and terminal variants inside renderer budget
   ] as const
 
   for (const [slug, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="approved"][data-kernel="crown"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
@@ -341,7 +342,7 @@ test('renders distinct crown family and terminal variants inside renderer budget
 })
 
 test('drags the volume view and preserves a separate fire interaction mode', async ({ page }) => {
-  await page.goto('/flames/karmic-lotus?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/karmic-lotus?benchmark=1&quality=balanced')
   const canvas = page.locator('canvas[data-benchmark-ready="true"]')
   await expect(canvas).toBeVisible()
   const angle = page.getByRole('slider')
@@ -383,7 +384,7 @@ test('drags the volume view and preserves a separate fire interaction mode', asy
 })
 
 test('stops automatic orbit on manual input, reset and pause', async ({ page }) => {
-  await page.goto('/flames/golden-emperor')
+  await openFlame(page, '/flames/golden-emperor')
   const automatic = page.getByRole('button', { name: '自动环绕' })
   const angle = page.getByRole('slider', { name: '左右环绕角度' })
   await expect(automatic).toHaveAttribute('aria-pressed', 'false')
@@ -403,7 +404,7 @@ test('stops automatic orbit on manual input, reset and pause', async ({ page }) 
 
 for (const slug of ['purifying-lotus', 'karmic-lotus']) {
   test(`orbits the ${slug} volume and keeps lite mode available`, async ({ page }) => {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toHaveAttribute('data-render-mode', 'volume')
     const front = await canvas.screenshot()
@@ -412,7 +413,7 @@ for (const slug of ['purifying-lotus', 'karmic-lotus']) {
     expect(front.equals(side)).toBe(false)
     await page.getByRole('button', { name: '自动环绕' }).click()
     await expect.poll(async () => Number(await page.getByRole('slider').inputValue())).toBeGreaterThan(91)
-    await page.goto(`/flames/${slug}?benchmark=1&quality=lite`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=lite`)
     await expect(canvas).toHaveAttribute('data-render-mode', 'planar')
     await expect(page.getByRole('button', { name: '自动环绕' })).toHaveCount(0)
   })
@@ -421,7 +422,7 @@ for (const slug of ['purifying-lotus', 'karmic-lotus']) {
 test('inspects golden volume from the side and falls back in lite quality', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('/flames/golden-emperor?benchmark=1&quality=balanced')
+  await openFlame(page, '/flames/golden-emperor?benchmark=1&quality=balanced')
   const canvas = page.locator('canvas[data-benchmark-ready="true"]')
   await expect(canvas).toHaveAttribute('data-render-mode', 'volume')
   const angle = page.getByRole('slider', { name: '左右环绕角度' })
@@ -434,7 +435,7 @@ test('inspects golden volume from the side and falls back in lite quality', asyn
   await expect(angle).toHaveValue('180')
   await page.getByRole('button', { name: '复位' }).click()
   await expect(angle).toHaveValue('0')
-  await page.goto('/flames/golden-emperor?benchmark=1&quality=lite')
+  await openFlame(page, '/flames/golden-emperor?benchmark=1&quality=lite')
   await expect(canvas).toHaveAttribute('data-render-mode', 'planar')
   await expect(angle).toHaveAttribute('max', '12')
   expect(errors).toEqual([])
@@ -454,7 +455,7 @@ test('renders distinct geofire family variants inside renderer budgets', async (
   ] as const
 
   for (const [slug, name, interpretation] of variants) {
-    await page.goto(`/flames/${slug}?benchmark=1&quality=balanced`)
+    await openFlame(page, `/flames/${slug}?benchmark=1&quality=balanced`)
     await expect(page.locator('main[data-visual-state="approved"][data-kernel="geofire"]')).toBeVisible()
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
@@ -480,6 +481,8 @@ test('returns a branded 404 for unknown flame slugs', async ({ page }) => {
 })
 
 test('initializes WebGL or presents an explicit fallback', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({ timeout: 30_000 })
   const canvas = page.locator('canvas')
   await expect(canvas).toBeVisible()
   const fallback = page.locator('.flame-fallback')
@@ -508,7 +511,7 @@ test('keeps approved kernels inside the foundation renderer budgets', async ({ p
   ]
 
   for (const path of representatives) {
-    await page.goto(`${path}?benchmark=1&quality=balanced`)
+    await openFlame(page, `${path}?benchmark=1&quality=balanced`)
     const canvas = page.locator('canvas[data-benchmark-ready="true"]')
     await expect(canvas).toBeVisible()
 
