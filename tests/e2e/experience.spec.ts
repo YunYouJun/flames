@@ -486,7 +486,7 @@ test('initializes WebGL or presents an explicit fallback', async ({ page }) => {
   await page.waitForFunction(() => {
     const fallbackElement = document.querySelector('.flame-fallback')
     const notice = document.querySelector('.runtime-notice')?.textContent ?? ''
-    return !fallbackElement || notice.includes('WebGL')
+    return !fallbackElement || notice.includes('实时火焰暂不可用')
   })
   const initialized = await fallback.count() === 0
 
@@ -495,7 +495,8 @@ test('initializes WebGL or presents an explicit fallback', async ({ page }) => {
     expect(bitmapWidth).toBeGreaterThan(0)
   }
   else {
-    await expect(page.getByText('当前环境未启用 WebGL')).toBeVisible()
+    await expect(page.getByRole('status', { name: '轻量火焰意象' })).toBeVisible()
+    await expect(page.getByText('实时火焰暂不可用，已呈现轻量意象，可刷新重试')).toBeVisible()
   }
 })
 

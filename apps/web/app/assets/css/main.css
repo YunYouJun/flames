@@ -250,41 +250,19 @@ select:focus-visible {
   cursor: grabbing;
 }
 
-.flame-fallback {
-  position: absolute;
-  z-index: 2;
-  inset: 12% 25% 20%;
-  display: grid;
-  place-items: center;
-  filter: blur(2px) drop-shadow(0 0 2rem rgba(159, 216, 218, 0.35));
-}
-
-.flame-fallback span {
-  width: 8rem;
-  height: 16rem;
-  border-radius: 50% 50% 45% 45%;
-  background: radial-gradient(ellipse at 50% 70%, #fff, #9fd8da 32%, transparent 70%);
-  clip-path: polygon(50% 0, 75% 32%, 92% 70%, 68% 100%, 50% 82%, 30% 100%, 8% 70%, 28% 30%);
-}
-
-[data-kernel='void'] .flame-fallback span {
-  border: 1px solid rgba(216, 168, 255, 0.35);
-  background: radial-gradient(ellipse at 50% 65%, #000 16%, #321d40 38%, #9c64b7 52%, transparent 69%);
-  clip-path: polygon(50% 0, 72% 24%, 82% 48%, 100% 70%, 70% 100%, 49% 83%, 25% 100%, 0 70%, 18% 44%, 30% 20%);
-}
-
-[data-kernel='cold'] .flame-fallback span {
-  background: radial-gradient(ellipse at 50% 67%, #fff 12%, #c9f9ff 40%, #498f9d 60%, transparent 72%);
-  clip-path: polygon(50% 0, 59% 34%, 82% 20%, 70% 48%, 100% 51%, 70% 64%, 82% 91%, 56% 76%, 50% 100%, 42% 75%, 16% 92%, 29% 63%, 0 52%, 30% 46%, 18% 20%, 41% 34%);
-}
-
 .runtime-notice {
   position: absolute;
   z-index: 5;
   right: 0;
-  bottom: 7rem;
+  bottom: 9.5rem;
   left: 0;
-  margin: 0;
+  width: fit-content;
+  max-width: calc(100% - 2rem);
+  margin: 0 auto;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  background: rgba(3, 6, 8, 0.8);
   color: var(--bone-dim);
   font-family: var(--display);
   font-size: 0.7rem;

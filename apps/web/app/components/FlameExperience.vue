@@ -133,9 +133,12 @@ watch(() => activeFlame.value?.slug, (slug) => {
         />
         <SealedFlameStage v-else :flame="flame" />
 
-        <div v-if="activeFlame && runtimeStatus !== 'ready'" class="flame-fallback" aria-label="正在唤醒异火">
-          <span />
-        </div>
+        <FlameFallback
+          v-if="activeFlame && runtimeStatus !== 'ready'"
+          :palette="activeFlame.palette"
+          :status="runtimeStatus"
+          :paused="paused || benchmarkTime !== undefined"
+        />
 
         <FlameAltar
           v-if="!activeFlame || runtimeStatus !== 'ready'"
@@ -150,7 +153,7 @@ watch(() => activeFlame.value?.slug, (slug) => {
           灵力波动中断，正在重新凝聚异火……
         </p>
         <p v-else-if="activeFlame && runtimeStatus === 'error'" class="runtime-notice">
-          当前环境未启用 WebGL，已呈现轻量火焰意象
+          实时火焰暂不可用，已呈现轻量意象，可刷新重试
         </p>
       </div>
 
