@@ -23,6 +23,8 @@ export const sharedFragment = /* glsl */ `
   uniform float uIntensity;
   uniform float uQuality;
   uniform float uVariant;
+  uniform float uViewYaw;
+  uniform float uAltarSource;
   uniform vec3 uCore;
   uniform vec3 uInner;
   uniform vec3 uOuter;
@@ -88,6 +90,7 @@ export const sharedFragment = /* glsl */ `
     vec2 point = vUv * 2.0 - 1.0;
     float aspect = uResolution.x / max(uResolution.y, 1.0);
     point.x *= aspect;
+    point.x -= uViewYaw * 0.18 * (point.y - (uAltarSource * 2.0 - 1.0));
     point /= max(uScale, 0.01);
     return point;
   }

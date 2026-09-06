@@ -262,7 +262,9 @@ export class LotusBloom implements FlameSculpture {
       const earthcoreDragTurn = earthcore * (index % 2 === 0 ? 1 : -1) * drag * (0.075 + index * 0.025)
       layer.rotation.y = time * this.speed * spec.spin * (1 - earthcore * 0.42) + pointerTurn + drag * spec.spin * 0.72 + karmic * karmicDragTurn + karmicOffset + karmicPulse + earthcoreDrift + earthcoreDragTurn
       const layerScale = 1 - karmic * index * 0.055 + pressed * karmic * (0.012 + index * 0.009) + earthcore * (0.055 - index * 0.018) + pressed * earthcore * (0.022 + index * 0.006)
-      layer.scale.setScalar(layerScale)
+      // Petal opening is geometric, not just a brighter texture on a fixed mesh.
+      const opening = pressed * (earthcore ? 0.08 : karmic ? 0.04 : 0.16)
+      layer.scale.set(layerScale + opening, layerScale * (1 - opening * 0.65), layerScale + opening)
     }
   }
 

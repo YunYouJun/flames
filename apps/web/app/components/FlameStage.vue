@@ -21,44 +21,23 @@ const emit = defineEmits<{
 
 const canvas = useTemplateRef<HTMLCanvasElement>('flameCanvas')
 const diagnostics = shallowRef<FlameRuntimeDiagnostics>()
+const dragRotation = shallowRef(true)
+const viewLimit = computed(() => props.quality !== 'lite' ? 180 : 12)
+const { angle: viewAngle, automatic, stop: stopOrbit, reset: resetOrbit, toggle: toggleOrbit } = useStageOrbit({
+  limit: () => viewLimit.value,
+  paused: () => props.paused,
+})
 let runtime: FlameRuntime | undefined
-let pointerOrigin: { x: number, y: number } | undefined
-
-function pointerInput(event: PointerEvent, pressed = event.buttons > 0) {
-  if (!canvas.value || !runtime)
-    return
-
-  const rect = canvas.value.getBoundingClientRect()
-  const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-  const y = -(((event.clientY - rect.top) / rect.height) * 2 - 1)
-  const drag = pointerOrigin
-    ? Math.min(Math.hypot(event.clientX - pointerOrigin.x, event.clientY - pointerOrigin.y) / 220, 1)
-    : 0
-
-  runtime.setPointer({ x, y, pressed, drag })
-}
-
-function onPointerDown(event: PointerEvent) {
-  pointerOrigin = { x: event.clientX, y: event.clientY }
-  canvas.value?.setPointerCapture(event.pointerId)
-  pointerInput(event, true)
-  emit('interact')
-}
-
-function onPointerMove(event: PointerEvent) {
-  pointerInput(event)
-}
-
-function onPointerUp(event: PointerEvent) {
-  pointerInput(event, false)
-  pointerOrigin = undefined
-  canvas.value?.releasePointerCapture(event.pointerId)
-}
-
-function onPointerLeave() {
-  runtime?.setPointer({ x: 0, y: 0, pressed: false, drag: 0 })
-  pointerOrigin = undefined
-}
+const rotating = computed(() => dragRotation.value && viewLimit.value === 180)
+const { phase, cancel: cancelGesture, onPointerDown, onPointerMove, onPointerUp, onPointerLeave, onKeyDown } = useStageInteraction({
+  canvas: () => canvas.value,
+  runtime: () => runtime,
+  rotating: () => rotating.value,
+  angle: () => viewAngle.value,
+  setAngle: angle => viewAngle.value = angle,
+  stopOrbit,
+  interact: () => emit('interact'),
+})
 
 onMounted(async () => {
   const mountedCanvas = canvas.value
@@ -78,6 +57,7 @@ onMounted(async () => {
       paused: props.paused,
       quality: props.quality,
       benchmarkTime: props.benchmarkTime,
+      altar: true,
       onStatusChange: status => emit('statusChange', status),
     })
     await runtime.warmup(flameKernelIds)
@@ -91,28 +71,61 @@ onMounted(async () => {
   }
 })
 
-watch(() => props.preset, preset => runtime?.setPreset(preset))
+watch(() => props.preset, (preset) => {
+  cancelGesture()
+  resetOrbit()
+  runtime?.setPreset(preset)
+})
 watch(() => props.paused, paused => runtime?.setPaused(paused))
-watch(() => props.quality, quality => runtime?.setQuality(quality))
+watch(() => props.quality, (quality) => {
+  cancelGesture()
+  runtime?.setQuality(quality)
+  requestAnimationFrame(() => {
+    diagnostics.value = runtime?.getDiagnostics()
+  })
+})
+watch(viewAngle, angle => runtime?.setViewAngle(angle))
 
-onBeforeUnmount(() => runtime?.dispose())
+onBeforeUnmount(() => {
+  cancelGesture()
+  runtime?.dispose()
+})
 </script>
 
 <template>
   <canvas
     ref="flameCanvas"
     class="flame-canvas"
+    :style="{ cursor: rotating ? (phase === 'dragging' ? 'grabbing' : 'grab') : undefined }"
     aria-label="可交互的实时异火模拟"
+    aria-description="点按唤焰，停留片刻蓄焰；开启旋转后拖动查看四周，蓄焰自然回落。聚焦后按回车或空格唤焰。"
+    tabindex="0"
+    title="点按唤焰 · 长按蓄焰 · 拖动观火"
     :data-benchmark-ready="benchmarkTime !== undefined && diagnostics ? 'true' : undefined"
     :data-programs="diagnostics?.programs"
+    :data-render-mode="diagnostics?.renderMode"
     :data-calls="diagnostics?.calls"
     :data-triangles="diagnostics?.triangles"
     :data-geometries="diagnostics?.geometries"
     :data-textures="diagnostics?.textures"
+    :data-gesture="phase"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
     @pointercancel="onPointerUp"
+    @lostpointercapture="onPointerUp"
     @pointerleave="onPointerLeave"
+    @keydown="onKeyDown"
+  />
+  <FlameOrbitControls
+    v-model:angle="viewAngle"
+    v-model:drag-rotation="dragRotation"
+    :limit="viewLimit"
+    :automatic="automatic"
+    :paused="paused"
+    :phase="phase"
+    @manual="stopOrbit"
+    @toggle-auto="toggleOrbit"
+    @reset="resetOrbit"
   />
 </template>

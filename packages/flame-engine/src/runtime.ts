@@ -21,9 +21,13 @@ import {
   ShaderMaterial,
   Timer,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from 'three'
+import { FlameCharge, ignitionPulse } from './interaction'
 import { flameKernelIds, getFlameKernelDefinition, getFlameKernelVariant } from './kernel-registry'
+import { FlameAltar } from './objects/flame-altar'
+import { VolumeFlame } from './objects/volume-flame'
 import { validateFlamePreset } from './preset'
 import { vertexShader } from './shaders/shared'
 
@@ -52,9 +56,16 @@ export class FlameRuntime {
   private readonly resizeObserver: ResizeObserver
   private readonly pointer = new Vector2()
   private readonly pointerTarget = new Vector2()
+  private readonly altar?: FlameAltar
+  private readonly volume = new VolumeFlame()
+  private readonly projectedSource = new Vector3()
+  private viewAngle = 0
+  private needsRender = true
   private frameId = 0
-  private pressed = 0
-  private pressedTarget = 0
+  private readonly charge = new FlameCharge()
+  private pulseAge = Infinity
+  private pulsePending = false
+  private lastFrame = 0
   private drag = 0
   private dragTarget = 0
   private preset: FlamePreset
@@ -79,12 +90,20 @@ export class FlameRuntime {
       premultipliedAlpha: false,
     })
     this.renderer.setClearColor(0x000000, 0)
+    this.renderer.info.autoReset = false
     this.timer.connect(document)
+    // Include the pedestal's front foot below the source plane, with room to orbit.
+    if (options.altar)
+      this.camera.fov = 36
     this.camera.position.set(0, 0.68, 3.35)
     this.camera.lookAt(0, -0.18, 0)
     this.mesh = new Mesh(this.geometry, this.materialFor(this.preset.kernel))
     this.mesh.renderOrder = -10
     this.scene.add(this.mesh)
+    if (options.altar) {
+      this.altar = new FlameAltar()
+      this.scene.add(this.altar.group)
+    }
     this.sculptures = Object.fromEntries(flameKernelIds.flatMap((kernel) => {
       const sculpture = getFlameKernelDefinition(kernel).createSculpture?.(this.preset.palette, this.quality)
       return sculpture ? [[kernel, sculpture]] : []
@@ -104,15 +123,45 @@ export class FlameRuntime {
   }
 
   setPreset(preset: FlamePreset): void {
+    this.resetInteraction()
+    this.needsRender = true
     this.preset = validateFlamePreset(preset)
     this.mesh.material = this.materialFor(preset.kernel)
     this.applyPreset(preset)
   }
 
   setPointer(input: FlamePointerInput): void {
+    this.needsRender = true
     this.pointerTarget.set(input.x, input.y)
-    this.pressedTarget = input.pressed ? 1 : 0
+    this.charge.setPressed(input.pressed)
     this.dragTarget = Math.max(0, Math.min(input.drag, 1))
+  }
+
+  /** Ignite once, independently of the paused/benchmark animation clock. */
+  ignite(): void {
+    this.pulsePending = true
+    this.needsRender = true
+  }
+
+  /** Clear interaction when a gesture is cancelled or the displayed flame changes. */
+  resetInteraction(): void {
+    this.pointer.set(0, 0)
+    this.pointerTarget.set(0, 0)
+    this.charge.reset()
+    this.drag = this.dragTarget = 0
+    this.pulseAge = Infinity
+    this.pulsePending = false
+    this.needsRender = true
+  }
+
+  /** Set a bounded inspection angle in degrees; the fire source stays centered. */
+  setViewAngle(degrees: number): void {
+    this.needsRender = true
+    const limit = this.usesVolume() ? 180 : 12
+    this.viewAngle = Math.max(-limit, Math.min(limit, degrees)) * Math.PI / 180
+    this.camera.position.set(Math.sin(this.viewAngle) * 3.35, 0.68, Math.cos(this.viewAngle) * 3.35)
+    this.camera.lookAt(0, -0.18, 0)
+    this.camera.updateMatrixWorld()
   }
 
   setPaused(paused: boolean): void {
@@ -122,7 +171,10 @@ export class FlameRuntime {
   }
 
   setQuality(quality: FlameQuality): void {
+    this.resetInteraction()
     this.quality = quality
+    this.syncVolume()
+    this.setViewAngle(this.viewAngle * 180 / Math.PI)
     for (const material of this.materials.values())
       this.uniform<number>(material, 'uQuality').value = shaderQuality[quality]
     for (const sculpture of Object.values(this.sculptures))
@@ -145,6 +197,7 @@ export class FlameRuntime {
     const info = this.renderer.info
     return {
       activeKernel: this.preset.kernel,
+      renderMode: this.usesVolume() ? 'volume' : 'planar',
       programs: info.programs?.length ?? 0,
       calls: info.render.calls,
       triangles: info.render.triangles,
@@ -162,6 +215,8 @@ export class FlameRuntime {
     this.renderer.domElement.removeEventListener('webglcontextlost', this.handleContextLost)
     this.renderer.domElement.removeEventListener('webglcontextrestored', this.handleContextRestored)
     this.geometry.dispose()
+    this.altar?.dispose()
+    this.volume.dispose()
     for (const sculpture of Object.values(this.sculptures))
       sculpture.dispose()
     for (const material of this.materials.values())
@@ -194,12 +249,20 @@ export class FlameRuntime {
 
     const material = new ShaderMaterial({
       vertexShader,
-      fragmentShader: getFlameKernelDefinition(kernel).fragmentShader,
+      fragmentShader: `${getFlameKernelDefinition(kernel).fragmentShader.replace(/void main\s*\(\s*\)/, 'void flameMain()')}
+        void main() {
+          flameMain();
+          if (uAltarSource > 0.0)
+            gl_FragColor.a *= smoothstep(uAltarSource - 0.015, uAltarSource + 0.025, vUv.y);
+        }
+      `,
       transparent: true,
       depthWrite: false,
       depthTest: false,
       uniforms: {
         uTime: { value: 0 },
+        uAltarSource: { value: 0 },
+        uViewYaw: { value: 0 },
         uResolution: { value: new Vector2(1, 1) },
         uPointer: { value: new Vector2() },
         uPressed: { value: 0 },
@@ -221,6 +284,9 @@ export class FlameRuntime {
   }
 
   private applyPreset(preset: FlamePreset): void {
+    this.syncVolume()
+    this.setViewAngle(this.viewAngle * 180 / Math.PI)
+    this.altar?.setAppearance(preset)
     const material = this.mesh.material
     const usesAdditiveFire = preset.kernel === 'crown'
       && (preset.kernelOptions as CrownKernelOptions | undefined)?.crownMode === 'golden'
@@ -238,14 +304,26 @@ export class FlameRuntime {
   }
 
   private resize(): void {
+    this.needsRender = true
     const canvas = this.renderer.domElement
     const width = Math.max(canvas.clientWidth, 1)
     const height = Math.max(canvas.clientHeight, 1)
     const ratio = Math.min(window.devicePixelRatio || 1, pixelRatioCaps[this.quality])
     this.renderer.setPixelRatio(ratio)
     this.renderer.setSize(width, height, false)
+    // setSize rounds the viewport at fractional DPR; returning from a render
+    // target floors it. Match the composite pass now so the first lit frame does
+    // not shift by one physical pixel after the first interaction (e.g. DPR 1.5).
+    this.renderer.setRenderTarget(null)
+    this.volume.setResolution(width * ratio, height * ratio)
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
+    this.altar?.setViewport(width / height)
+    this.volume.setViewport(width / height)
+    if (this.altar) {
+      this.volume.mesh.position.copy(this.altar.group.position)
+      this.volume.mesh.scale.copy(this.altar.group.scale)
+    }
     for (const sculpture of Object.values(this.sculptures))
       sculpture.setViewport(width / height)
 
@@ -254,6 +332,7 @@ export class FlameRuntime {
   }
 
   private start(): void {
+    this.needsRender = true
     cancelAnimationFrame(this.frameId)
     this.timer.reset()
     this.frameId = requestAnimationFrame(this.render)
@@ -261,27 +340,77 @@ export class FlameRuntime {
 
   private readonly render = (timestamp: number): void => {
     this.frameId = requestAnimationFrame(this.render)
-    if (this.paused || this.status !== 'ready')
+    if (this.status !== 'ready' || (this.paused && !this.needsRender))
       return
+    this.needsRender = false
 
     this.timer.update(timestamp)
-    this.pointer.lerp(this.pointerTarget, 0.075)
-    this.pressed += (this.pressedTarget - this.pressed) * 0.09
-    this.drag += (this.dragTarget - this.drag) * 0.08
+    // Time-based easing keeps input responsive on slower GPUs, not just at 60 fps.
+    const delta = Math.min(Math.max(timestamp - this.lastFrame, 0), 100)
+    this.lastFrame = timestamp
+    const response = 1 - Math.exp(-delta / 105)
+    this.pointer.lerp(this.pointerTarget, response)
+    this.charge.update(delta)
+    this.drag += (this.dragTarget - this.drag) * response
+    if (this.pointer.distanceToSquared(this.pointerTarget) < 0.000001)
+      this.pointer.copy(this.pointerTarget)
+    if (Math.abs(this.dragTarget - this.drag) < 0.001)
+      this.drag = this.dragTarget
+    // Cap elapsed input time so a stalled GPU cannot consume the entire pulse
+    // before the compositor has presented it. Normal frame rates retain 1.1 s.
+    this.pulseAge = this.pulsePending ? 0 : this.pulseAge + delta
+    this.pulsePending = false
+    const pulse = ignitionPulse(this.pulseAge)
+    const energy = Math.max(this.charge.value, pulse)
+    this.needsRender = pulse > 0 || !this.charge.settled
+      || this.pointer.distanceToSquared(this.pointerTarget) > 0.000001
+      || Math.abs(this.dragTarget - this.drag) > 0.001
 
     const material = this.mesh.material
     const time = this.uniform<number>(material, 'uTime')
-    time.value = this.benchmarkTime ?? time.value + this.timer.getDelta()
+    time.value = this.benchmarkTime ?? time.value + (this.paused ? 0 : this.timer.getDelta())
+    if (this.altar) {
+      this.camera.updateMatrixWorld()
+      this.uniform<number>(material, 'uAltarSource').value = (this.projectedSource.copy(this.altar.group.position).project(this.camera).y + 1) / 2
+      this.uniform<number>(material, 'uViewYaw').value = this.viewAngle
+      this.altar.update(time.value, this.preset.intensity, energy)
+    }
     this.uniform<Vector2>(material, 'uPointer').value.copy(this.pointer)
-    this.uniform<number>(material, 'uPressed').value = this.pressed
+    this.uniform<number>(material, 'uPressed').value = energy
     this.uniform<number>(material, 'uDrag').value = this.drag
     this.sculptures[this.preset.kernel]?.update(
       time.value,
       this.pointer,
-      this.pressed,
+      energy,
       this.drag,
     )
+    if (this.volume.mesh.visible)
+      this.volume.update(this.camera, time.value * this.preset.speed, this.pointer, energy, this.drag)
+    if (this.usesVolume() && this.preset.kernel === 'lotus') {
+      const bloom = this.sculptures.lotus!.group
+      bloom.scale.multiplyScalar(0.9)
+      // Petal geometry starts below its local origin; anchor its root to the source.
+      bloom.position.y = this.volume.mesh.position.y + 0.13 * bloom.scale.y
+    }
+    this.renderer.info.reset()
     this.renderer.render(this.scene, this.camera)
+    if (this.volume.mesh.visible)
+      this.volume.render(this.renderer, this.camera)
+  }
+
+  private usesVolume(): boolean {
+    return this.quality !== 'lite'
+  }
+
+  private syncVolume(): void {
+    this.volume.mesh.visible = this.usesVolume()
+    this.mesh.visible = !this.volume.mesh.visible
+    this.volume.setQuality(this.quality)
+    this.volume.setAppearance(this.preset)
+    // Existing petals, vortex cores and tidal rings share the volume camera and depth buffer.
+    const target = this.usesVolume() ? this.volume.scene : this.scene
+    for (const sculpture of Object.values(this.sculptures))
+      target.add(sculpture.group)
   }
 
   private setActiveSculpture(kernel: FlameKernelId): void {

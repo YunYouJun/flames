@@ -80,6 +80,8 @@ export interface FlameRuntimeOptions {
   preset: FlamePreset
   quality?: FlameQuality
   paused?: boolean
+  /** Render a lit three-dimensional pedestal beneath the flame. */
+  altar?: boolean
   /** Locks the animated uniforms to one repeatable frame for visual and performance checks. */
   benchmarkTime?: number
   onStatusChange?: (status: FlameRuntimeStatus) => void
@@ -88,6 +90,7 @@ export interface FlameRuntimeOptions {
 /** Read-only renderer counters used by performance checks and diagnostics UIs. */
 export interface FlameRuntimeDiagnostics {
   activeKernel: FlameKernelId
+  renderMode: 'volume' | 'planar'
   programs: number
   calls: number
   triangles: number

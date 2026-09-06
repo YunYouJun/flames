@@ -15,6 +15,7 @@
     "@yunyoujun/flame-engine": "workspace:*",
     "better-sqlite3": "catalog:",
     "nuxt": "catalog:",
+    "reka-ui": "catalog:",
     "three": "catalog:",
     "vue": "catalog:"
   },

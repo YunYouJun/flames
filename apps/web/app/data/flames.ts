@@ -143,14 +143,6 @@ function approvedVisual(
   return { state: 'approved', plannedFamily, brief, preset }
 }
 
-function prototypeVisual(
-  plannedFamily: Extract<VisualFamilyId, FlameKernelId>,
-  brief: FlameVisualBrief,
-  preset: FlameRenderPreset,
-): FlameVisual {
-  return { state: 'prototype', plannedFamily, brief, preset }
-}
-
 const visualBriefs = {
   nihility: {
     facts: ['黑色异火，与吞噬和虚无相连。'],
@@ -300,11 +292,11 @@ const visualBriefs = {
     facts: ['小说正文未命名第十八席；风怒龙炎作为项目采用的扩展补位，不宣称为小说正文设定。'],
     interpretation: '让两股青灰风焰彼此缠绕成上升龙卷，龙首只在高位风压汇聚时显形，外围两道高速风轨交叉旋切。',
     silhouette: '宽窄交替的双股龙卷焰身贯穿纵向空间，顶部凝出侧向龙首、后掠角冠与风须，外围保留两道倾斜风轨。',
-    palette: '冷白龙目、青灰风鳞、深蓝黑外风与少量风刃高光。',
+    palette: '青灰龙焰、深蓝黑外风，暖金眼线从低亮面部中显露。',
     motion: '双股风焰交替越过龙卷表面，紊流外焰不断撕开轮廓；外轨速度高于龙身，形成包裹式风暴。',
     interactions: {
       pointer: '龙首与上段龙身朝指针方向追随。',
-      hold: '龙首抬高、双角点亮，外轨半径扩大。',
+      hold: '3D 模式下龙首抬高并张颌，暖金眼线随蓄焰增亮。',
       drag: '螺旋龙身加剧摆动，两道外轨产生反向旋切。',
     },
     fallback: '以青灰双股龙卷、短暂凝形的侧向龙首和交叉风轨保持扩展身份。',
@@ -316,11 +308,11 @@ const visualBriefs = {
     facts: ['紫黑色异火诞生于星空，能够借星辰之力延续，并呈现龙形本源。'],
     interpretation: '将紫黑焰身拉成长距离星轨火龙：龙身沿纵向星弧蜿蜒，头部在高位凝聚，周围的断续星环补足“星空孕火”的空间感。',
     silhouette: '一条细长紫黑火龙从低位星尘中盘旋上升，高位龙首与外侧星环构成明显的不对称轮廓。',
-    palette: '冷白星核、亮紫内焰、深紫黑龙身与少量蓝紫星尘。',
+    palette: '冷白星核、亮紫内焰、深紫黑龙身，暖金眼线点明龙首。',
     motion: '龙身以缓慢长波摆动，鳞光逐段流向龙首；星环的旋转速度低于龙身，形成深空漂移感。',
     interactions: {
       pointer: '龙首追随指针，长龙身以延迟波动跟进。',
-      hold: '龙首抬升，星环与沿途鳞光同时增强。',
+      hold: '3D 模式下龙首抬升张颌，眼线亮起，颈焰仍与星弧衔接。',
       drag: '龙身被拉出更长的星轨，外环产生反向偏转。',
     },
     fallback: '以紫黑长龙、冷白龙首和断续星环保留星空龙火识别。',
@@ -336,7 +328,7 @@ const visualBriefs = {
     motion: '九条龙轨以三组差速巡游，放射雷弧间歇闪断；主焰呼吸节奏短促而有重量。',
     interactions: {
       pointer: '雷轮中心向指针轻移，近侧龙首率先偏转。',
-      hold: '三层龙轨外扩，九道雷弧同时贯通中央。',
+      hold: '3D 模式下九枚龙首张颌，银蓝眼线同时增亮。',
       drag: '相邻龙轨发生错相旋转，雷弧被拉成折线。',
     },
     fallback: '以银色中央雷焰、九枚环绕龙首和放射电弧保持识别。',
@@ -347,13 +339,13 @@ const visualBriefs = {
   turtleSpirit: {
     facts: ['褐色异火凝成巨龟轮廓，甲身布满火刺，并带有獠牙与巨尾。'],
     interpretation: '压低普通火焰的上升感，以厚重龟甲作为主体；甲纹内透出熔亮裂隙，首尾与背刺只在外缘短促燃烧。',
-    silhouette: '低伏宽阔的褐色龟甲占据中央，右侧伸出带獠牙的头部，左侧拖出粗尾，背部排列短火刺。',
+    silhouette: '低伏宽阔的褐色龟甲占据中央，前端伸出带獠牙的头部，后方拖出粗尾，背部排列短火刺；可旋转查看首尾。',
     palette: '琥珀裂隙、赤褐甲面、深棕外壳与少量暗金背刺。',
     motion: '龟甲仅缓慢起伏，裂隙像沉积热流般游走；首尾摆动幅度小，整体保持山岳般重量。',
     interactions: {
-      pointer: '龟首略向指针转动，甲内熔光向近侧聚集。',
-      hold: '龟甲外扩，背刺与甲纹逐层点亮。',
-      drag: '巨尾产生延迟摆动，甲纹沿拖拽方向错位。',
+      pointer: '关闭旋转后，甲兽与首尾随指针轻微偏转。',
+      hold: '背部火刺向上伸展，甲纹与獠牙随焰压增亮。',
+      drag: '开启旋转时查看首尾与甲背，关闭后拖动引导甲兽火流。',
     },
     fallback: '以低伏褐色龟甲、发光甲纹、头尾和背刺保持灵龟轮廓。',
     differentiation: '唯一压低到近乎贴地、以完整甲兽承担主体的灵形异火。',
@@ -363,13 +355,13 @@ const visualBriefs = {
   myriadBeasts: {
     facts: ['红色异火升腾时会浮现万兽轮廓；原著未将其描述为召唤或统御万兽。'],
     interpretation: '让七枚抽象兽面在红色主焰外围交替浮现，以角、耳与短吻的剪影暗示万兽，而不表现实体召唤或支配能力。',
-    silhouette: '中央红色焰柱外环绕七枚带双角的兽面火印，轮廓时隐时现并保持半透明。',
+    silhouette: '中央红色焰柱外围错落浮现七处兽面：尖耳、圆耳短吻与角形轮廓交替，保持半透明而非固定单兽。',
     palette: '暖白焰心、鲜红主焰、深绯兽面与暗酒红外缘。',
     motion: '主焰持续升腾，兽面火印以低速轮转和交替明灭出现，避免形成整齐召唤阵。',
     interactions: {
-      pointer: '近侧兽面向指针聚拢，主焰轻微偏转。',
-      hold: '七枚兽面同时显形，中央红焰增高。',
-      drag: '兽面火印沿环轨错相追逐，角形拖出短暂火痕。',
+      pointer: '点按触发短促焰压；关闭拖拽旋转后，指针使兽面与主焰共同偏转。',
+      hold: '七枚兽面同时显形，中央红焰增高；先旋转到所需角度，再长按观察背侧。',
+      drag: '开启拖拽旋转时查看各侧兽面；关闭后拖动拨焰，兽影随火流偏转。',
     },
     fallback: '以红色主焰、七枚半透明兽面火印和深绯外环保持识别。',
     differentiation: '多枚交替显现的兽面剪影区别于具象单兽、龙形与普通红焰，同时严格避免新增召唤设定。',
@@ -384,7 +376,7 @@ const visualBriefs = {
     motion: '火蟒以延迟波动盘升，心环维持近似心跳的双段脉冲；整体不出现普通高亮焰柱。',
     interactions: {
       pointer: '透明蟒首追随指针，热晕向近侧折射。',
-      hold: '心火环向外扩张，蟒身鳞光短暂显现。',
+      hold: '心火环向外扩张，蟒身热晕短暂显现。',
       drag: '火蟒被拉出透明热痕，心环产生轻微偏心。',
     },
     fallback: '以淡琥珀心环、低透明火蟒线和空气扭曲保留无形心火识别。',
@@ -410,45 +402,45 @@ const visualBriefs = {
   },
   goldenEmperor: {
     facts: ['金色异火近似液体般流转，能够焚烧斗气并侵蚀空间。'],
-    interpretation: '以七枚流金火种轮番催生火舌：显形、并合、熄灭后再生，低位熔金火池持续补充焰身；日轮退到后景压住空间。',
-    silhouette: '数道高低错落的金色火舌从宽阔熔金底座交替升起，数量与重心持续变化；日轮只作为后景。',
+    interpretation: '以立体金焰呈现通体金色的焚烧意象：三维涡流卷起断续火舌，前后焰层相互遮挡，火光映亮八角承台；轻量模式保留流金火冠。',
+    silhouette: '高低错落的立体金焰从低位焰池交替升起，火舌数量与重心持续变化；轻量模式的日轮只作为后景。',
     palette: '熔炉橙外焰、鲜亮帝金与浅金焰心组成高饱和金色，白金仅留在最热处。',
-    motion: '漂移涡核逆向卷吸火冠，七道火苗独立摆动、断裂与再生；日轮缓慢转动。',
+    motion: '3D 模式的错相涡流卷起变化的焰舌；轻量模式保留七处火种轮番催生火苗和缓转日轮。',
     interactions: {
       pointer: '主焰与涡纹向指针偏转，近侧火舌提前卷起。',
-      hold: '七重火苗同时抬高，熔金底座外扩，涡纹随焰身增强。',
+      hold: '金色焰身抬高，火势与台面映光随之增强。',
       drag: '液金纹横向剪切，裂痕沿拖拽方向产生错位。',
     },
     fallback: '以七重金焰、熔金底座与后景日轮保持通体金色的火冠识别。',
-    differentiation: '真实动态火苗承担主体，日轮仅提供帝王威势；区别于帝炎的多色万火归一，也避免退化为静态金色纹章。',
+    differentiation: '动态金色火苗承担主体，轻量模式的日轮仅作陪衬；区别于帝炎的多色万火归一，不以静态金色纹章代替燃烧。',
     specialPasses: [],
     reviewScenes,
   },
   eightDesolation: {
     facts: ['八荒破灭焱为炎族传承异火，色泽淡黑，火炫施展时可化作巨大的火焰双翼。'],
-    interpretation: '让左右展开的淡黑宽翼占据画面并越出边界；拍击时推出一道向下崩散的压焰，以名称引申破灭感，不宣称额外权能。',
-    silhouette: '一对横贯画面的巨大火翼包围低亮焰心，上缘如刃、翼尖下压，翼下只保留一道拍击压焰。',
-    palette: '冷白翼刃、淡黑火翼、深灰紫外缘与低亮中央焰心。',
-    motion: '双翼以沉重节拍扩张并下压，翼纹向外传播；每次拍击只产生一道快速下坠并消隐的压焰。',
+    interpretation: '让左右展开的淡黑宽翼占据画面主体；3D 模式以连续后掠翼膜和错相翼脊表现焰势，轻量模式保留拍击压焰。破灭感属于名称引申，不宣称额外权能。',
+    silhouette: '成对后掠的淡黑翼焰包围低亮焰心，3D 翼膜保留厚度与完整边界，便于旋转检查。',
+    palette: '淡黑翼膜、灰白翼脊、深灰紫外缘与低亮中央焰心；轻量模式保留冷白翼刃。',
+    motion: '3D 翼膜起伏燃烧，翼脊错相游动；轻量模式保留双翼拍击和单道下坠压焰。',
     interactions: {
-      pointer: '双翼迎着指针方向产生不对称倾角。',
-      hold: '翼展越出画面边缘，翼刃与压焰同时增强。',
-      drag: '左右火翼反向扭曲，压焰沿拖拽方向偏折。',
+      pointer: '关闭旋转后，中央焰心随指针偏转，双翼维持后掠轮廓。',
+      hold: '3D 模式下翼膜抬起并加厚，焰势增强，轮廓保持在可环视范围内。',
+      drag: '开启旋转时查看双翼厚度与后掠角；关闭后拖动引导中央火流。',
     },
     fallback: '以淡黑巨大双翼、中央小焰心和单道下坠压焰保持识别。',
-    differentiation: '画面主体是越出边界的横向双翼而非龙、莲或圆环；破灭仅作为名称引申的拍击压焰。',
+    differentiation: '主体是成对后掠的宽翼而非龙、莲或圆环；破灭感属于项目演绎，轻量模式以拍击压焰表达。',
     specialPasses: [],
     reviewScenes,
   },
   netherGolden: {
     facts: ['原著明确名称、榜位、持有者和融合关系，但没有可靠细述独立颜色、形态或能力。'],
     interpretation: '仅从名称做克制的项目演绎：让暗金祖焰受断续祖纹环约束成碑形，焰身在碑肩内上涌并间歇冲出顶部，不扩写独立权能。',
-    silhouette: '窄长暗金主焰被束成碑形，肩部保留折角，顶部化作游动焰尖，外围一圈断续祖纹火环。',
+    silhouette: '窄长暗金主焰被束成碑形，肩部保留折角，顶部化作游动焰尖，3D 外围的断续祖纹火环按高度分层。',
     palette: '暗白纹心、沉金主体、乌金外缘与低亮褐黑背景。',
     motion: '碑肩保持沉稳，内部焰身持续向上翻涌并蚀出缺口；祖纹逆流，外围火环间歇分段点亮。',
     interactions: {
       pointer: '碑状火印轻微偏转，近侧祖纹提前显现。',
-      hold: '主焰尖向上抬升，外围祖纹环向外扩张。',
+      hold: '3D 模式下祖纹环增亮，顶部焰势抬升。',
       drag: '内部铭纹沿拖拽方向倾斜，主体保持沉稳。',
     },
     fallback: '以碑形暗金主焰、游动祖纹和断续祖纹环保持项目演绎轮廓。',
@@ -463,24 +455,24 @@ const visualBriefs = {
     palette: '无色炽白核心、金色主环、冷蓝与绯红交替光谱、深紫外缘。',
     motion: '四层冠环以不同低速错相转动，光谱沿环面缓慢汇入中心；节奏比单席异火更稳定克制。',
     interactions: {
-      pointer: '冠环整体朝指针偏心，主焰保持居中牵引。',
+      pointer: '关闭旋转后，中央主焰随指针偏转，冠环保持汇聚结构。',
       hold: '四层环逐级展开，辐线从外向内完成一次汇聚。',
-      drag: '相邻冠环反向错转，冷暖光谱产生短暂分离。',
+      drag: '开启旋转时查看冠环的分层与倾角；关闭后拖动引导中央火流。',
     },
     fallback: '以无色焰核、四层同心冠环和十一道汇聚辐线保持终局识别。',
-    differentiation: '多层万火归一结构只属于终局帝炎，并始终保持开发原型，等待全部基础席视觉审定。',
+    differentiation: '多层万火归一结构只属于终局帝炎，以二十二席基础异火全部完成作为开放前提。',
     specialPasses: [],
     reviewScenes,
   },
   volcanicStone: {
     facts: ['原著明确名称、榜位与融合关系，但没有可靠细述独立颜色或岩浆形态。'],
-    interpretation: '仅从“火山石焰”名称做项目演绎：以破裂玄武岩丘包住岩浆焰口，熔光沿石隙渗出，少量火山弹从中央喷发。',
+    interpretation: '仅从“火山石焰”名称做项目演绎：以破裂玄武岩丘包住岩浆焰口，3D 模式保留实体岩块与石隙上涌的火流；轻量模式延续火山弹喷发。',
     silhouette: '低宽黑褐岩丘围住扁平焰口，中央短焰上涌，表面交错裂隙构成主要细节。',
     palette: '淡金熔核、橙红岩浆、黑褐玄武岩与暗红裂隙。',
-    motion: '岩丘保持稳定，熔光沿裂隙缓慢游走；中央焰口周期鼓动并抛出少量火山弹。',
+    motion: '3D 岩块保持稳定，石隙焰光缓慢游走，中央火流周期鼓动；轻量模式保留少量火山弹。',
     interactions: {
       pointer: '岩浆焰口朝指针偏移，近侧裂隙先行点亮。',
-      hold: '岩丘略微张开，裂隙增亮并提高火山弹喷发高度。',
+      hold: '3D 模式下中央焰身增高、石隙焰光增强，岩体保持稳定。',
       drag: '熔光沿拖拽方向穿过石隙，焰口产生短暂横向喷流。',
     },
     fallback: '以黑褐岩丘、橙红焰口和发光裂隙保持项目演绎轮廓。',
@@ -528,12 +520,12 @@ const roster = [
     slug: 'emperor',
     rank: 1,
     name: '帝炎',
-    epithet: '万火归一，终局封印',
+    epithet: '万火归一，诸焰同辉',
     summary: '帝炎被保留为完整异火榜的终局状态；它不会作为普通异火提前解封。',
     identityBasis: 'terminal',
     alternateNames: [],
     sources: [novelSource('终局关于多种异火汇聚与帝炎的相关描写。'), projectSource('项目将帝炎作为二十二种基础异火完成后的终局体验。')],
-    visual: prototypeVisual('crown', visualBriefs.emperor, {
+    visual: approvedVisual('crown', visualBriefs.emperor, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'emperor' },
       palette: { core: '#ffffff', inner: '#ffd45a', outer: '#5b2b8c' },
@@ -591,7 +583,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('金色、液态感、焚烧斗气与空间灼烧的相关描写。')],
-    visual: prototypeVisual('crown', visualBriefs.goldenEmperor, {
+    visual: approvedVisual('crown', visualBriefs.goldenEmperor, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'golden' },
       palette: { core: '#fff0a3', inner: '#ffc400', outer: '#ff6b00' },
@@ -611,7 +603,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('翠绿液态火海、绿雾、催生药材与高灵智的相关描写。')],
-    visual: prototypeVisual('fluid', visualBriefs.lifeSpirit, {
+    visual: approvedVisual('fluid', visualBriefs.lifeSpirit, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'verdant' },
       palette: { core: '#dfff8a', inner: '#35ef77', outer: '#063d2c' },
@@ -631,7 +623,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('淡黑色火焰、巨大火翼与火焰风暴的相关描写。')],
-    visual: prototypeVisual('crown', visualBriefs.eightDesolation, {
+    visual: approvedVisual('crown', visualBriefs.eightDesolation, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'desolation' },
       palette: { core: '#f5ffff', inner: '#aaa5af', outer: '#09070b' },
@@ -651,7 +643,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('名称、榜位、持有者及其与火山石焰融合的相关描写。')],
-    visual: prototypeVisual('crown', visualBriefs.netherGolden, {
+    visual: approvedVisual('crown', visualBriefs.netherGolden, {
       kernel: 'crown',
       kernelOptions: { crownMode: 'ancestral' },
       palette: { core: '#fff5c7', inner: '#dda531', outer: '#241307' },
@@ -691,7 +683,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [{ name: '三千炎焱火', context: '原著中出现的异文写法' }],
     sources: [novelSource('紫黑色、星空来源、星力恢复与龙形本源的相关描写。')],
-    visual: prototypeVisual('spirit', visualBriefs.threeThousand, {
+    visual: approvedVisual('spirit', visualBriefs.threeThousand, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'starlit' },
       palette: { core: '#f6e8ff', inner: '#a955ff', outer: '#32105c' },
@@ -711,7 +703,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('淡黑疾风形态、诞生环境与扰动情绪的相关描写。')],
-    visual: prototypeVisual('gale', visualBriefs.netherGale, {
+    visual: approvedVisual('gale', visualBriefs.netherGale, {
       kernel: 'gale',
       kernelOptions: { galeMode: 'nether' },
       palette: { core: '#eef8f6', inner: '#93aaad', outer: '#223137' },
@@ -750,7 +742,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('银色、九条火龙、龙威与灵魂压迫的相关描写。')],
-    visual: prototypeVisual('spirit', visualBriefs.nineDragonThunder, {
+    visual: approvedVisual('spirit', visualBriefs.nineDragonThunder, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'thunder' },
       palette: { core: '#ffffff', inner: '#d4e9ff', outer: '#58688f' },
@@ -770,7 +762,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('褐色、巨龟形态、火刺、獠牙与巨尾的相关描写。')],
-    visual: prototypeVisual('spirit', visualBriefs.turtleSpirit, {
+    visual: approvedVisual('spirit', visualBriefs.turtleSpirit, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'turtle' },
       palette: { core: '#ffe0a0', inner: '#e77834', outer: '#4b2412' },
@@ -790,7 +782,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('无形无色、心火、淬炼作用与透明火蟒形态的相关描写。')],
-    visual: prototypeVisual('soul', visualBriefs.fallenHeart, {
+    visual: approvedVisual('soul', visualBriefs.fallenHeart, {
       kernel: 'soul',
       kernelOptions: { soulMode: 'heart' },
       palette: { core: '#fffef5', inner: '#ffdda5', outer: '#713548' },
@@ -830,7 +822,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('名称、榜位与炎族火曜持有的相关描写。')],
-    visual: prototypeVisual('fluid', visualBriefs.fireCloudWater, {
+    visual: approvedVisual('fluid', visualBriefs.fireCloudWater, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'cloudwater' },
       palette: { core: '#fff4d4', inner: '#ff6c5a', outer: '#276da8' },
@@ -850,7 +842,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('名称、榜位、持有者及其与九幽金祖火融合的相关描写。')],
-    visual: prototypeVisual('geofire', visualBriefs.volcanicStone, {
+    visual: approvedVisual('geofire', visualBriefs.volcanicStone, {
       kernel: 'geofire',
       kernelOptions: { earthMode: 'volcanic' },
       palette: { core: '#fff1a8', inner: '#ff6a1f', outer: '#40150b' },
@@ -870,7 +862,7 @@ const roster = [
     identityBasis: 'extension',
     alternateNames: [{ name: '风雷怒焱', context: '另一套正版衍生榜单采用的第十八席' }],
     sources: extensionSources('名称与视觉均作为扩展补位处理，不宣称来自小说正文。'),
-    visual: prototypeVisual('gale', visualBriefs.windFuryDragon, {
+    visual: approvedVisual('gale', visualBriefs.windFuryDragon, {
       kernel: 'gale',
       kernelOptions: { galeMode: 'dragon' },
       palette: { core: '#f4fff9', inner: '#57ffdd', outer: '#126779' },
@@ -910,7 +902,7 @@ const roster = [
     identityBasis: 'extension',
     alternateNames: [{ name: '龙凤焱', context: '另一套正版衍生榜单采用的第二十席' }],
     sources: extensionSources('名称、毒性与形态均作为扩展补位处理，不宣称来自小说正文。'),
-    visual: prototypeVisual('fluid', visualBriefs.netherPoison, {
+    visual: approvedVisual('fluid', visualBriefs.netherPoison, {
       kernel: 'fluid',
       kernelOptions: { flowMode: 'venom' },
       palette: { core: '#efff78', inner: '#b543e6', outer: '#093f31' },
@@ -930,7 +922,7 @@ const roster = [
     identityBasis: 'extension',
     alternateNames: [{ name: '六道轮回炎', context: '另一套正版衍生榜单采用的第二十一席' }],
     sources: extensionSources('后补篇仅出现黑白混色异火，名称、榜位与能力不作为小说正文事实。'),
-    visual: prototypeVisual('soul', visualBriefs.yinYang, {
+    visual: approvedVisual('soul', visualBriefs.yinYang, {
       kernel: 'soul',
       kernelOptions: { soulMode: 'duality' },
       palette: { core: '#ffffff', inner: '#e5e1d7', outer: '#14161b' },
@@ -950,10 +942,10 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('红色火焰与万兽轮廓的相关描写。')],
-    visual: prototypeVisual('spirit', visualBriefs.myriadBeasts, {
+    visual: approvedVisual('spirit', visualBriefs.myriadBeasts, {
       kernel: 'spirit',
       kernelOptions: { spiritMode: 'beasts' },
-      palette: { core: '#fff0ba', inner: '#ff563b', outer: '#7a1320' },
+      palette: { core: '#ffe1a0', inner: '#ff301c', outer: '#780b20' },
       speed: 0.96,
       scale: 1.00,
       turbulence: 1.18,
@@ -970,7 +962,7 @@ const roster = [
     identityBasis: 'novel',
     alternateNames: [],
     sources: [novelSource('深黄色与古帝广场弱小火种的相关描写。')],
-    visual: prototypeVisual('geofire', visualBriefs.darkYellow, {
+    visual: approvedVisual('geofire', visualBriefs.darkYellow, {
       kernel: 'geofire',
       kernelOptions: { earthMode: 'seed' },
       palette: { core: '#fff2a0', inner: '#dfa72b', outer: '#4a310d' },
@@ -985,13 +977,13 @@ const roster = [
 export const visualFamilyCatalog: Record<VisualFamilyId, VisualFamilyDefinition> = {
   void: { id: 'void', label: '虚无', representativeFlameId: 'nihility', status: 'ready' },
   lotus: { id: 'lotus', label: '莲相', representativeFlameId: 'purifying-lotus', status: 'ready' },
-  crown: { id: 'crown', label: '冠焰', representativeFlameId: 'golden-emperor', status: 'planned' },
+  crown: { id: 'crown', label: '冠焰', representativeFlameId: 'golden-emperor', status: 'ready' },
   fluid: { id: 'fluid', label: '流火', representativeFlameId: 'sea-heart', status: 'ready' },
-  spirit: { id: 'spirit', label: '灵形', representativeFlameId: 'nine-dragon-thunder', status: 'planned' },
-  gale: { id: 'gale', label: '风焰', representativeFlameId: 'nether-gale', status: 'planned' },
+  spirit: { id: 'spirit', label: '灵形', representativeFlameId: 'nine-dragon-thunder', status: 'ready' },
+  gale: { id: 'gale', label: '风焰', representativeFlameId: 'nether-gale', status: 'ready' },
   cold: { id: 'cold', label: '冷焰', representativeFlameId: 'bone-chilling', status: 'ready' },
-  soul: { id: 'soul', label: '心焰', representativeFlameId: 'fallen-heart', status: 'planned' },
-  geofire: { id: 'geofire', label: '地火', representativeFlameId: 'volcanic-stone', status: 'planned' },
+  soul: { id: 'soul', label: '心焰', representativeFlameId: 'fallen-heart', status: 'ready' },
+  geofire: { id: 'geofire', label: '地火', representativeFlameId: 'volcanic-stone', status: 'ready' },
 }
 
 export function validateFlameRoster<T extends readonly FlameSeat[]>(flames: T): T {
@@ -1043,6 +1035,9 @@ export function validateFlameRoster<T extends readonly FlameSeat[]>(flames: T): 
     slugs.add(flame.slug)
     ranks.add(flame.rank)
   }
+
+  if (flames[0]?.visual.state === 'approved' && flames.some(flame => flame.rank > 1 && flame.visual.state !== 'approved'))
+    throw new Error('Emperor release requires all 22 base flames to be approved.')
 
   return flames
 }

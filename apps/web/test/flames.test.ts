@@ -1,3 +1,4 @@
+import type { FlameSeat } from '../app/data/flames'
 import { validateFlamePreset } from '@yunyoujun/flame-engine'
 import { describe, expect, it } from 'vitest'
 import {
@@ -86,14 +87,21 @@ describe('flame roster', () => {
       'myriad-beasts',
       'dark-yellow',
     ])
-    expect(flameCatalog.map(flame => flame.id)).toEqual([
-      'nihility',
-      'purifying-lotus',
-      'karmic-lotus',
-      'bone-chilling',
-      'sea-heart',
-      'green-lotus',
-    ])
+    expect(flameCatalog.map(flame => flame.id)).toEqual(renderable.map(preset => preset.id))
+    expect(flameRoster.every(flame => flame.visual.state === 'approved')).toBe(true)
+    expect(flameCatalog.filter(flame => flame.rank > 1)).toHaveLength(22)
+    for (const flame of flameCatalog)
+      expect(flame.epithet).not.toMatch(/凝聚中|仅供评审|未启|封印/)
+  })
+
+  it('prevents emperor publication before all base seats are approved', () => {
+    const incomplete: FlameSeat[] = flameRoster.map(flame => flame.id === 'dark-yellow'
+      ? { ...flame, visual: { state: 'reserved', plannedFamily: 'geofire' } }
+      : flame)
+    expect(() => validateFlameRoster(incomplete)).toThrow('Emperor release requires all 22 base flames')
+    incomplete[0] = { ...incomplete[0]!, visual: { state: 'reserved', plannedFamily: 'crown' } }
+    expect(validateFlameRoster(incomplete)).toBe(incomplete)
+    expect(getFlamePreset(incomplete[0]!)).toBeUndefined()
   })
 
   it('publishes the red lotus implementation after visual approval', () => {
@@ -141,103 +149,103 @@ describe('flame roster', () => {
     expect(flameCatalog.map(flame => flame.id)).toContain('sea-heart')
   })
 
-  it('keeps reviewed fluid siblings dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes reviewed fluid siblings', () => {
+    const variants = [
       ['life-spirit', 5, 'verdant'],
       ['fire-cloud-water', 16, 'cloudwater'],
       ['nether-poison', 20, 'venom'],
     ] as const
 
-    for (const [id, rank, flowMode] of prototypes) {
+    for (const [id, rank, flowMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'fluid',
         kernelOptions: { flowMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
   })
 
-  it('keeps the gale family dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes the reviewed gale family', () => {
+    const variants = [
       ['nether-gale', 10, 'nether'],
       ['wind-fury-dragon', 18, 'dragon'],
     ] as const
 
-    for (const [id, rank, galeMode] of prototypes) {
+    for (const [id, rank, galeMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'gale',
         kernelOptions: { galeMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
   })
 
-  it('keeps the spirit family dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes the reviewed spirit family', () => {
+    const variants = [
       ['three-thousand', 9, 'starlit'],
       ['nine-dragon-thunder', 12, 'thunder'],
       ['turtle-spirit', 13, 'turtle'],
       ['myriad-beasts', 22, 'beasts'],
     ] as const
 
-    for (const [id, rank, spiritMode] of prototypes) {
+    for (const [id, rank, spiritMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'spirit',
         kernelOptions: { spiritMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
   })
 
-  it('keeps the soul family dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes the reviewed soul family', () => {
+    const variants = [
       ['fallen-heart', 14, 'heart'],
       ['yin-yang', 21, 'duality'],
     ] as const
 
-    for (const [id, rank, soulMode] of prototypes) {
+    for (const [id, rank, soulMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'soul',
         kernelOptions: { soulMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
   })
 
-  it('keeps the crown family and terminal emperor dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes the reviewed crown family and terminal emperor', () => {
+    const variants = [
       ['emperor', 1, 'emperor'],
       ['golden-emperor', 4, 'golden'],
       ['eight-desolation', 6, 'desolation'],
       ['nether-golden', 7, 'ancestral'],
     ] as const
 
-    for (const [id, rank, crownMode] of prototypes) {
+    for (const [id, rank, crownMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'crown',
         kernelOptions: { crownMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
 
     expect(getFlamePreset(flameRosterBySlug.get('golden-emperor')!)).toMatchObject({
@@ -253,22 +261,22 @@ describe('flame roster', () => {
     })
   })
 
-  it('keeps the geofire family dev-only until final visual approval', () => {
-    const prototypes = [
+  it('publishes the reviewed geofire family', () => {
+    const variants = [
       ['volcanic-stone', 17, 'volcanic'],
       ['dark-yellow', 23, 'seed'],
     ] as const
 
-    for (const [id, rank, earthMode] of prototypes) {
+    for (const [id, rank, earthMode] of variants) {
       const flame = flameRosterBySlug.get(id)
-      expect(flame?.visual.state).toBe('prototype')
+      expect(flame?.visual.state).toBe('approved')
       expect(getFlamePreset(flame!)).toMatchObject({
         id,
         rank,
         kernel: 'geofire',
         kernelOptions: { earthMode },
       })
-      expect(flameCatalog.map(entry => entry.id)).not.toContain(id)
+      expect(flameCatalog.map(entry => entry.id)).toContain(id)
     }
   })
 
@@ -277,6 +285,7 @@ describe('flame roster', () => {
       const representative = flameRoster.find(flame => flame.id === family.representativeFlameId)
       expect(representative, family.id).toBeDefined()
       expect(representative?.visual.plannedFamily).toBe(family.id)
+      expect(family.status).toBe('ready')
     }
   })
 

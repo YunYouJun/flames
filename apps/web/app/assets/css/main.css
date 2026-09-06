@@ -527,10 +527,6 @@ select:focus-visible {
     display: none;
   }
 
-  .experience-controls label {
-    display: none;
-  }
-
   .flame-composition {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(24rem, 51svh) auto;
@@ -545,6 +541,12 @@ select:focus-visible {
     height: 51svh;
     min-height: 24rem;
     margin: auto;
+  }
+
+  .flame-canvas {
+    top: 6.5rem;
+    bottom: 0;
+    height: calc(100% - 6.5rem);
   }
 
   .flame-identity {
@@ -606,9 +608,23 @@ select:focus-visible {
   }
 
   .experience-controls button {
-    min-height: 1.9rem;
+    min-height: 2.75rem;
     padding: 0.2rem 0.55rem;
     font-size: 0.58rem;
+  }
+
+  .experience-controls label {
+    min-height: 2.75rem;
+    padding: 0 0.4rem;
+    font-size: 0.58rem;
+  }
+
+  .experience-controls label > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
 
   .flame-composition {
@@ -623,9 +639,9 @@ select:focus-visible {
   }
 
   .flame-canvas {
-    inset: -8% -14% -1%;
+    inset: 6.5rem -14% 0;
     width: 128%;
-    height: 109%;
+    height: calc(100% - 6.5rem);
   }
 
   .flame-identity h1 {

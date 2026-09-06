@@ -25,6 +25,8 @@ const showDetails = shallowRef(false)
 const showRoster = shallowRef(false)
 const hydrated = shallowRef(false)
 
+useFlameKeyboardNavigation(() => props.flame.slug, () => !showDetails.value && !showRoster.value)
+
 const activeFlame = computed(() => {
   const state = props.flame.visual.state
   if (state === 'approved' || (state === 'prototype' && import.meta.dev))
@@ -45,6 +47,7 @@ const activeFlowMode = computed(() => {
   return options?.flowMode ?? 'tidal'
 })
 const completedBaseCount = computed(() => flameCatalog.filter(flame => flame.rank > 1).length)
+const emperorAvailable = computed(() => flameCatalog.some(flame => flame.id === 'emperor'))
 const benchmarkTime = computed(() => route.query.benchmark === '1' ? 4.25 : undefined)
 const benchmarkQuality = computed<FlameQuality>(() => {
   const requested = route.query.quality
@@ -71,7 +74,10 @@ onMounted(() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const coarsePointer = window.matchMedia('(pointer: coarse)').matches
   paused.value = reducedMotion
-  quality.value = coarsePointer ? 'balanced' : 'high'
+  const requested = route.query.quality
+  quality.value = requested === 'high' || requested === 'balanced' || requested === 'lite'
+    ? requested
+    : coarsePointer ? 'balanced' : 'high'
 })
 
 watch(() => activeFlame.value?.slug, (slug) => {
@@ -132,6 +138,7 @@ watch(() => activeFlame.value?.slug, (slug) => {
         </div>
 
         <FlameAltar
+          v-if="!activeFlame || runtimeStatus !== 'ready'"
           :family="activeFamily"
           :flame-id="flame.id"
           :palette="activeFlame?.palette"
@@ -161,7 +168,8 @@ watch(() => activeFlame.value?.slug, (slug) => {
       <p class="progress-mark">
         <span>基础异火已现世 {{ completedBaseCount }} / 22</span>
         <span>已观测 {{ seenCount }} / {{ flameCatalog.length }}</span>
-        <span>帝炎未启</span>
+        <span>{{ emperorAvailable ? '帝炎已现世' : '帝炎未启' }}</span>
+        <span>← / → 切换异火</span>
       </p>
       <FlameRosterRail
         :flames="flameRoster"
@@ -174,7 +182,8 @@ watch(() => activeFlame.value?.slug, (slug) => {
       v-if="showRoster"
       :flames="flameRoster"
       :active-slug="flame.slug"
-      :approved-count="flameCatalog.length"
+      :approved-count="completedBaseCount"
+      :emperor-available="emperorAvailable"
       @close="showRoster = false"
     />
 

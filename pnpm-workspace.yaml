@@ -9,6 +9,8 @@ allowBuilds:
   better-sqlite3: true
   esbuild: true
   simple-git-hooks: true
+  # The package ships its Vue 3 entry; no Vue 2 switching is needed here.
+  vue-demi: false
 
 packages:
   - apps/*
@@ -39,6 +41,7 @@ catalog:
   nuxt: ^4.5.2
   pinia: ^4.0.2
   publint: ^0.3.23
+  reka-ui: ^2.10.4
   simple-git-hooks: ^2.13.1
   three: ^0.185.1
   tsdown: ^0.22.14

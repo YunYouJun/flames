@@ -5,6 +5,7 @@ const props = defineProps<{
   flames: FlameSeat[]
   activeSlug: string
   approvedCount: number
+  emperorAvailable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -48,7 +49,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     <section class="roster-gallery" role="dialog" aria-modal="true" aria-labelledby="roster-title">
       <header class="roster-header">
         <div>
-          <p>异火碑廊 · 基础已现世 {{ approvedCount }} / 22 · 帝炎未启</p>
+          <p>异火碑廊 · 基础已现世 {{ approvedCount }} / 22 · {{ emperorAvailable ? '帝炎已现世' : '帝炎未启' }}</p>
           <h2 id="roster-title">
             廿三席
           </h2>
