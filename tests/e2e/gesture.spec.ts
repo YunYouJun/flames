@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 import { Buffer } from 'node:buffer'
 import { expect, test } from '@playwright/test'
 import { FireFrame } from './helpers/fire-frame'
-import { openFlame } from './helpers/scene'
+import { advanceFlame, openFlame } from './helpers/scene'
 
 async function gestureScene(page: Page, mobile: boolean) {
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -44,30 +44,29 @@ test('fades a held charge when mouse or touch hands over to rotation, even while
   page.on('pageerror', error => errors.push(error.message))
   await page.clock.install()
   const { canvas, pointer, frame } = await gestureScene(page, isMobile)
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 10_000))
   await pointer('down')
+  await expect(canvas).toHaveAttribute('data-gesture', 'pending')
+  await advanceFlame(page, 1100)
   await expect(canvas).toHaveAttribute('data-gesture', 'holding')
   await expect(page.getByRole('group', { name: '环绕查看' }).getByRole('status')).toContainText('蓄焰中')
-  await page.waitForTimeout(800)
   await page.screenshot({ path: testInfo.outputPath('holding.png') })
-  // Freeze only the browser test clock so screenshot/IPC latency cannot consume
-  // the complete 600 ms envelope before its first sample on software WebGL.
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 60_000))
   await pointer('move', 40)
-  await page.clock.runFor(100)
+  await advanceFlame(page, 100)
   const releasing = await frame()
   await expect(canvas).toHaveAttribute('data-gesture', 'dragging')
   await expect(page.getByRole('group', { name: '环绕查看' }).getByRole('status')).toContainText('环视中')
   await expect(page.getByRole('slider', { name: '左右环绕角度' })).not.toHaveValue('0')
   // The camera is now stationary but the fire must keep fading, not cut to rest.
-  await page.clock.runFor(200)
+  await advanceFlame(page, 200)
   expect((await frame()).equals(releasing), 'The rotated charge must continue fading').toBe(false)
-  await page.clock.runFor(1000)
+  await advanceFlame(page, 1000)
   const settled = await frame()
-  await page.clock.runFor(300)
+  await advanceFlame(page, 300)
   expect((await frame()).equals(settled), 'Holding after rotation must not resume charge').toBe(true)
   await page.screenshot({ path: testInfo.outputPath('rotating.png') })
   await pointer('up', 40)
-  await page.clock.runFor(100)
+  await advanceFlame(page, 100)
   await expect(canvas).toHaveAttribute('data-gesture', 'idle')
   expect((await frame()).equals(settled), 'Releasing a rotation must not trigger a click pulse').toBe(true)
   expect(errors).toEqual([])

@@ -39,7 +39,7 @@ const { phase, cancel: cancelGesture, onPointerDown, onPointerMove, onPointerUp,
   interact: () => emit('interact'),
 })
 
-onNuxtReady(async () => {
+onFlameReady(async () => {
   // Let the experience apply URL/reduced-motion preferences before allocating GL.
   await nextTick()
   const mountedCanvas = canvas.value

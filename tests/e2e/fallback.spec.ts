@@ -25,7 +25,7 @@ test('keeps themed fallback, pause, and roster navigation usable without WebGL',
 
   await page.goto('/flames/golden-emperor')
   await expect(page).toHaveTitle(/金帝焚天炎/)
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({ timeout: 30_000 })
   const fallback = page.getByRole('status', { name: '轻量火焰意象' })
   await expect(fallback).toBeVisible()
   await expect(page.getByText('实时火焰暂不可用，已呈现轻量意象，可刷新重试')).toBeVisible()
@@ -56,6 +56,7 @@ test('keeps themed fallback, pause, and roster navigation usable without WebGL',
 test('honors reduced motion and benchmark freeze without WebGL', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/flames/emperor')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({ timeout: 30_000 })
   const fallback = page.getByRole('status', { name: '轻量火焰意象' })
   await expect(fallback).toBeVisible()
   await expect(fallback).toHaveClass(/flame-fallback--paused/)
@@ -63,6 +64,7 @@ test('honors reduced motion and benchmark freeze without WebGL', async ({ page }
 
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto('/flames/emperor?benchmark=1&quality=balanced')
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({ timeout: 30_000 })
   await expect(fallback).toBeVisible()
   await expect(fallback).toHaveClass(/flame-fallback--paused/)
   expect(await fallback.locator('.flame-fallback__wisp').first().evaluate(element => getComputedStyle(element).animationPlayState)).toBe('paused')

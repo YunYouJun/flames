@@ -8,6 +8,8 @@ test.beforeEach(() => {
 })
 
 test('navigates between approved flames from the short roster', async ({ page }) => {
+  // Route assertions do not need a continuously animating software GPU.
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await openFlame(page, '/')
   await expect(page.getByRole('heading', { name: '净莲妖火' })).toBeVisible()
 
@@ -58,6 +60,7 @@ for (const slug of ['nihility', 'purifying-lotus', 'golden-emperor', 'life-spiri
 }
 
 test('opens the independently written setting summary and source tier', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await openFlame(page, '/')
   await page.getByRole('button', { name: /阅览设定/ }).click()
   const details = page.getByRole('dialog', { name: '净莲妖火' })
@@ -81,6 +84,7 @@ test('keeps orbit controls clear of the flame viewing area', async ({ page }) =>
 })
 
 test('labels extension-only identities and derived alternatives', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await openFlame(page, '/flames/wind-fury-dragon')
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible()
   await page.getByRole('button', { name: /阅览设定/ }).click()
@@ -361,11 +365,16 @@ test('drags the volume view and preserves a separate fire interaction mode', asy
 })
 
 test('stops automatic orbit on manual input, reset and pause', async ({ page }) => {
+  await page.clock.install()
   await openFlame(page, '/flames/golden-emperor')
+  // Exercise the real animation loop in bounded frames, rather than rendering
+  // continuously while slow software-GPU locator checks cross the process boundary.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 10_000))
   const automatic = page.getByRole('button', { name: '自动环绕' })
   const angle = page.getByRole('slider', { name: '左右环绕角度' })
   await expect(automatic).toHaveAttribute('aria-pressed', 'false')
   await automatic.click()
+  await advanceFlame(page, 300)
   await expect.poll(async () => Number(await angle.inputValue())).toBeGreaterThan(1)
   await angle.fill('45')
   await expect(automatic).toHaveAttribute('aria-pressed', 'false')
