@@ -95,9 +95,14 @@ jobs:
       - run: pnpm budget:web
 
   e2e:
-    name: Browser tests
+    name: Browser tests (${{ matrix.project }}, ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop, mobile]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -110,4 +115,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm e2e
+      # Balance individual cases across runners, keeping software WebGL single-worker.
+      - run: pnpm e2e --project=${{ matrix.project }} --shard=${{ matrix.shard }}/2 --fully-parallel --workers=1 --reporter=line
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: browser-failures-${{ matrix.project }}-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 7
