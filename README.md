@@ -46,7 +46,9 @@ docs/                     VitePress 文档与设计规范
 
 ## 部署
 
-仓库内的 `edgeone.json` 将 EdgeOne Pages 构建命令设为 `pnpm generate`，静态输出目录为 `apps/web/.output/public`。已连接的项目会在推送 `main` 后自动部署，线上地址为 [flames.yunyoujun.cn](https://flames.yunyoujun.cn)。
+EdgeOne 项目设置使用根目录 `apps/web`、框架预设 `Other`，由 `apps/web/edgeone.json` 指定构建命令 `pnpm --dir ../.. generate` 和相对输出目录 `.output/public`。安装命令为 `pnpm install --frozen-lockfile`，仍使用整个 pnpm workspace。已连接的项目会在推送 `main` 后自动部署，线上地址为 [flames.yunyoujun.cn](https://flames.yunyoujun.cn)。
+
+部署根目录必须指向 Nuxt 应用：EdgeOne 按源码目录自动判断 SPA/SSG，仓库根目录可能被误判为 SPA，导致未知地址返回首页和 HTTP 200，即使产物中已有 `404.html`。
 
 发布前运行 `pnpm generate`，然后用 `pnpm preview:web` 在 `http://127.0.0.1:3100` 检查正式产物。静态托管应优先匹配生成的页面，未知路径返回 `404.html` 和 HTTP 404，不应重写到首页。
 

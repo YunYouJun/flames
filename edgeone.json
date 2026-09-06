@@ -1,6 +1,0 @@
-{
-  "name": "flames",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm generate",
-  "outputDirectory": "apps/web/.output/public"
-}
