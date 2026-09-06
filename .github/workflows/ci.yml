@@ -116,9 +116,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm generate
-      # Balance individual cases across runners, keeping software WebGL single-worker.
-      # Stop the test runner before the job deadline so failure traces can upload.
-      - run: pnpm e2e --project=${{ matrix.project }} --shard=${{ matrix.shard }}/4 --fully-parallel --workers=1 --reporter=line --global-timeout=1500000
+      # Shard expensive three-tier captures separately: count-based sharding of
+      # the whole suite otherwise puts twenty captures on the first runner.
+      # Both deadlines leave time for build setup and failure evidence upload.
+      - name: Accept all flame visuals
+        run: pnpm e2e tests/e2e/acceptance.spec.ts --project=${{ matrix.project }} --shard=${{ matrix.shard }}/4 --fully-parallel --workers=1 --reporter=line --global-timeout=900000 --output=test-results/acceptance
+      - name: Check routes, gestures and rendering contracts
+        run: pnpm e2e 'tests/e2e/(?!acceptance\.spec\.ts$).*\.spec\.ts$' --project=${{ matrix.project }} --shard=${{ matrix.shard }}/4 --fully-parallel --workers=1 --reporter=line --global-timeout=600000 --output=test-results/experience
       - uses: actions/upload-artifact@v7
         if: ${{ failure() || cancelled() }}
         with:
