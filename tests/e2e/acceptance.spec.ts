@@ -1,8 +1,7 @@
-import type { CDPSession, Page } from '@playwright/test'
-import { Buffer } from 'node:buffer'
+import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { flameRoster } from '../../apps/web/app/data/flames'
-import { FireFrame } from './helpers/fire-frame'
+import { expectFrame, fireSnapshot } from './helpers/capture'
 import { advanceFlame, openFlame } from './helpers/scene'
 
 async function flameCrop(page: Page) {
@@ -11,23 +10,10 @@ async function flameCrop(page: Page) {
   return { x: rect.x + rect.width * 0.22, y: rect.y + rect.height * 0.08, width: rect.width * 0.56, height: rect.height * 0.57 }
 }
 
-const sessions = new WeakMap<Page, CDPSession>()
-
-async function fireSnapshot(page: Page, clip: Awaited<ReturnType<typeof flameCrop>>) {
-  let session = sessions.get(page)
-  if (!session) {
-    session = await page.context().newCDPSession(page)
-    sessions.set(page, session)
-  }
-  // Capture the next compositor frame directly. Playwright's screenshot preparation
-  // can outlast a one-second pulse on software WebGL, hiding a real transient response.
-  const result = await session.send('Page.captureScreenshot', { format: 'png', clip: { ...clip, scale: 1 } })
-  return new FireFrame(Buffer.from(result.data, 'base64'))
-}
-
 for (const flame of flameRoster) {
   test(`accepts ${flame.slug}: tap, hold, side view and quality tiers`, async ({ page, isMobile }, testInfo) => {
-    test.setTimeout(120_000)
+    // Three real quality tiers include cold shaders and software-GPU readbacks.
+    test.setTimeout(180_000)
     const errors: string[] = []
     const warnings: string[] = []
     page.on('pageerror', error => errors.push(error.message))
@@ -74,20 +60,24 @@ for (const flame of flameRoster) {
     else
       await page.mouse.click(point.x, point.y)
     await advanceFlame(page, 100)
-    await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Quick tap must change the fire, not just its altar', intervals: [50] }).toBe(false)
+    await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Quick tap must change the fire, not just its altar', intervals: [50] }).toBe(false)
     await expect(angle).toHaveValue('0')
     await advanceFlame(page, 2000)
-    await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { timeout: 10_000 }).toBe(true)
+    await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(true)
     const settled = await fireSnapshot(page, clip)
     expect(settled.equals(resting), 'Tap must decay back to the fixed-time baseline').toBe(true)
     await page.mouse.move(point.x, point.y)
     await page.mouse.down()
+    // Input acknowledgement can precede its main-thread handler on a busy GPU.
+    // Do not advance the virtual hold deadline until the gesture actually starts.
+    await expect(canvas).toHaveAttribute('data-gesture', 'pending')
     await advanceFlame(page, 800)
-    await expect.poll(async () => (await fireSnapshot(page, clip)).equals(settled)).toBe(false)
+    await expect(canvas).toHaveAttribute('data-gesture', 'holding')
+    await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(settled), { message: 'A recognized hold must change the fire' }).toBe(false)
     await page.screenshot({ path: testInfo.outputPath('hold.png') })
     await page.mouse.up()
     await advanceFlame(page, 2000)
-    await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Released hold returns to baseline', timeout: 10_000 }).toBe(true)
+    await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { message: 'Released hold returns to baseline' }).toBe(true)
     await page.screenshot({ path: testInfo.outputPath('front.png') })
     await angle.fill('90')
     await advanceFlame(page, 100)
@@ -109,7 +99,7 @@ for (const flame of flameRoster) {
       const tierRect = (await canvas.boundingBox())!
       await page.mouse.click(tierRect.x + tierRect.width * 0.5, tierRect.y + tierRect.height * 0.5)
       await advanceFlame(page, 100)
-      await expect.poll(async () => (await fireSnapshot(page, tierClip)).equals(tierResting), { message: `${quality} tap feedback`, intervals: [50] }).toBe(false)
+      await expectFrame.poll(async () => (await fireSnapshot(page, tierClip)).equals(tierResting), { message: `${quality} tap feedback`, intervals: [50] }).toBe(false)
       await advanceFlame(page, 2000)
       await page.screenshot({ path: testInfo.outputPath(`${quality}.png`) })
     }
@@ -134,19 +124,19 @@ test('supports paused keyboard ignition, gesture cancellation and quality change
   await canvas.focus()
   await page.keyboard.press('Enter')
   await advanceFlame(page, 100)
-  await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
+  await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
   await advanceFlame(page, 2000)
-  await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting), { timeout: 10_000 }).toBe(true)
+  await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(true)
   await page.keyboard.press('Space')
   await advanceFlame(page, 100)
-  await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
+  await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(false)
   const rect = (await canvas.boundingBox())!
   await page.mouse.move(rect.x + rect.width * 0.5, rect.y + rect.height * 0.5)
   await page.mouse.down()
   await canvas.dispatchEvent('pointercancel', { pointerId: 1, pointerType: 'mouse', isPrimary: true })
   await page.mouse.up()
   await advanceFlame(page, 2000)
-  await expect.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(true)
+  await expectFrame.poll(async () => (await fireSnapshot(page, clip)).equals(resting)).toBe(true)
   await page.getByLabel('画质').selectOption('lite')
   await advanceFlame(page, 100)
   await expect(page.locator('canvas')).toHaveAttribute('data-render-mode', 'planar')

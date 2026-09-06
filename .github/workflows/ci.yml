@@ -95,14 +95,14 @@ jobs:
       - run: pnpm budget:web
 
   e2e:
-    name: Browser tests (${{ matrix.project }}, ${{ matrix.shard }}/2)
+    name: Browser tests (${{ matrix.project }}, ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         project: [desktop, mobile]
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -117,9 +117,10 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm generate
       # Balance individual cases across runners, keeping software WebGL single-worker.
-      - run: pnpm e2e --project=${{ matrix.project }} --shard=${{ matrix.shard }}/2 --fully-parallel --workers=1 --reporter=line
+      # Stop the test runner before the job deadline so failure traces can upload.
+      - run: pnpm e2e --project=${{ matrix.project }} --shard=${{ matrix.shard }}/4 --fully-parallel --workers=1 --reporter=line --global-timeout=1500000
       - uses: actions/upload-artifact@v7
-        if: ${{ failure() }}
+        if: ${{ failure() || cancelled() }}
         with:
           name: browser-failures-${{ matrix.project }}-${{ matrix.shard }}
           path: test-results/

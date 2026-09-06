@@ -340,7 +340,9 @@ export class FlameRuntime {
 
   private readonly render = (timestamp: number): void => {
     this.frameId = requestAnimationFrame(this.render)
-    if (this.status !== 'ready' || (this.paused && !this.needsRender))
+    // Fixed-time captures need input/resize updates, but no identical GPU frames.
+    const frozen = this.paused || this.benchmarkTime !== undefined
+    if (this.status !== 'ready' || (frozen && !this.needsRender))
       return
     this.needsRender = false
 
