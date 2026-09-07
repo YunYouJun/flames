@@ -33,6 +33,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
       - run: pnpm typecheck
 
   test:
@@ -56,8 +57,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
       - run: pnpm test
+      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
+      - run: pnpm build
 
   docs:
     name: Build docs
@@ -91,11 +93,21 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
       - run: pnpm generate
       - run: pnpm budget:web
+      # All browser shards exercise the same budget-checked static build.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: flame-static-site
+          path: apps/web/.output/public/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
 
   e2e:
     name: Browser tests (${{ matrix.project }}, ${{ matrix.shard }}/4)
+    needs: [lint, test, docs, static]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -114,8 +126,11 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm generate
+      - run: pnpm exec playwright install --with-deps --only-shell chromium
+      - uses: actions/download-artifact@v8
+        with:
+          name: flame-static-site
+          path: apps/web/.output/public/
       # Shard expensive three-tier captures separately: count-based sharding of
       # the whole suite otherwise puts twenty captures on the first runner.
       # Both deadlines leave time for build setup and failure evidence upload.

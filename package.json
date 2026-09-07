@@ -18,7 +18,7 @@
     "prepublishOnly": "nr build",
     "predocs": "typedoc",
     "docs:dev": "pnpm -C docs run docs:dev",
-    "docs:build": "pnpm build && pnpm predocs && pnpm -C docs run docs:build",
+    "docs:build": "pnpm --filter @yunyoujun/flame-engine build && pnpm predocs && pnpm -C docs run docs:build",
     "docs:preview": "pnpm -C docs run docs:preview",
     "e2e": "playwright test",
     "release": "bumpp -r && pnpm -r publish",
