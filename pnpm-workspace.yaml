@@ -1,16 +1,12 @@
 ignoreWorkspaceRootCheck: true
-
 minimumReleaseAge: 1440
-shellEmulator: true
+minimumReleaseAgeExcludePrune: true
+
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
-allowBuilds:
-  better-sqlite3: true
-  esbuild: true
-  simple-git-hooks: true
-  # The package ships its Vue 3 entry; no Vue 2 switching is needed here.
-  vue-demi: false
+
+shellEmulator: true
 
 packages:
   - apps/*
@@ -18,46 +14,55 @@ packages:
   - docs
   - packages/*
   - examples/*
+
 overrides:
   esbuild: ^0.28.1
+
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  simple-git-hooks: true
+  # The package ships its Vue 3 entry; no Vue 2 switching is needed here.
+  vue-demi: false
+
 catalog:
-  '@antfu/eslint-config': ^9.3.0
+  '@antfu/eslint-config': ^9.5.1
   '@antfu/ni': ^30.5.0
   '@antfu/utils': ^9.3.0
   '@iconify-json/svg-spinners': ^1.2.4
   '@nuxt/content': ^3.16.0
-  '@playwright/test': ^1.55.0
+  '@playwright/test': ^1.63.0
   '@shikijs/vitepress-twoslash': ^4.4.3
-  '@types/node': ^26.2.0
+  '@types/node': ^26.4.1
   '@types/pngjs': ^6.0.5
-  '@types/three': ^0.185.0
-  '@unocss/reset': ^66.7.5
+  '@types/three': ^0.185.4
+  '@unocss/reset': ^66.10.0
   '@vueuse/core': ^14.4.0
   '@yunyoujun/docs': ^0.1.14
   better-sqlite3: ^12.11.1
-  bumpp: ^12.2.0
-  eslint: ^10.8.1
+  bumpp: ^12.3.0
+  eslint: ^10.10.0
   floating-vue: ^5.2.2
-  lint-staged: ^17.3.0
+  lint-staged: ^17.5.0
   nuxt: ^4.5.2
-  pinia: ^4.0.2
+  pinia: ^4.0.3
   pngjs: ^7.0.0
-  publint: ^0.3.23
+  publint: ^0.3.24
   reka-ui: ^2.10.4
-  simple-git-hooks: ^2.13.1
+  simple-git-hooks: ^2.14.0
   three: ^0.185.1
-  tsdown: ^0.22.14
-  tsx: ^4.23.12
+  tsdown: ^0.23.0
+  tsx: ^4.23.13
   typedoc: ^0.28.20
-  typedoc-plugin-markdown: ^4.12.0
+  typedoc-plugin-markdown: ^4.13.0
   typedoc-vitepress-theme: ^1.1.3
   typescript: ^6.0.3
-  unocss: ^66.7.5
+  unocss: ^66.10.0
   unplugin-vue-components: ^32.1.0
-  vite: ^8.2.1
+  vite: ^8.2.2
   vite-plugin-vue-devtools: ^8.2.1
-  vitepress: ^2.0.0-alpha.19
+  vitepress: 2.0.0-alpha.20
   vitepress-plugin-group-icons: ^1.7.6
   vitest: ^4.1.10
-  vue: ^3.5.41
+  vue: ^3.5.42
   vue-tsc: ^3.3.11
