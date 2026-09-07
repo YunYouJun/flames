@@ -366,7 +366,9 @@ test('drags the volume view and preserves a separate fire interaction mode', asy
 
 test('stops automatic orbit on manual input, reset and pause', async ({ page }) => {
   await page.clock.install()
-  await openFlame(page, '/flames/golden-emperor')
+  // Fine quality software rendering can stall even a slider read on CI.
+  // Keep normal playback controls available while testing view behavior.
+  await openFlame(page, '/flames/golden-emperor?quality=balanced')
   // Exercise the real animation loop in bounded frames, rather than rendering
   // continuously while slow software-GPU locator checks cross the process boundary.
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 10_000))
