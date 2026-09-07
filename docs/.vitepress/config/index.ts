@@ -6,7 +6,7 @@ import { groupIconMdPlugin } from 'vitepress-plugin-group-icons'
 import { version } from '../../../package.json' with { type: 'json' }
 import typedocSidebar from '../../api/typedoc-sidebar.json' with { type: 'json' }
 
-const REPOSITORY_URL = 'https://github.com/YunYouJun/starter-monorepo'
+const REPOSITORY_URL = 'https://github.com/YunYouJun/flames'
 
 const ZH_MARKDOWN = {
   container: {
@@ -26,14 +26,14 @@ const ZH_MARKDOWN = {
 }
 
 const EN_GUIDES: DefaultTheme.NavItemWithLink[] = [
-  { text: 'What is starter-monorepo?', link: '/guide/what-is' },
+  { text: 'What is Flames?', link: '/guide/what-is' },
   { text: 'Getting Started', link: '/guide/getting-started' },
   { text: 'Nuxt Web Application', link: '/guide/web-app' },
   { text: 'Configuration', link: '/guide/configuration' },
 ]
 
 const ZH_GUIDES: DefaultTheme.NavItemWithLink[] = [
-  { text: '什么是 starter-monorepo？', link: '/zh/guide/what-is' },
+  { text: '什么是 Flames？', link: '/zh/guide/what-is' },
   { text: '快速开始', link: '/zh/guide/getting-started' },
   { text: 'Nuxt Web 应用', link: '/zh/guide/web-app' },
   { text: '配置', link: '/zh/guide/configuration' },
@@ -58,8 +58,8 @@ const vpConfig = getVitepressConfig({
 export default defineConfig({
   ...vpConfig,
 
-  title: 'starter-monorepo',
-  description: 'TypeScript Monorepo Starter with VitePress Documentation',
+  title: 'Flames',
+  description: 'Procedural Three.js flame engine and interactive visual experience',
   locales: {
     root: {
       label: 'English',
@@ -69,7 +69,7 @@ export default defineConfig({
       label: '简体中文',
       lang: 'zh-CN',
       link: '/zh/',
-      description: '基于 TypeScript、内置 VitePress 文档的 Monorepo 起始模板',
+      description: '程序化 Three.js 火焰引擎与交互式异火视觉体验',
       markdown: ZH_MARKDOWN,
       themeConfig: {
         nav: [
@@ -249,7 +249,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/YunYouJun/starter-monorepo' },
+      { icon: 'github', link: 'https://github.com/YunYouJun/flames' },
     ],
 
     footer: {
@@ -261,8 +261,8 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'author', content: 'YunYouJun' }],
-    ['meta', { property: 'og:title', content: 'starter-monorepo' }],
-    ['meta', { property: 'og:description', content: 'TypeScript Monorepo Starter with VitePress Documentation' }],
+    ['meta', { property: 'og:title', content: 'Flames' }],
+    ['meta', { property: 'og:description', content: 'Procedural Three.js flame engine and interactive visual experience' }],
     ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1.0, viewport-fit=cover' }],
   ],
 })
