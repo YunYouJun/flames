@@ -22,7 +22,7 @@
     "docs:preview": "pnpm -C docs run docs:preview",
     "e2e": "playwright test",
     "release": "bumpp -r && pnpm -r publish",
-    "test": "vitest run",
+    "test": "pnpm --filter @yunyoujun/flames-web exec nuxt prepare && vitest run",
     "typecheck": "nr -r typecheck",
     "prepare": "simple-git-hooks"
   },

@@ -58,7 +58,6 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
-      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
       - run: pnpm build
 
   docs:
@@ -127,6 +126,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps --only-shell chromium
+      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
       - uses: actions/download-artifact@v8
         with:
           name: flame-static-site

@@ -28,7 +28,6 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
-      - run: pnpm --filter @yunyoujun/flames-web exec nuxt prepare
       - run: pnpm build
       - run: pnpm docs:build
 
