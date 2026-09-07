@@ -25,10 +25,15 @@ features:
     details: Pointer, hold, and drag input are first-class runtime controls.
 ---
 
-## Install
+## Run locally
 
 ```bash
-pnpm add @yunyoujun/flame-engine three
+git clone https://github.com/YunYouJun/flames.git
+cd flames
+pnpm install
+pnpm dev
 ```
 
-The package is private while the full visual catalog is being developed.
+Use Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` and pnpm `11.21.0`.
+The source code is available under MIT; see the repository's NOTICE for third-party intellectual property boundaries.
+The engine is currently a local workspace package and is not published to npm. Try `examples/basic` for a standalone integration.

@@ -25,10 +25,15 @@ features:
     details: 移动、长按与拖拽直接进入火焰运行时，而非装饰性页面动效。
 ---
 
-## 安装
+## 本地运行
 
 ```bash
-pnpm add @yunyoujun/flame-engine three
+git clone https://github.com/YunYouJun/flames.git
+cd flames
+pnpm install
+pnpm dev
 ```
 
-完整异火目录完成前，包与仓库保持私有。
+需要 Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` 与 pnpm `11.21.0`。
+原创代码采用 MIT 许可证，第三方知识产权边界详见仓库中的 NOTICE。
+引擎目前作为本地 workspace 包使用，尚未发布到 npm；独立接入方式可参考 `examples/basic`。

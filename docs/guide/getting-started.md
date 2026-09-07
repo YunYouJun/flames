@@ -2,8 +2,21 @@
 
 ## Requirements
 
+- Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` and pnpm `11.21.0`
 - A browser with WebGL 2 support
 - Three.js `0.185` or compatible
+
+## Run from source
+
+```bash
+git clone https://github.com/YunYouJun/flames.git
+cd flames
+pnpm install
+pnpm dev
+```
+
+The engine is a local workspace package and is not published to npm yet.
+The example below runs inside this workspace; see `examples/basic` for a complete integration.
 
 ## Create a runtime
 

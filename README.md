@@ -13,9 +13,13 @@
 需要 Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` 与 pnpm `11.21.0`。
 
 ```bash
+git clone https://github.com/YunYouJun/flames.git
+cd flames
 pnpm install
 pnpm dev
 ```
+
+引擎目前作为本地 workspace 包使用，尚未发布到 npm。独立接入方式可参考 `examples/basic`；仓库中的 `private: true` 用于防止误发布 npm 包。
 
 常用命令：
 
@@ -53,6 +57,10 @@ EdgeOne 项目设置使用根目录 `apps/web`、框架预设 `Other`，由 `app
 发布前运行 `pnpm generate`，然后用 `pnpm preview:web` 在 `http://127.0.0.1:3100` 检查正式产物。静态托管应优先匹配生成的页面，未知路径返回 `404.html` 和 HTTP 404，不应重写到首页。
 
 CI 将桌面与移动端的浏览器验收分片运行在静态产物上。可用 `FLAMES_E2E_STATIC=1 pnpm e2e --workers=1` 本地复测；设置 `FLAMES_E2E_SOFTWARE=1` 可显式使用软件 WebGL。软件渲染结果用于功能与像素回归，不代表真机帧率验收。
+
+首次运行浏览器测试前执行 `pnpm exec playwright install chromium`。更新依赖后若 Nuxt 类型文件过期，先执行 `pnpm --filter @yunyoujun/flames-web exec nuxt prepare`。
+
+依赖由维护者主动更新，不启用 Dependabot 自动更新 PR。提交依赖升级时同步更新 `pnpm-workspace.yaml` 与 `pnpm-lock.yaml`，并运行上述质量检查。
 
 ## License
 
