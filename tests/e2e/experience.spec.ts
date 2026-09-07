@@ -374,7 +374,10 @@ test('stops automatic orbit on manual input, reset and pause', async ({ page }) 
   const angle = page.getByRole('slider', { name: '左右环绕角度' })
   await expect(automatic).toHaveAttribute('aria-pressed', 'false')
   await automatic.click()
-  await advanceFlame(page, 300)
+  await expect(automatic).toHaveAttribute('aria-pressed', 'true')
+  // Orbit integrates animation-frame deltas. Tick every frame here: fastForward
+  // skips overdue callbacks, and polling a paused clock cannot advance the angle.
+  await page.clock.runFor(300)
   await expect.poll(async () => Number(await angle.inputValue())).toBeGreaterThan(1)
   await angle.fill('45')
   await expect(automatic).toHaveAttribute('aria-pressed', 'false')
